@@ -28,7 +28,7 @@ const emptyInvoice = (): InvoiceForm => ({
   phone: "",
 });
 
-const InvoiceUpload = ({ onBack }: InvoiceUploadProps) => {
+const InvoiceUpload = ({ onBack, onLogout }: InvoiceUploadProps) => {
   const [invoices, setInvoices] = useState<InvoiceForm[]>([emptyInvoice()]);
   const [sending, setSending] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);

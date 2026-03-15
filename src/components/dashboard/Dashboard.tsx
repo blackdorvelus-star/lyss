@@ -101,6 +101,35 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
     setLoading(false);
   };
 
+  const markRecovered = async (invoiceId: string, amount: number, maxAmount: number) => {
+    if (amount <= 0 || amount > maxAmount) {
+      toast.error(`Le montant doit être entre 1 $ et ${maxAmount} $.`);
+      return;
+    }
+    setSaving(true);
+    const { error } = await supabase
+      .from("invoices")
+      .update({
+        amount_recovered: amount,
+        status: amount >= maxAmount ? "recovered" : "in_progress",
+      })
+      .eq("id", invoiceId);
+
+    if (error) {
+      toast.error("Erreur lors de la mise à jour.");
+    } else {
+      toast.success(
+        amount >= maxAmount
+          ? `${formatMoney(amount)} récupéré ! Facture complétée 🎉`
+          : `${formatMoney(amount)} récupéré sur ${formatMoney(maxAmount)}.`
+      );
+      setRecoveryId(null);
+      setRecoveryAmount("");
+      fetchData();
+    }
+    setSaving(false);
+  };
+
   // Stats
   const totalOwed = invoices.reduce((s, i) => s + i.amount, 0);
   const totalRecovered = invoices.reduce((s, i) => s + (i.amount_recovered || 0), 0);

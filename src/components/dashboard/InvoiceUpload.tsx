@@ -17,6 +17,7 @@ interface InvoiceForm {
 
 interface InvoiceUploadProps {
   onBack: () => void;
+  onLogout?: () => void;
 }
 
 const emptyInvoice = (): InvoiceForm => ({

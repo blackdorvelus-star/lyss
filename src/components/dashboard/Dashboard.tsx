@@ -61,6 +61,9 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
   const [reminders, setReminders] = useState<Record<string, Reminder[]>>({});
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [recoveryId, setRecoveryId] = useState<string | null>(null);
+  const [recoveryAmount, setRecoveryAmount] = useState("");
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     fetchData();

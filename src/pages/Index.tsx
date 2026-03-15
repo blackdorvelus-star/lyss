@@ -7,9 +7,10 @@ import MessagePreview from "@/components/landing/MessagePreview";
 import PricingSection from "@/components/landing/PricingSection";
 import Footer from "@/components/landing/Footer";
 import InvoiceUpload from "@/components/dashboard/InvoiceUpload";
+import Dashboard from "@/components/dashboard/Dashboard";
 import AuthPage from "@/components/auth/AuthPage";
 
-type View = "landing" | "auth" | "upload";
+type View = "landing" | "auth" | "upload" | "dashboard";
 
 const Index = () => {
   const [view, setView] = useState<View>("landing");
@@ -34,14 +35,14 @@ const Index = () => {
 
   const handleStart = () => {
     if (session) {
-      setView("upload");
+      setView("dashboard");
     } else {
       setView("auth");
     }
   };
 
   const handleAuth = () => {
-    setView("upload");
+    setView("dashboard");
   };
 
   const handleLogout = async () => {
@@ -61,13 +62,27 @@ const Index = () => {
     return <AuthPage onAuth={handleAuth} />;
   }
 
+  if (view === "dashboard") {
+    return (
+      <Dashboard
+        onBack={() => setView("landing")}
+        onNewInvoice={() => setView("upload")}
+        onLogout={handleLogout}
+      />
+    );
+  }
+
   if (view === "upload") {
-    return <InvoiceUpload onBack={() => setView("landing")} onLogout={handleLogout} />;
+    return (
+      <InvoiceUpload
+        onBack={() => setView("dashboard")}
+        onLogout={handleLogout}
+      />
+    );
   }
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Nav */}
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border px-5 py-3">
         <div className="max-w-lg mx-auto flex items-center justify-between">
           <span className="font-display font-bold text-primary text-lg">Cash-Flow AI</span>
@@ -84,7 +99,7 @@ const Index = () => {
               onClick={handleStart}
               className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
             >
-              {session ? "Mes factures →" : "Commencer →"}
+              {session ? "Tableau de bord →" : "Commencer →"}
             </button>
           </div>
         </div>

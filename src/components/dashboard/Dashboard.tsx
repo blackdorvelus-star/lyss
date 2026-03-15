@@ -11,9 +11,12 @@ import {
   ChevronDown,
   ChevronUp,
   Loader2,
+  Banknote,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface DashboardProps {
   onBack: () => void;

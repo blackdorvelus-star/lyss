@@ -293,6 +293,58 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                             {inv.due_date && <p><span className="font-medium text-foreground">Échéance :</span> {formatDate(inv.due_date)}</p>}
                           </div>
 
+                          {/* Mark as recovered */}
+                          {inv.status !== "recovered" && (
+                            <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
+                              {recoveryId === inv.id ? (
+                                <div className="space-y-2">
+                                  <p className="text-xs font-medium text-foreground">Montant récupéré ($)</p>
+                                  <div className="flex gap-2">
+                                    <Input
+                                      type="number"
+                                      placeholder={`Max ${inv.amount}`}
+                                      value={recoveryAmount}
+                                      onChange={(e) => setRecoveryAmount(e.target.value)}
+                                      className="bg-card h-9 text-sm"
+                                      max={inv.amount}
+                                      min={1}
+                                      autoFocus
+                                    />
+                                    <Button
+                                      size="sm"
+                                      disabled={saving || !recoveryAmount}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        markRecovered(inv.id, parseFloat(recoveryAmount), inv.amount);
+                                      }}
+                                      className="bg-primary text-primary-foreground h-9 px-4 font-display whitespace-nowrap"
+                                    >
+                                      {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : "Confirmer"}
+                                    </Button>
+                                  </div>
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); setRecoveryId(null); setRecoveryAmount(""); }}
+                                    className="text-xs text-muted-foreground hover:text-foreground"
+                                  >
+                                    Annuler
+                                  </button>
+                                </div>
+                              ) : (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setRecoveryId(inv.id);
+                                    setRecoveryAmount(String(inv.amount));
+                                  }}
+                                  className="flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors w-full"
+                                >
+                                  <Banknote className="w-4 h-4" />
+                                  Marquer comme récupéré
+                                </button>
+                              )}
+                            </div>
+                          )}
+
                           {invReminders.length === 0 ? (
                             <p className="text-xs text-muted-foreground text-center py-3">
                               Aucune relance générée encore.

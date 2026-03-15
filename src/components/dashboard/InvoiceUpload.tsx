@@ -4,8 +4,9 @@ import { Upload, FileText, X, Send, ArrowLeft, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
-interface Invoice {
+interface InvoiceForm {
   id: string;
   file?: File;
   clientName: string;
@@ -18,7 +19,7 @@ interface InvoiceUploadProps {
   onBack: () => void;
 }
 
-const emptyInvoice = (): Invoice => ({
+const emptyInvoice = (): InvoiceForm => ({
   id: crypto.randomUUID(),
   clientName: "",
   amount: "",
@@ -27,14 +28,14 @@ const emptyInvoice = (): Invoice => ({
 });
 
 const InvoiceUpload = ({ onBack }: InvoiceUploadProps) => {
-  const [invoices, setInvoices] = useState<Invoice[]>([emptyInvoice()]);
+  const [invoices, setInvoices] = useState<InvoiceForm[]>([emptyInvoice()]);
   const [sending, setSending] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const [activeIdx, setActiveIdx] = useState(0);
 
   const active = invoices[activeIdx];
 
-  const updateField = (field: keyof Invoice, value: string) => {
+  const updateField = (field: keyof InvoiceForm, value: string) => {
     setInvoices((prev) =>
       prev.map((inv, i) => (i === activeIdx ? { ...inv, [field]: value } : inv))
     );
@@ -61,20 +62,116 @@ const InvoiceUpload = ({ onBack }: InvoiceUploadProps) => {
     setActiveIdx((prev) => Math.min(prev, invoices.length - 2));
   };
 
-  const handleSubmit = () => {
-    if (!active.clientName || !active.amount) {
-      toast.error("Remplis au minimum le nom du client et le montant.");
-      return;
+  const handleSubmit = async () => {
+    // Validate all invoices
+    for (const inv of invoices) {
+      if (!inv.clientName.trim() || !inv.amount.trim()) {
+        toast.error("Remplis au minimum le nom du client et le montant pour chaque facture.");
+        return;
+      }
+      const amount = parseFloat(inv.amount);
+      if (isNaN(amount) || amount <= 0) {
+        toast.error(`Montant invalide pour ${inv.clientName || "une facture"}.`);
+        return;
+      }
     }
+
     setSending(true);
-    setTimeout(() => {
-      setSending(false);
-      toast.success("Facture soumise ! L'IA commence les relances sous 24h.", {
-        description: `${active.clientName} — ${active.amount} $`,
-      });
+
+    try {
+      // Check auth
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error("Tu dois être connecté pour soumettre une facture.");
+        setSending(false);
+        return;
+      }
+
+      for (const inv of invoices) {
+        // 1. Upsert client
+        const { data: existingClients } = await supabase
+          .from("clients")
+          .select("id")
+          .eq("name", inv.clientName.trim())
+          .eq("user_id", user.id)
+          .limit(1);
+
+        let clientId: string;
+
+        if (existingClients && existingClients.length > 0) {
+          clientId = existingClients[0].id;
+          // Update contact info if provided
+          const updates: Record<string, string> = {};
+          if (inv.email.trim()) updates.email = inv.email.trim();
+          if (inv.phone.trim()) updates.phone = inv.phone.trim();
+          if (Object.keys(updates).length > 0) {
+            await supabase.from("clients").update(updates).eq("id", clientId);
+          }
+        } else {
+          const { data: newClient, error: clientError } = await supabase
+            .from("clients")
+            .insert({
+              user_id: user.id,
+              name: inv.clientName.trim(),
+              email: inv.email.trim() || null,
+              phone: inv.phone.trim() || null,
+            })
+            .select("id")
+            .single();
+
+          if (clientError || !newClient) {
+            throw new Error(clientError?.message || "Erreur création client");
+          }
+          clientId = newClient.id;
+        }
+
+        // 2. Upload file if present
+        let fileUrl: string | null = null;
+        if (inv.file) {
+          const ext = inv.file.name.split(".").pop();
+          const filePath = `${user.id}/${crypto.randomUUID()}.${ext}`;
+          const { error: uploadError } = await supabase.storage
+            .from("invoices")
+            .upload(filePath, inv.file);
+
+          if (uploadError) {
+            console.error("Upload error:", uploadError);
+          } else {
+            const { data: urlData } = supabase.storage
+              .from("invoices")
+              .getPublicUrl(filePath);
+            fileUrl = urlData.publicUrl;
+          }
+        }
+
+        // 3. Create invoice
+        const { error: invoiceError } = await supabase.from("invoices").insert({
+          user_id: user.id,
+          client_id: clientId,
+          amount: parseFloat(inv.amount),
+          file_url: fileUrl,
+          status: "pending",
+        });
+
+        if (invoiceError) {
+          throw new Error(invoiceError.message);
+        }
+      }
+
+      toast.success(
+        invoices.length === 1
+          ? "Facture soumise ! L'IA commence les relances sous 24h."
+          : `${invoices.length} factures soumises ! Relances en cours.`,
+        { description: invoices.map((i) => `${i.clientName} — ${i.amount} $`).join(", ") }
+      );
       setInvoices([emptyInvoice()]);
       setActiveIdx(0);
-    }, 1500);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Erreur inconnue";
+      toast.error(`Erreur : ${message}`);
+    } finally {
+      setSending(false);
+    }
   };
 
   return (

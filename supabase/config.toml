@@ -1,1 +1,4 @@
 project_id = "jpulnascpktoteamjspw"
+
+[functions.generate-reminder]
+verify_jwt = false

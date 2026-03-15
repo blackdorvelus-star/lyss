@@ -145,16 +145,45 @@ const InvoiceUpload = ({ onBack }: InvoiceUploadProps) => {
         }
 
         // 3. Create invoice
-        const { error: invoiceError } = await supabase.from("invoices").insert({
-          user_id: user.id,
-          client_id: clientId,
-          amount: parseFloat(inv.amount),
-          file_url: fileUrl,
-          status: "pending",
-        });
+        const { data: newInvoice, error: invoiceError } = await supabase
+          .from("invoices")
+          .insert({
+            user_id: user.id,
+            client_id: clientId,
+            amount: parseFloat(inv.amount),
+            file_url: fileUrl,
+            status: "pending",
+          })
+          .select("id")
+          .single();
 
-        if (invoiceError) {
-          throw new Error(invoiceError.message);
+        if (invoiceError || !newInvoice) {
+          throw new Error(invoiceError?.message || "Erreur création facture");
+        }
+
+        // 4. Generate AI reminder
+        try {
+          const { data: session } = await supabase.auth.getSession();
+          const token = session?.session?.access_token;
+          const res = await fetch(
+            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-reminder`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+                apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+              },
+              body: JSON.stringify({ invoice_id: newInvoice.id }),
+            }
+          );
+          if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            console.warn("Reminder generation issue:", errData);
+          }
+        } catch (reminderErr) {
+          // Non-blocking — invoice is saved, reminder gen is best-effort
+          console.warn("Could not generate reminder:", reminderErr);
         }
       }
 

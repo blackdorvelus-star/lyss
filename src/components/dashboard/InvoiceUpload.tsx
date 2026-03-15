@@ -213,7 +213,14 @@ const InvoiceUpload = ({ onBack, onLogout }: InvoiceUploadProps) => {
             <ArrowLeft className="w-4 h-4" />
             Retour
           </button>
-          <span className="font-display font-bold text-primary text-sm">Cash-Flow AI</span>
+          <div className="flex items-center gap-3">
+            {onLogout && (
+              <button onClick={onLogout} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+                Déconnexion
+              </button>
+            )}
+            <span className="font-display font-bold text-primary text-sm">Cash-Flow AI</span>
+          </div>
         </div>
       </header>
 

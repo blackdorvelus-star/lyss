@@ -135,6 +135,80 @@ export type Database = {
           },
         ]
       }
+      payment_settings: {
+        Row: {
+          company_logo_url: string | null
+          company_name: string | null
+          created_at: string
+          id: string
+          interac_answer: string | null
+          interac_email: string | null
+          interac_question: string | null
+          stripe_link: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company_logo_url?: string | null
+          company_name?: string | null
+          created_at?: string
+          id?: string
+          interac_answer?: string | null
+          interac_email?: string | null
+          interac_question?: string | null
+          stripe_link?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company_logo_url?: string | null
+          company_name?: string | null
+          created_at?: string
+          id?: string
+          interac_answer?: string | null
+          interac_email?: string | null
+          interac_question?: string | null
+          stripe_link?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      payment_tokens: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          invoice_id: string
+          token: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          invoice_id: string
+          token?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          invoice_id?: string
+          token?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_tokens_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reminders: {
         Row: {
           channel: string

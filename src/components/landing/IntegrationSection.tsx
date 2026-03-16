@@ -17,8 +17,8 @@ const methods = [
   {
     icon: Code,
     title: "API comptable",
-    description: "Connecte QuickBooks, FreshBooks, Sage ou Wave pour synchroniser automatiquement tes factures en temps réel.",
-    status: "coming" as const,
+    description: "Connecte QuickBooks ou Sage Business Cloud pour synchroniser automatiquement tes factures impayées.",
+    status: "available" as const,
   },
   {
     icon: Link2,

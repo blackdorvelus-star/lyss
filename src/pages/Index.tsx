@@ -109,7 +109,7 @@ const Index = () => {
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <img src="/logo-lyss.png" alt="Lyss" className="h-9 object-contain" />
 
-          {/* Nav links */}
+          {/* Desktop nav */}
           <nav className="hidden sm:flex items-center gap-6">
             <a href="#how-it-works" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Comment ça marche
@@ -129,7 +129,7 @@ const Index = () => {
             {session && (
               <button
                 onClick={handleLogout}
-                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                className="hidden sm:inline text-xs text-muted-foreground hover:text-foreground transition-colors"
               >
                 Déconnexion
               </button>
@@ -140,8 +140,45 @@ const Index = () => {
             >
               {session ? "Tableau de bord →" : "Connexion →"}
             </button>
+
+            {/* Mobile hamburger */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="sm:hidden flex flex-col gap-1.5 p-1.5"
+              aria-label="Menu"
+            >
+              <span className={`block w-5 h-0.5 bg-foreground transition-transform ${mobileMenuOpen ? "rotate-45 translate-y-2" : ""}`} />
+              <span className={`block w-5 h-0.5 bg-foreground transition-opacity ${mobileMenuOpen ? "opacity-0" : ""}`} />
+              <span className={`block w-5 h-0.5 bg-foreground transition-transform ${mobileMenuOpen ? "-rotate-45 -translate-y-2" : ""}`} />
+            </button>
           </div>
         </div>
+
+        {/* Mobile menu */}
+        {mobileMenuOpen && (
+          <nav className="sm:hidden mt-3 pb-2 border-t border-border pt-3 flex flex-col gap-3">
+            <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              Comment ça marche
+            </a>
+            <a href="#integrations" onClick={() => setMobileMenuOpen(false)} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              Intégrations
+            </a>
+            <a href="#pricing" onClick={() => setMobileMenuOpen(false)} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              Tarifs
+            </a>
+            <a href="#faq" onClick={() => setMobileMenuOpen(false)} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              FAQ
+            </a>
+            {session && (
+              <button
+                onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors text-left"
+              >
+                Déconnexion
+              </button>
+            )}
+          </nav>
+        )}
       </header>
 
       <HeroSection onStart={handleStart} />

@@ -106,8 +106,25 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border px-5 py-3">
-        <div className="max-w-2xl mx-auto flex items-center justify-between">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
           <img src="/logo-lyss.png" alt="Lyss" className="h-9 object-contain" />
+
+          {/* Nav links */}
+          <nav className="hidden sm:flex items-center gap-6">
+            <a href="#how-it-works" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              Comment ça marche
+            </a>
+            <a href="#integrations" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              Intégrations
+            </a>
+            <a href="#pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              Tarifs
+            </a>
+            <a href="#faq" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              FAQ
+            </a>
+          </nav>
+
           <div className="flex items-center gap-3">
             {session && (
               <button
@@ -119,20 +136,20 @@ const Index = () => {
             )}
             <button
               onClick={handleStart}
-              className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+              className="text-sm font-medium bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors font-display"
             >
-              {session ? "Tableau de bord →" : "Commencer →"}
+              {session ? "Tableau de bord →" : "Connexion →"}
             </button>
           </div>
         </div>
       </header>
 
       <HeroSection onStart={handleStart} />
-      <HowItWorks />
+      <div id="how-it-works"><HowItWorks /></div>
       <MessagePreview />
-      <IntegrationSection />
-      <PricingSection />
-      <FAQSection />
+      <div id="integrations"><IntegrationSection /></div>
+      <div id="pricing"><PricingSection /></div>
+      <div id="faq"><FAQSection /></div>
       <Footer />
     </div>
   );

@@ -152,7 +152,8 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
             <ArrowLeft className="w-4 h-4" />
             Accueil
           </button>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <NotificationBell />
             {onLogout && (
               <button onClick={onLogout} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
                 Déconnexion

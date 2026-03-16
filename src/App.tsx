@@ -8,6 +8,8 @@ import PayerPortal from "./pages/PayerPortal.tsx";
 import ClientWidget from "./pages/ClientWidget.tsx";
 import AdminPage from "./pages/AdminPage.tsx";
 import TarifsPage from "./pages/TarifsPage.tsx";
+import PrivacyPage from "./pages/PrivacyPage.tsx";
+import TermsPage from "./pages/TermsPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();

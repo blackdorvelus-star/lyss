@@ -58,7 +58,7 @@ const AuthPage = ({ onAuth }: AuthPageProps) => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <header className="px-5 py-4">
-        <img src="/logo-lyss.png" alt="Lyss" className="h-14 brightness-150 -my-3" />
+        <img src="/logo-lyss.png" alt="Lyss" className="h-14 brightness-200 contrast-125 drop-shadow-[0_0_8px_hsl(160,30%,46%,0.3)] -my-3" />
       </header>
 
       <div className="flex-1 flex items-center justify-center px-5 pb-12">

@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import logoLyss from "@/assets/logo-lyss.png";
 import { motion, AnimatePresence } from "framer-motion";
 import { Upload, FileText, X, Send, ArrowLeft, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -210,7 +211,7 @@ const InvoiceUpload = ({ onBack, onLogout }: InvoiceUploadProps) => {
                 Déconnexion
               </button>
             )}
-            <img src="/logo-lyss.png" alt="Lyss" className="h-16 brightness-200 contrast-150 drop-shadow-[0_0_12px_hsl(160,30%,46%,0.5)] -my-3" />
+            <img src={logoLyss} alt="Lyss" className="h-10 object-contain" />
           </div>
         </div>
       </header>

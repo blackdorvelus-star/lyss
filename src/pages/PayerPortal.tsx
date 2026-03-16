@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import logoLyss from "@/assets/logo-lyss.png";
 import { useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -433,7 +434,7 @@ const PayerPortal = () => {
       {/* Footer */}
       <footer className="border-t border-border px-5 py-5 mt-8">
         <div className="max-w-lg mx-auto flex flex-col items-center gap-2">
-          <img src="/logo-lyss.png" alt="Lyss" className="h-12 brightness-200 contrast-150 drop-shadow-[0_0_12px_hsl(160,30%,46%,0.5)] opacity-70" />
+          <img src={logoLyss} alt="Lyss" className="h-8 object-contain opacity-70" />
           <p className="text-xs text-muted-foreground">
             Portail sécurisé propulsé par Lyss · Adjointe administrative IA
           </p>

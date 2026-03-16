@@ -373,7 +373,12 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
           ) : activeSection === "clients" ? (
             <PlaceholderSection title="Relations clients" desc="Les sondages de satisfaction et le suivi de la relation client arrivent bientôt." />
           ) : activeSection === "settings" ? (
-            <AssistantIdentity />
+            <div className="max-w-2xl space-y-10">
+              <AssistantIdentity />
+              <div className="border-t border-border pt-8">
+                <PaymentSettings />
+              </div>
+            </div>
           ) : (
             <PlaceholderSection title="Gestion d'agenda" desc="La prise de rendez-vous et les confirmations automatiques arrivent bientôt." />
           )}

@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import CsvImport from "./CsvImport";
 import QuickBooksConnect from "./QuickBooksConnect";
-import FreshBooksConnect from "./FreshBooksConnect";
+import SageConnect from "./SageConnect";
 
 interface InvoiceForm {
   id: string;

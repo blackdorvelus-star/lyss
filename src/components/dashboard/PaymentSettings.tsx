@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Banknote, CreditCard, Building2, Save, Loader2, Link2, ShieldAlert } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 

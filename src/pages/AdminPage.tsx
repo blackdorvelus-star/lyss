@@ -3,10 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   Users, FileText, DollarSign, TrendingUp, Shield, Loader2,
-  ArrowLeft, Crown, BarChart3, UserCheck
+  ArrowLeft, Crown, BarChart3, UserCheck, Sparkles, ChevronDown
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAdmin } from "@/hooks/useAdmin";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -20,6 +21,7 @@ interface AdminStats {
   pendingCount: number;
   recoveredCount: number;
   recoveryRate: number;
+  planCounts: { free: number; solo: number; pro: number; enterprise: number };
 }
 
 interface AdminUser {
@@ -28,7 +30,16 @@ interface AdminUser {
   created_at: string;
   last_sign_in_at: string | null;
   roles: string[];
+  plan: string;
+  max_dossiers: number;
 }
+
+const PLAN_OPTIONS = [
+  { value: "free", label: "Gratuit", maxDossiers: 1, color: "text-muted-foreground" },
+  { value: "solo", label: "Solo", maxDossiers: 3, color: "text-accent" },
+  { value: "pro", label: "Pro", maxDossiers: 10, color: "text-primary" },
+  { value: "enterprise", label: "Entreprise", maxDossiers: 9999, color: "text-primary" },
+];
 
 const AdminPage = () => {
   const { isAdmin, loading: adminLoading } = useAdmin();
@@ -36,32 +47,33 @@ const AdminPage = () => {
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
+  const [updatingPlan, setUpdatingPlan] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!adminLoading && !isAdmin) {
-      navigate("/");
-    }
+    if (!adminLoading && !isAdmin) navigate("/");
   }, [adminLoading, isAdmin, navigate]);
 
   useEffect(() => {
     if (isAdmin) fetchData();
   }, [isAdmin]);
 
+  const getAuthHeaders = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) throw new Error("Non connecté");
+    return {
+      Authorization: `Bearer ${session.access_token}`,
+      apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+      "Content-Type": "application/json",
+    };
+  };
+
   const fetchData = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
-
+      const headers = await getAuthHeaders();
       const res = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-stats`,
-        {
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-          },
-        }
+        { headers }
       );
-
       if (!res.ok) throw new Error("Accès refusé");
       const data = await res.json();
       setStats(data.stats);
@@ -70,6 +82,36 @@ const AdminPage = () => {
       toast.error(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const updateUserPlan = async (userId: string, plan: string) => {
+    setUpdatingPlan(userId);
+    try {
+      const planOption = PLAN_OPTIONS.find(p => p.value === plan);
+      const headers = await getAuthHeaders();
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-stats`,
+        {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
+            action: "update_plan",
+            userId,
+            plan,
+            maxDossiers: planOption?.maxDossiers || 1,
+          }),
+        }
+      );
+      if (!res.ok) throw new Error("Erreur de mise à jour");
+      toast.success(`Plan mis à jour → ${planOption?.label}`);
+      setUsers(prev => prev.map(u =>
+        u.id === userId ? { ...u, plan, max_dossiers: planOption?.maxDossiers || 1 } : u
+      ));
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setUpdatingPlan(null);
     }
   };
 
@@ -131,6 +173,21 @@ const AdminPage = () => {
           </div>
         </div>
 
+        {/* Plan distribution */}
+        <div>
+          <h2 className="font-display font-bold text-lg mb-4">Distribution des plans</h2>
+          <div className="grid grid-cols-4 gap-3">
+            {PLAN_OPTIONS.map((p) => (
+              <div key={p.value} className="bg-card border border-border rounded-xl p-4 text-center">
+                <p className={`text-2xl font-display font-bold ${p.color}`}>
+                  {stats?.planCounts?.[p.value as keyof typeof stats.planCounts] || 0}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">{p.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Pending vs Recovered */}
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-accent/10 border border-accent/20 rounded-xl p-4 text-center">
@@ -143,7 +200,7 @@ const AdminPage = () => {
           </div>
         </div>
 
-        {/* Users table */}
+        {/* Users table with plan management */}
         <div>
           <h2 className="font-display font-bold text-lg mb-4">
             Utilisateurs ({users.length})
@@ -157,6 +214,8 @@ const AdminPage = () => {
                     <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Inscrit le</th>
                     <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Dernière connexion</th>
                     <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Rôles</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Plan</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">Dossiers max</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -167,9 +226,7 @@ const AdminPage = () => {
                         {new Date(u.created_at).toLocaleDateString("fr-CA")}
                       </td>
                       <td className="px-4 py-3 text-muted-foreground">
-                        {u.last_sign_in_at
-                          ? new Date(u.last_sign_in_at).toLocaleDateString("fr-CA")
-                          : "—"}
+                        {u.last_sign_in_at ? new Date(u.last_sign_in_at).toLocaleDateString("fr-CA") : "—"}
                       </td>
                       <td className="px-4 py-3">
                         {u.roles.length > 0 ? (
@@ -189,6 +246,30 @@ const AdminPage = () => {
                         ) : (
                           <span className="text-muted-foreground text-xs">utilisateur</span>
                         )}
+                      </td>
+                      <td className="px-4 py-3">
+                        <Select
+                          value={u.plan}
+                          onValueChange={(value) => updateUserPlan(u.id, value)}
+                          disabled={updatingPlan === u.id}
+                        >
+                          <SelectTrigger className="w-32 h-8 text-xs bg-secondary border-border">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {PLAN_OPTIONS.map((p) => (
+                              <SelectItem key={p.value} value={p.value}>
+                                <span className="flex items-center gap-1.5">
+                                  {p.value === "enterprise" && <Sparkles className="w-3 h-3" />}
+                                  {p.label}
+                                </span>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </td>
+                      <td className="px-4 py-3 text-muted-foreground text-xs">
+                        {u.max_dossiers === 9999 ? "∞" : u.max_dossiers}
                       </td>
                     </tr>
                   ))}

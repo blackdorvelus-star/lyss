@@ -8,7 +8,7 @@ const corsHeaders = {
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
@@ -33,36 +33,72 @@ serve(async (req) => {
 
     if (!roleData) throw new Error("Accès refusé — admin requis");
 
-    // Fetch global stats
+    // Handle POST for plan updates
+    if (req.method === "POST") {
+      const { action, userId, plan, maxDossiers } = await req.json();
+
+      if (action === "update_plan") {
+        const { error } = await supabase
+          .from("subscriptions")
+          .upsert({
+            user_id: userId,
+            plan,
+            max_dossiers: maxDossiers,
+          }, { onConflict: "user_id" });
+
+        if (error) throw new Error(error.message);
+        return new Response(JSON.stringify({ success: true }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      throw new Error("Action inconnue");
+    }
+
+    // GET: Fetch global stats
     const [
       { count: totalUsers },
       { count: totalClients },
       { count: totalInvoices },
       { data: invoiceStats },
       { data: recentUsers },
+      { data: allSubs },
     ] = await Promise.all([
       supabase.from("payment_settings").select("*", { count: "exact", head: true }),
       supabase.from("clients").select("*", { count: "exact", head: true }),
       supabase.from("invoices").select("*", { count: "exact", head: true }),
       supabase.from("invoices").select("amount, status, amount_recovered"),
       supabase.auth.admin.listUsers({ perPage: 50, page: 1 }),
+      supabase.from("subscriptions").select("user_id, plan, max_dossiers"),
     ]);
 
-    const totalAmount = invoiceStats?.reduce((sum, i) => sum + Number(i.amount), 0) || 0;
-    const totalRecovered = invoiceStats?.reduce((sum, i) => sum + Number(i.amount_recovered || 0), 0) || 0;
-    const pendingCount = invoiceStats?.filter(i => i.status === "pending").length || 0;
-    const recoveredCount = invoiceStats?.filter(i => i.status === "recovered").length || 0;
+    const totalAmount = invoiceStats?.reduce((sum: number, i: any) => sum + Number(i.amount), 0) || 0;
+    const totalRecovered = invoiceStats?.reduce((sum: number, i: any) => sum + Number(i.amount_recovered || 0), 0) || 0;
+    const pendingCount = invoiceStats?.filter((i: any) => i.status === "pending").length || 0;
+    const recoveredCount = invoiceStats?.filter((i: any) => i.status === "recovered").length || 0;
 
-    // Get user roles
     const { data: allRoles } = await supabase.from("user_roles").select("user_id, role");
 
-    const users = (recentUsers?.users || []).map(u => ({
-      id: u.id,
-      email: u.email,
-      created_at: u.created_at,
-      last_sign_in_at: u.last_sign_in_at,
-      roles: allRoles?.filter(r => r.user_id === u.id).map(r => r.role) || [],
-    }));
+    const users = (recentUsers?.users || []).map((u: any) => {
+      const sub = allSubs?.find((s: any) => s.user_id === u.id);
+      return {
+        id: u.id,
+        email: u.email,
+        created_at: u.created_at,
+        last_sign_in_at: u.last_sign_in_at,
+        roles: allRoles?.filter((r: any) => r.user_id === u.id).map((r: any) => r.role) || [],
+        plan: sub?.plan || "free",
+        max_dossiers: sub?.max_dossiers || 1,
+      };
+    });
+
+    // Plan distribution
+    const planCounts = { free: 0, solo: 0, pro: 0, enterprise: 0 };
+    users.forEach((u: any) => {
+      if (planCounts[u.plan as keyof typeof planCounts] !== undefined) {
+        planCounts[u.plan as keyof typeof planCounts]++;
+      }
+    });
 
     return new Response(JSON.stringify({
       stats: {
@@ -74,12 +110,13 @@ serve(async (req) => {
         pendingCount,
         recoveredCount,
         recoveryRate: totalAmount > 0 ? Math.round((totalRecovered / totalAmount) * 100) : 0,
+        planCounts,
       },
       users,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
-  } catch (err) {
+  } catch (err: any) {
     return new Response(JSON.stringify({ error: err.message }), {
       status: 403,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

@@ -34,11 +34,11 @@ const QuickBooksConnect = () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    const { data } = await supabase
+    const { data } = await (supabase
       .from("quickbooks_connections" as any)
       .select("id, realm_id, company_name, updated_at")
       .eq("user_id", user.id)
-      .single();
+      .single() as any);
 
     setConnection(data as QBConnection | null);
     setLoading(false);

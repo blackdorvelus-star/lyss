@@ -111,10 +111,10 @@ const QuickBooksConnect = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      await supabase
+      await (supabase
         .from("quickbooks_connections" as any)
         .delete()
-        .eq("user_id", user.id);
+        .eq("user_id", user.id) as any);
 
       setConnection(null);
       toast.success("QuickBooks déconnecté.");

@@ -67,7 +67,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
   const [recoveryId, setRecoveryId] = useState<string | null>(null);
   const [recoveryAmount, setRecoveryAmount] = useState("");
   const [saving, setSaving] = useState(false);
-  const [activeSection, setActiveSection] = useState<"clients" | "billing" | "calendar">("billing");
+  const [activeSection, setActiveSection] = useState<Section>("billing");
   const [personality, setPersonality] = useState<Personality>("chaleureuse");
 
   useEffect(() => { fetchData(); }, []);

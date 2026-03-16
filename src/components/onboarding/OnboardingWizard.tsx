@@ -24,6 +24,7 @@ const OnboardingWizard = ({ onComplete }: OnboardingWizardProps) => {
   // Step 1: Company
   const [companyName, setCompanyName] = useState("");
   const [interacEmail, setInteracEmail] = useState("");
+  const [stripeLink, setStripeLink] = useState("");
 
   // Step 2: First client
   const [clientName, setClientName] = useState("");

@@ -72,8 +72,8 @@ const PricingSection = () => {
 
   const getLyssCost = () => {
     if (invoiceCount <= 3) return 49;
-    if (invoiceCount <= 10) return 149 + Math.max(0, invoiceCount - 10) * 15;
-    return 149 + (invoiceCount - 10) * 15;
+    if (invoiceCount <= 10) return 149;
+    return 149 + (invoiceCount - 10) * 20;
   };
   const lyssMonthlyCost = getLyssCost();
   const savings = humanMonthlyCost - lyssMonthlyCost;

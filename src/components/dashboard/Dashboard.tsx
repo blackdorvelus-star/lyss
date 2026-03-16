@@ -244,6 +244,15 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                 <ActivityHistory items={activityItems} />
               </div>
 
+              {/* Call History */}
+              <CallHistory
+                calls={callLogs}
+                getClientName={(invoiceId) => {
+                  const inv = invoices.find((i) => i.id === invoiceId);
+                  return inv?.clients?.name || "Client";
+                }}
+              />
+
               {/* Personality selector */}
               <PersonalitySelector value={personality} onChange={setPersonality} />
 

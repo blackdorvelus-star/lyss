@@ -11,6 +11,7 @@ import {
   Loader2,
   Banknote,
   Sparkles,
+  Phone,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +26,8 @@ import PersonalitySelector, { type Personality } from "./PersonalitySelector";
 import WeeklyProductivity from "./WeeklyProductivity";
 import AssistantIdentity from "./AssistantIdentity";
 import PaymentSettings from "./PaymentSettings";
+import VapiCallButton from "./VapiCallButton";
+import CallHistory, { type CallLog } from "./CallHistory";
 
 interface DashboardProps {
   onBack: () => void;
@@ -63,6 +66,8 @@ const statusConfig: Record<string, { label: string; icon: typeof Clock; color: s
 const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
   const [invoices, setInvoices] = useState<InvoiceWithClient[]>([]);
   const [reminders, setReminders] = useState<Record<string, Reminder[]>>({});
+  const [callLogs, setCallLogs] = useState<CallLog[]>([]);
+  const [vapiPublicKey, setVapiPublicKey] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [recoveryId, setRecoveryId] = useState<string | null>(null);
@@ -99,6 +104,25 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
         }
       }
     }
+
+    // Fetch call logs
+    const { data: calls } = await supabase
+      .from("call_logs" as any)
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (calls) setCallLogs(calls as any as CallLog[]);
+
+    // Fetch vapi public key
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data: settings } = await supabase
+        .from("payment_settings")
+        .select("*")
+        .eq("user_id", user.id)
+        .single();
+      if (settings) setVapiPublicKey((settings as any).vapi_public_key || null);
+    }
+
     setLoading(false);
   };
 
@@ -220,6 +244,15 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                 <ActivityHistory items={activityItems} />
               </div>
 
+              {/* Call History */}
+              <CallHistory
+                calls={callLogs}
+                getClientName={(invoiceId) => {
+                  const inv = invoices.find((i) => i.id === invoiceId);
+                  return inv?.clients?.name || "Client";
+                }}
+              />
+
               {/* Personality selector */}
               <PersonalitySelector value={personality} onChange={setPersonality} />
 
@@ -315,6 +348,21 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                                   {inv.clients.phone && <p><span className="font-medium text-foreground">Tél :</span> {inv.clients.phone}</p>}
                                   {inv.due_date && <p><span className="font-medium text-foreground">Échéance :</span> {formatDate(inv.due_date)}</p>}
                                 </div>
+
+                                {/* Vapi Call Button */}
+                                {inv.status !== "recovered" && inv.clients.phone && (
+                                  <div className="pt-1">
+                                    <VapiCallButton
+                                      invoiceId={inv.id}
+                                      clientName={inv.clients.name}
+                                      clientPhone={inv.clients.phone}
+                                      amount={inv.amount}
+                                      invoiceNumber={inv.invoice_number}
+                                      vapiPublicKey={vapiPublicKey}
+                                      onCallEnd={fetchData}
+                                    />
+                                  </div>
+                                )}
 
                                 {inv.status !== "recovered" && (
                                   <div className="bg-primary/5 border border-primary/15 rounded-lg p-3">

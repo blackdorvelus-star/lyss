@@ -53,7 +53,8 @@ const PaymentSettings = () => {
       interac_answer: interacAnswer || null,
       stripe_link: stripeLink || null,
       company_name: companyName || null,
-    };
+      vapi_public_key: vapiPublicKey || null,
+    } as any;
 
     const { error } = await supabase
       .from("payment_settings")

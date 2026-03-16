@@ -110,6 +110,7 @@ const Index = () => {
       <HeroSection onStart={handleStart} />
       <HowItWorks />
       <MessagePreview />
+      <IntegrationSection />
       <PricingSection />
       <FAQSection />
       <Footer />

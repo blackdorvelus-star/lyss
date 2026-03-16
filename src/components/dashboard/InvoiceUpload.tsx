@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import CsvImport from "./CsvImport";
+import QuickBooksConnect from "./QuickBooksConnect";
 
 interface InvoiceForm {
   id: string;

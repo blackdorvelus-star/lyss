@@ -134,6 +134,23 @@ const VapiAssistantConfig = ({ onConfigChange }: VapiAssistantConfigProps) => {
         </p>
       </div>
 
+      {/* Vapi Public Key */}
+      <div className="bg-card border border-border rounded-xl p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <Key className="w-4 h-4 text-primary" />
+          <h4 className="font-medium text-sm">Clé publique Vapi</h4>
+        </div>
+        <Input
+          value={vapiPublicKey}
+          onChange={(e) => setVapiPublicKey(e.target.value)}
+          placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+          className="bg-secondary font-mono text-xs"
+        />
+        <p className="text-xs text-muted-foreground">
+          Disponible dans ton tableau de bord Vapi → Settings → Public Key.
+        </p>
+      </div>
+
       {/* Voice selection */}
       <div className="bg-card border border-border rounded-xl p-4 space-y-3">
         <div className="flex items-center gap-2">

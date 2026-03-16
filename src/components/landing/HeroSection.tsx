@@ -59,7 +59,7 @@ const HeroSection = ({ onStart }: HeroSectionProps) => {
           transition={{ delay: 0.7 }}
           className="mt-8 text-sm text-muted-foreground"
         >
-          3 tâches gratuites · 20 $/facture traitée · Aucun abonnement
+          3 crédits offerts · À partir de 49 $/mois · Annulation en tout temps
         </motion.p>
       </motion.div>
     </section>

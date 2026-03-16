@@ -24,6 +24,7 @@ const OnboardingWizard = ({ onComplete }: OnboardingWizardProps) => {
   // Step 1: Company
   const [companyName, setCompanyName] = useState("");
   const [interacEmail, setInteracEmail] = useState("");
+  const [stripeLink, setStripeLink] = useState("");
 
   // Step 2: First client
   const [clientName, setClientName] = useState("");
@@ -64,6 +65,7 @@ const OnboardingWizard = ({ onComplete }: OnboardingWizardProps) => {
         user_id: user.id,
         company_name: companyName.trim(),
         interac_email: interacEmail.trim() || null,
+        stripe_link: stripeLink.trim() || null,
         assistant_name: assistantName.trim(),
         assistant_role: assistantRole.trim(),
         onboarding_completed: true,
@@ -175,6 +177,15 @@ const OnboardingWizard = ({ onComplete }: OnboardingWizardProps) => {
                     autoFocus
                   />
                 </div>
+
+                <div className="bg-primary/5 border border-primary/20 rounded-xl p-3">
+                  <p className="text-xs text-muted-foreground">
+                    <span className="font-medium text-foreground">💡 Pourquoi ces infos ?</span> Lyss ne traite aucun paiement. 
+                    Elle indique simplement à tes clients <span className="font-medium text-foreground">comment te payer directement</span>. 
+                    Tu peux configurer ça plus tard dans les réglages.
+                  </p>
+                </div>
+
                 <div>
                   <label className="text-sm font-medium mb-1.5 block">Courriel Interac (optionnel)</label>
                   <Input
@@ -184,7 +195,20 @@ const OnboardingWizard = ({ onComplete }: OnboardingWizardProps) => {
                     className="bg-card"
                   />
                   <p className="text-xs text-muted-foreground mt-1">
-                    Pour recevoir les paiements directement de tes clients.
+                    Lyss pourra dire à tes clients d'envoyer un virement à cette adresse.
+                  </p>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium mb-1.5 block">Lien Stripe (optionnel)</label>
+                  <Input
+                    value={stripeLink}
+                    onChange={(e) => setStripeLink(e.target.value)}
+                    placeholder="https://buy.stripe.com/..."
+                    className="bg-card"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Pour offrir le paiement par carte de crédit via ton compte Stripe.
                   </p>
                 </div>
               </>

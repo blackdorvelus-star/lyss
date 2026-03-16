@@ -13,6 +13,7 @@ const PaymentSettings = () => {
   const [interacAnswer, setInteracAnswer] = useState("");
   const [stripeLink, setStripeLink] = useState("");
   const [companyName, setCompanyName] = useState("");
+  const [allowDisputes, setAllowDisputes] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 

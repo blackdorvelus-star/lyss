@@ -29,6 +29,7 @@ import PaymentSettings from "./PaymentSettings";
 import VapiCallButton from "./VapiCallButton";
 import CallHistory, { type CallLog } from "./CallHistory";
 import VapiAssistantConfig from "./VapiAssistantConfig";
+import ClientManagement from "./ClientManagement";
 
 interface DashboardProps {
   onBack: () => void;

@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import * as XLSX from "xlsx";
 import { Upload, FileSpreadsheet, AlertCircle, CheckCircle2, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -103,38 +104,58 @@ const CsvImport = ({ onComplete }: CsvImportProps) => {
   const [fileName, setFileName] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
 
+  const processData = (h: string[], r: string[][], name: string) => {
+    if (h.length === 0) {
+      toast.error("Fichier vide ou format invalide.");
+      return;
+    }
+    setHeaders(h);
+    setRawRows(r);
+    const detected = autoDetect(h);
+    setMapping((prev) => ({ ...prev, ...detected }));
+    setStep("mapping");
+    toast.success(`${r.length} lignes détectées dans ${name}`);
+  };
+
   const handleFile = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!file.name.match(/\.(csv|txt)$/i)) {
-      toast.error("Format non supporté. Utilise un fichier .csv");
+    const isExcel = file.name.match(/\.(xlsx|xls)$/i);
+    const isCsv = file.name.match(/\.(csv|txt)$/i);
+
+    if (!isExcel && !isCsv) {
+      toast.error("Format non supporté. Utilise un fichier .csv ou .xlsx");
       return;
     }
 
     setFileName(file.name);
 
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const text = ev.target?.result as string;
-      const { headers: h, rows: r } = parseCSV(text);
-
-      if (h.length === 0) {
-        toast.error("Fichier vide ou format invalide.");
-        return;
-      }
-
-      setHeaders(h);
-      setRawRows(r);
-
-      // Auto-detect mapping
-      const detected = autoDetect(h);
-      setMapping((prev) => ({ ...prev, ...detected }));
-
-      setStep("mapping");
-      toast.success(`${r.length} lignes détectées dans ${file.name}`);
-    };
-    reader.readAsText(file);
+    if (isExcel) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const data = new Uint8Array(ev.target?.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: "array" });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const json: string[][] = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+        if (json.length < 2) {
+          toast.error("Fichier vide ou format invalide.");
+          return;
+        }
+        const h = json[0].map((cell) => String(cell).trim());
+        const r = json.slice(1).map((row) => row.map((cell) => String(cell).trim()));
+        processData(h, r, file.name);
+      };
+      reader.readAsArrayBuffer(file);
+    } else {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const text = ev.target?.result as string;
+        const { headers: h, rows: r } = parseCSV(text);
+        processData(h, r, file.name);
+      };
+      reader.readAsText(file);
+    }
   }, []);
 
   const applyMapping = () => {
@@ -289,12 +310,12 @@ const CsvImport = ({ onComplete }: CsvImportProps) => {
               onClick={() => fileRef.current?.click()}
               className="border-2 border-dashed border-border rounded-xl p-8 text-center cursor-pointer hover:border-primary/40 transition-colors"
             >
-              <input ref={fileRef} type="file" accept=".csv,.txt" onChange={handleFile} className="hidden" />
+              <input ref={fileRef} type="file" accept=".csv,.txt,.xlsx,.xls" onChange={handleFile} className="hidden" />
               <FileSpreadsheet className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-              <p className="text-sm font-medium">Glisse ton fichier CSV ici</p>
+              <p className="text-sm font-medium">Glisse ton fichier CSV ou Excel ici</p>
               <p className="text-xs text-muted-foreground mt-1">ou clique pour sélectionner</p>
               <p className="text-xs text-muted-foreground mt-3">
-                Colonnes attendues : Nom du client, Montant, Courriel, Téléphone, # Facture, Date d'échéance
+                Formats acceptés : .csv, .xlsx, .xls
               </p>
             </div>
           </motion.div>

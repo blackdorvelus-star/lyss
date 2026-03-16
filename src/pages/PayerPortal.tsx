@@ -33,6 +33,7 @@ interface PortalData {
     interac_question: string | null;
     interac_answer: string | null;
     stripe_link: string | null;
+    allow_disputes: boolean;
   };
 }
 

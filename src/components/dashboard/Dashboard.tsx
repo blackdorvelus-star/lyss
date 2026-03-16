@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  ArrowLeft,
   Plus,
-  DollarSign,
   Clock,
   CheckCircle2,
   XCircle,
@@ -12,12 +10,16 @@ import {
   ChevronUp,
   Loader2,
   Banknote,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import NotificationBell from "@/components/notifications/NotificationBell";
+import AppSidebar from "./AppSidebar";
+import ToneToggle, { type ToneSetting } from "./ToneToggle";
+import WeeklyProductivity from "./WeeklyProductivity";
 
 interface DashboardProps {
   onBack: () => void;
@@ -52,8 +54,8 @@ interface Reminder {
 const statusConfig: Record<string, { label: string; icon: typeof Clock; color: string }> = {
   pending: { label: "En attente", icon: Clock, color: "text-accent" },
   in_progress: { label: "Suivi en cours", icon: MessageSquare, color: "text-primary" },
-  recovered: { label: "Récupéré", icon: CheckCircle2, color: "text-primary" },
-  failed: { label: "Échoué", icon: XCircle, color: "text-destructive" },
+  recovered: { label: "Réglé", icon: CheckCircle2, color: "text-primary" },
+  failed: { label: "Non résolu", icon: XCircle, color: "text-destructive" },
   cancelled: { label: "Annulé", icon: XCircle, color: "text-muted-foreground" },
 };
 
@@ -65,6 +67,8 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
   const [recoveryId, setRecoveryId] = useState<string | null>(null);
   const [recoveryAmount, setRecoveryAmount] = useState("");
   const [saving, setSaving] = useState(false);
+  const [activeSection, setActiveSection] = useState<"clients" | "billing" | "calendar">("billing");
+  const [tone, setTone] = useState<ToneSetting>("gentle");
 
   useEffect(() => {
     fetchData();
@@ -79,8 +83,6 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
 
     if (inv) {
       setInvoices(inv as unknown as InvoiceWithClient[]);
-
-      // Fetch reminders for all invoices
       const invoiceIds = inv.map((i) => i.id);
       if (invoiceIds.length > 0) {
         const { data: rems } = await supabase
@@ -121,8 +123,8 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
     } else {
       toast.success(
         amount >= maxAmount
-          ? `${formatMoney(amount)} récupéré ! Facture complétée 🎉`
-          : `${formatMoney(amount)} récupéré sur ${formatMoney(maxAmount)}.`
+          ? `${formatMoney(amount)} réglé ! Dossier complété 🎉`
+          : `${formatMoney(amount)} reçu sur ${formatMoney(maxAmount)}.`
       );
       setRecoveryId(null);
       setRecoveryAmount("");
@@ -131,13 +133,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
     setSaving(false);
   };
 
-  // Stats
-  const totalOwed = invoices.reduce((s, i) => s + i.amount, 0);
-  const totalRecovered = invoices.reduce((s, i) => s + (i.amount_recovered || 0), 0);
-  const activeCount = invoices.filter((i) => i.status === "in_progress").length;
-  const creditsUsed = invoices.length;
-  const freeCredits = Math.max(0, 3 - creditsUsed);
-  const serviceCost = Math.max(0, creditsUsed - 3) * 20;
+  const settledCount = invoices.filter((i) => i.status === "recovered").length;
 
   const formatMoney = (n: number) =>
     new Intl.NumberFormat("fr-CA", { style: "currency", currency: "CAD", maximumFractionDigits: 0 }).format(n);
@@ -146,278 +142,333 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
     new Date(d).toLocaleDateString("fr-CA", { day: "numeric", month: "short" });
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border px-5 py-3">
-        <div className="max-w-lg mx-auto flex items-center justify-between">
-          <button onClick={onBack} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
-            <ArrowLeft className="w-4 h-4" />
-            Accueil
-          </button>
-          <div className="flex items-center gap-2">
-            <NotificationBell />
-            {onLogout && (
-              <button onClick={onLogout} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
-                Déconnexion
-              </button>
-            )}
-            <span className="font-display font-bold text-primary text-sm">Lyss</span>
+    <div className="min-h-screen bg-background flex">
+      <AppSidebar
+        activeSection={activeSection}
+        onSectionChange={setActiveSection}
+        onLogout={onLogout}
+      />
+
+      <div className="flex-1 flex flex-col min-h-screen">
+        {/* Header */}
+        <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border px-6 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-primary" />
+              <h1 className="font-display font-bold text-base">
+                {activeSection === "clients" && "Relations clients"}
+                {activeSection === "billing" && "Suivi de facturation"}
+                {activeSection === "calendar" && "Gestion d'agenda"}
+              </h1>
+            </div>
+            <div className="flex items-center gap-3">
+              <NotificationBell />
+              <span className="text-xs text-muted-foreground font-medium">Admin-Flow</span>
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      <div className="max-w-lg mx-auto px-5 py-6">
-        {/* Stats */}
-        {/* Credits banner */}
-        {freeCredits > 0 && (
-          <div className="bg-accent/10 border border-accent/20 rounded-xl p-3 mb-4 flex items-center gap-3">
-            <span className="text-accent text-lg">⚡</span>
-            <p className="text-sm text-foreground">
-              <span className="font-semibold">{freeCredits} crédit{freeCredits > 1 ? "s" : ""} gratuit{freeCredits > 1 ? "s" : ""}</span>{" "}
-              restant{freeCredits > 1 ? "s" : ""}
-            </p>
-          </div>
-        )}
-
-        <div className="grid grid-cols-2 gap-3 mb-8">
-          <div className="bg-card border border-border rounded-xl p-4">
-            <p className="text-xs text-muted-foreground mb-1">Total dû</p>
-            <p className="font-display text-xl font-bold">{formatMoney(totalOwed)}</p>
-          </div>
-          <div className="bg-primary/10 border border-primary/20 rounded-xl p-4">
-            <p className="text-xs text-primary mb-1">Récupéré</p>
-            <p className="font-display text-xl font-bold text-primary">{formatMoney(totalRecovered)}</p>
-          </div>
-          <div className="bg-card border border-border rounded-xl p-4">
-            <p className="text-xs text-muted-foreground mb-1">Suivis actifs</p>
-            <p className="font-display text-xl font-bold">{activeCount}</p>
-          </div>
-          <div className="bg-card border border-border rounded-xl p-4">
-            <p className="text-xs text-muted-foreground mb-1">Coût du service</p>
-            <p className="font-display text-xl font-bold">{formatMoney(serviceCost)}</p>
-            {totalRecovered > 0 && (
-              <p className="text-xs text-primary mt-0.5">
-                ROI : {serviceCost > 0 ? `${Math.round(totalRecovered / serviceCost)}x` : "∞"}
-              </p>
-            )}
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="font-display text-lg font-bold">Mes factures</h2>
-          <Button size="sm" onClick={onNewInvoice} className="bg-primary text-primary-foreground font-display">
-            <Plus className="w-4 h-4 mr-1" />
-            Nouvelle
-          </Button>
-        </div>
-
-        {loading ? (
-          <div className="flex items-center justify-center py-16">
-            <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-          </div>
-        ) : invoices.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-16"
-          >
-            <DollarSign className="w-12 h-12 text-muted-foreground mx-auto mb-3 opacity-40" />
-            <p className="text-muted-foreground mb-4">Aucune facture soumise encore.</p>
-            <Button onClick={onNewInvoice} className="bg-primary text-primary-foreground font-display">
-              <Plus className="w-4 h-4 mr-1" />
-              Ajouter ta première facture
-            </Button>
-          </motion.div>
-        ) : (
-          <div className="space-y-3">
-            {invoices.map((inv, i) => {
-              const config = statusConfig[inv.status] || statusConfig.pending;
-              const StatusIcon = config.icon;
-              const invReminders = reminders[inv.id] || [];
-              const isExpanded = expandedId === inv.id;
-
-              return (
-                <motion.div
-                  key={inv.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                >
-                  {/* Invoice card */}
-                  <button
-                    onClick={() => setExpandedId(isExpanded ? null : inv.id)}
-                    className="w-full text-left bg-card border border-border rounded-xl p-4 hover:border-primary/20 transition-colors"
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium truncate">{inv.clients.name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {inv.invoice_number ? `#${inv.invoice_number} · ` : ""}
-                          {formatDate(inv.created_at)}
-                        </p>
-                      </div>
-                      <p className="font-display font-bold text-lg ml-3">{formatMoney(inv.amount)}</p>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <div className={`flex items-center gap-1.5 text-xs font-medium ${config.color}`}>
-                        <StatusIcon className="w-3.5 h-3.5" />
-                        {config.label}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {invReminders.length > 0 && (
-                          <span className="text-xs text-muted-foreground">
-                            {invReminders.length} relance{invReminders.length > 1 ? "s" : ""}
-                          </span>
-                        )}
-                        {isExpanded ? (
-                          <ChevronUp className="w-4 h-4 text-muted-foreground" />
-                        ) : (
-                          <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                        )}
-                      </div>
-                    </div>
-
-                    {(inv.amount_recovered || 0) > 0 && (
-                      <div className="mt-2 bg-primary/10 rounded-lg px-3 py-1.5">
-                        <p className="text-xs text-primary font-medium">
-                          Récupéré : {formatMoney(inv.amount_recovered || 0)} / {formatMoney(inv.amount)}
-                        </p>
-                        <div className="mt-1 h-1.5 bg-primary/20 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-primary rounded-full transition-all"
-                            style={{ width: `${Math.min(100, ((inv.amount_recovered || 0) / inv.amount) * 100)}%` }}
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </button>
-
-                  {/* Expanded reminders */}
-                  <AnimatePresence>
-                    {isExpanded && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="overflow-hidden"
-                      >
-                        <div className="pt-2 pb-1 space-y-2">
-                          {/* Client info */}
-                          <div className="bg-secondary rounded-lg p-3 text-xs text-muted-foreground space-y-1">
-                            <p><span className="font-medium text-foreground">Client :</span> {inv.clients.name}</p>
-                            {inv.clients.email && <p><span className="font-medium text-foreground">Courriel :</span> {inv.clients.email}</p>}
-                            {inv.clients.phone && <p><span className="font-medium text-foreground">Tél :</span> {inv.clients.phone}</p>}
-                            {inv.due_date && <p><span className="font-medium text-foreground">Échéance :</span> {formatDate(inv.due_date)}</p>}
-                          </div>
-
-                          {/* Mark as recovered */}
-                          {inv.status !== "recovered" && (
-                            <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
-                              {recoveryId === inv.id ? (
-                                <div className="space-y-2">
-                                  <p className="text-xs font-medium text-foreground">Montant récupéré ($)</p>
-                                  <div className="flex gap-2">
-                                    <Input
-                                      type="number"
-                                      placeholder={`Max ${inv.amount}`}
-                                      value={recoveryAmount}
-                                      onChange={(e) => setRecoveryAmount(e.target.value)}
-                                      className="bg-card h-9 text-sm"
-                                      max={inv.amount}
-                                      min={1}
-                                      autoFocus
-                                    />
-                                    <Button
-                                      size="sm"
-                                      disabled={saving || !recoveryAmount}
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        markRecovered(inv.id, parseFloat(recoveryAmount), inv.amount);
-                                      }}
-                                      className="bg-primary text-primary-foreground h-9 px-4 font-display whitespace-nowrap"
-                                    >
-                                      {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : "Confirmer"}
-                                    </Button>
-                                  </div>
-                                  <button
-                                    onClick={(e) => { e.stopPropagation(); setRecoveryId(null); setRecoveryAmount(""); }}
-                                    className="text-xs text-muted-foreground hover:text-foreground"
-                                  >
-                                    Annuler
-                                  </button>
-                                </div>
-                              ) : (
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setRecoveryId(inv.id);
-                                    setRecoveryAmount(String(inv.amount));
-                                  }}
-                                  className="flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors w-full"
-                                >
-                                  <Banknote className="w-4 h-4" />
-                                  Marquer comme récupéré
-                                </button>
-                              )}
-                            </div>
-                          )}
-
-                          {invReminders.length === 0 ? (
-                            <p className="text-xs text-muted-foreground text-center py-3">
-                              Aucune relance générée encore.
-                            </p>
-                          ) : (
-                            invReminders.map((rem) => (
-                              <div
-                                key={rem.id}
-                                className="bg-secondary rounded-lg p-3"
-                              >
-                                <div className="flex items-center gap-2 mb-2">
-                                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                                    rem.channel === "sms"
-                                      ? "bg-accent/20 text-accent"
-                                      : "bg-primary/15 text-primary"
-                                  }`}>
-                                    {rem.channel === "sms" ? "SMS" : "Courriel"}
-                                  </span>
-                                  <span className="text-xs text-muted-foreground">
-                                    {rem.sent_at ? formatDate(rem.sent_at) : "Planifié"}
-                                  </span>
-                                  <span className={`text-xs ml-auto ${
-                                    rem.status === "sent" || rem.status === "delivered"
-                                      ? "text-primary"
-                                      : rem.status === "failed"
-                                      ? "text-destructive"
-                                      : "text-muted-foreground"
-                                  }`}>
-                                    {rem.status === "scheduled" && "⏳ Planifié"}
-                                    {rem.status === "sent" && "✓ Envoyé"}
-                                    {rem.status === "delivered" && "✓✓ Livré"}
-                                    {rem.status === "replied" && "💬 Répondu"}
-                                    {rem.status === "failed" && "✕ Échoué"}
-                                  </span>
-                                </div>
-                                <p className="text-xs text-secondary-foreground leading-relaxed whitespace-pre-wrap">
-                                  {rem.message_content}
-                                </p>
-                              </div>
-                            ))
-                          )}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
-              );
-            })}
-          </div>
-        )}
+        <main className="flex-1 overflow-y-auto px-6 py-6 max-w-3xl">
+          {activeSection === "billing" ? (
+            <BillingSection
+              invoices={invoices}
+              reminders={reminders}
+              loading={loading}
+              expandedId={expandedId}
+              setExpandedId={setExpandedId}
+              recoveryId={recoveryId}
+              setRecoveryId={setRecoveryId}
+              recoveryAmount={recoveryAmount}
+              setRecoveryAmount={setRecoveryAmount}
+              saving={saving}
+              markRecovered={markRecovered}
+              onNewInvoice={onNewInvoice}
+              settledCount={settledCount}
+              tone={tone}
+              setTone={setTone}
+              formatMoney={formatMoney}
+              formatDate={formatDate}
+            />
+          ) : activeSection === "clients" ? (
+            <PlaceholderSection
+              title="Relations clients"
+              desc="Les sondages de satisfaction et le suivi de la relation client arrivent bientôt."
+            />
+          ) : (
+            <PlaceholderSection
+              title="Gestion d'agenda"
+              desc="La prise de rendez-vous et les confirmations automatiques arrivent bientôt."
+            />
+          )}
+        </main>
       </div>
     </div>
   );
 };
+
+/* ─── Billing Section ─── */
+interface BillingSectionProps {
+  invoices: InvoiceWithClient[];
+  reminders: Record<string, Reminder[]>;
+  loading: boolean;
+  expandedId: string | null;
+  setExpandedId: (id: string | null) => void;
+  recoveryId: string | null;
+  setRecoveryId: (id: string | null) => void;
+  recoveryAmount: string;
+  setRecoveryAmount: (v: string) => void;
+  saving: boolean;
+  markRecovered: (id: string, amount: number, max: number) => void;
+  onNewInvoice: () => void;
+  settledCount: number;
+  tone: ToneSetting;
+  setTone: (t: ToneSetting) => void;
+  formatMoney: (n: number) => string;
+  formatDate: (d: string) => string;
+}
+
+const BillingSection = ({
+  invoices, reminders, loading, expandedId, setExpandedId,
+  recoveryId, setRecoveryId, recoveryAmount, setRecoveryAmount,
+  saving, markRecovered, onNewInvoice, settledCount,
+  tone, setTone, formatMoney, formatDate,
+}: BillingSectionProps) => {
+  const activeCount = invoices.filter((i) => i.status === "in_progress").length;
+
+  return (
+    <div className="space-y-6">
+      {/* Weekly productivity */}
+      <WeeklyProductivity
+        tasksCompleted={invoices.length}
+        appointmentsConfirmed={0}
+        invoicesSettled={settledCount}
+      />
+
+      {/* Tone setting */}
+      <ToneToggle value={tone} onChange={setTone} />
+
+      {/* Client follow-ups header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="font-display text-lg font-bold">Suivis clients</h2>
+          <p className="text-xs text-muted-foreground">{activeCount} suivi{activeCount !== 1 ? "s" : ""} actif{activeCount !== 1 ? "s" : ""}</p>
+        </div>
+        <Button size="sm" onClick={onNewInvoice} className="bg-primary text-primary-foreground font-display">
+          <Plus className="w-4 h-4 mr-1" />
+          Nouveau suivi
+        </Button>
+      </div>
+
+      {loading ? (
+        <div className="flex items-center justify-center py-16">
+          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+        </div>
+      ) : invoices.length === 0 ? (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16">
+          <Sparkles className="w-12 h-12 text-muted-foreground mx-auto mb-3 opacity-40" />
+          <p className="text-muted-foreground mb-4">Aucun suivi en cours.</p>
+          <Button onClick={onNewInvoice} className="bg-primary text-primary-foreground font-display">
+            <Plus className="w-4 h-4 mr-1" />
+            Ajouter un suivi
+          </Button>
+        </motion.div>
+      ) : (
+        <div className="space-y-3">
+          {invoices.map((inv, i) => {
+            const config = statusConfig[inv.status] || statusConfig.pending;
+            const StatusIcon = config.icon;
+            const invReminders = reminders[inv.id] || [];
+            const isExpanded = expandedId === inv.id;
+
+            return (
+              <motion.div
+                key={inv.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.04 }}
+              >
+                <button
+                  onClick={() => setExpandedId(isExpanded ? null : inv.id)}
+                  className="w-full text-left bg-card border border-border rounded-xl p-4 hover:border-primary/20 transition-colors"
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium truncate">{inv.clients.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {inv.invoice_number ? `#${inv.invoice_number} · ` : ""}
+                        {formatDate(inv.created_at)}
+                      </p>
+                    </div>
+                    <p className="font-display font-bold text-lg ml-3">{formatMoney(inv.amount)}</p>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className={`flex items-center gap-1.5 text-xs font-medium ${config.color}`}>
+                      <StatusIcon className="w-3.5 h-3.5" />
+                      {config.label}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {invReminders.length > 0 && (
+                        <span className="text-xs text-muted-foreground">
+                          {invReminders.length} message{invReminders.length > 1 ? "s" : ""}
+                        </span>
+                      )}
+                      {isExpanded ? (
+                        <ChevronUp className="w-4 h-4 text-muted-foreground" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                      )}
+                    </div>
+                  </div>
+
+                  {(inv.amount_recovered || 0) > 0 && (
+                    <div className="mt-2 bg-primary/10 rounded-lg px-3 py-1.5">
+                      <p className="text-xs text-primary font-medium">
+                        Reçu : {formatMoney(inv.amount_recovered || 0)} / {formatMoney(inv.amount)}
+                      </p>
+                      <div className="mt-1 h-1.5 bg-primary/20 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-primary rounded-full transition-all"
+                          style={{ width: `${Math.min(100, ((inv.amount_recovered || 0) / inv.amount) * 100)}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </button>
+
+                <AnimatePresence>
+                  {isExpanded && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="pt-2 pb-1 space-y-2">
+                        <div className="bg-secondary rounded-lg p-3 text-xs text-muted-foreground space-y-1">
+                          <p><span className="font-medium text-foreground">Client :</span> {inv.clients.name}</p>
+                          {inv.clients.email && <p><span className="font-medium text-foreground">Courriel :</span> {inv.clients.email}</p>}
+                          {inv.clients.phone && <p><span className="font-medium text-foreground">Tél :</span> {inv.clients.phone}</p>}
+                          {inv.due_date && <p><span className="font-medium text-foreground">Échéance :</span> {formatDate(inv.due_date)}</p>}
+                        </div>
+
+                        {inv.status !== "recovered" && (
+                          <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
+                            {recoveryId === inv.id ? (
+                              <div className="space-y-2">
+                                <p className="text-xs font-medium text-foreground">Montant reçu ($)</p>
+                                <div className="flex gap-2">
+                                  <Input
+                                    type="number"
+                                    placeholder={`Max ${inv.amount}`}
+                                    value={recoveryAmount}
+                                    onChange={(e) => setRecoveryAmount(e.target.value)}
+                                    className="bg-card h-9 text-sm"
+                                    max={inv.amount}
+                                    min={1}
+                                    autoFocus
+                                  />
+                                  <Button
+                                    size="sm"
+                                    disabled={saving || !recoveryAmount}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      markRecovered(inv.id, parseFloat(recoveryAmount), inv.amount);
+                                    }}
+                                    className="bg-primary text-primary-foreground h-9 px-4 font-display whitespace-nowrap"
+                                  >
+                                    {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : "Confirmer"}
+                                  </Button>
+                                </div>
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); setRecoveryId(null); setRecoveryAmount(""); }}
+                                  className="text-xs text-muted-foreground hover:text-foreground"
+                                >
+                                  Annuler
+                                </button>
+                              </div>
+                            ) : (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setRecoveryId(inv.id);
+                                  setRecoveryAmount(String(inv.amount));
+                                }}
+                                className="flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors w-full"
+                              >
+                                <Banknote className="w-4 h-4" />
+                                Marquer comme réglé
+                              </button>
+                            )}
+                          </div>
+                        )}
+
+                        {invReminders.length === 0 ? (
+                          <p className="text-xs text-muted-foreground text-center py-3">
+                            Aucun message envoyé encore.
+                          </p>
+                        ) : (
+                          invReminders.map((rem) => (
+                            <div key={rem.id} className="bg-secondary rounded-lg p-3">
+                              <div className="flex items-center gap-2 mb-2">
+                                <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                                  rem.channel === "sms"
+                                    ? "bg-accent/20 text-accent"
+                                    : "bg-primary/15 text-primary"
+                                }`}>
+                                  {rem.channel === "sms" ? "SMS" : "Courriel"}
+                                </span>
+                                <span className="text-xs text-muted-foreground">
+                                  {rem.sent_at ? formatDate(rem.sent_at) : "Planifié"}
+                                </span>
+                                <span className={`text-xs ml-auto ${
+                                  rem.status === "sent" || rem.status === "delivered"
+                                    ? "text-primary"
+                                    : rem.status === "failed"
+                                    ? "text-destructive"
+                                    : "text-muted-foreground"
+                                }`}>
+                                  {rem.status === "scheduled" && "⏳ Planifié"}
+                                  {rem.status === "sent" && "✓ Envoyé"}
+                                  {rem.status === "delivered" && "✓✓ Livré"}
+                                  {rem.status === "replied" && "💬 Répondu"}
+                                  {rem.status === "failed" && "✕ Échoué"}
+                                </span>
+                              </div>
+                              <p className="text-xs text-secondary-foreground leading-relaxed whitespace-pre-wrap">
+                                {rem.message_content}
+                              </p>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* ─── Placeholder Section ─── */
+const PlaceholderSection = ({ title, desc }: { title: string; desc: string }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 10 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="flex flex-col items-center justify-center py-24 text-center"
+  >
+    <Sparkles className="w-12 h-12 text-muted-foreground mb-4 opacity-40" />
+    <h2 className="font-display text-xl font-bold mb-2">{title}</h2>
+    <p className="text-sm text-muted-foreground max-w-sm">{desc}</p>
+    <span className="mt-4 text-xs text-primary font-medium px-3 py-1 rounded-full border border-primary/30 bg-primary/10">
+      Bientôt disponible
+    </span>
+  </motion.div>
+);
 
 export default Dashboard;

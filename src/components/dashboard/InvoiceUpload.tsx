@@ -285,8 +285,6 @@ const InvoiceUpload = ({ onBack, onLogout }: InvoiceUploadProps) => {
         {method === "manual" && (
         <>
 
-        </p>
-
         {invoices.length > 1 && (
           <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
             {invoices.map((inv, i) => (

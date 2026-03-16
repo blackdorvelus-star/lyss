@@ -21,6 +21,8 @@ const navItems: { id: Section; label: string; icon: typeof Users }[] = [
 
 const AppSidebar = ({ activeSection, onSectionChange, onLogout }: AppSidebarProps) => {
   const [collapsed, setCollapsed] = useState(false);
+  const { isAdmin } = useAdmin();
+  const navigate = useNavigate();
 
   return (
     <aside

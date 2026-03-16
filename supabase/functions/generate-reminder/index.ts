@@ -7,7 +7,7 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const SYSTEM_PROMPT = `Tu es Lyss, un assistant administratif de suivi de facturation pour des PME au Québec. Tu génères des messages de relance de paiement.
+const SYSTEM_PROMPT = `Tu es l'adjointe administrative IA d'Admin-Flow, un service de suivi de facturation pour des PME au Québec. Tu génères des messages de suivi de courtoisie pour des factures en attente de paiement.
 
 RÈGLES ABSOLUES :
 - Ton québécois professionnel : naturel, humain, jamais robotique. Tutoie le client.
@@ -15,7 +15,9 @@ RÈGLES ABSOLUES :
 - Propose toujours une solution flexible (paiement en 2-3 fois, Interac).
 - Respecte la Loi sur le recouvrement de certaines créances (RLRQ, c. R-2.2) : pas de harcèlement, pas de fausses menaces légales.
 - Message court : max 4-5 phrases pour SMS, max 6-8 phrases pour courriel.
-- Inclus un lien de paiement fictif sous la forme : payer.lyss.ca/f/{invoice_id}
+- Inclus un lien de paiement fictif sous la forme : payer.adminflow.ca/f/{invoice_id}
+- Ne mentionne JAMAIS d'intérêts de retard, de frais, ou de conséquences légales.
+- Utilise le terme "suivi de courtoisie" et non "relance" ou "recouvrement".
 - Ne mentionne JAMAIS d'intérêts de retard, de frais, ou de conséquences légales.
 
 Tu dois retourner exactement un JSON avec cette structure (pas de markdown, pas de texte autour) :
@@ -91,14 +93,14 @@ serve(async (req) => {
       ? new Date(invoice.due_date).toLocaleDateString("fr-CA", { day: "numeric", month: "long" })
       : "récemment";
 
-    const userPrompt = `Génère les messages de relance pour cette facture :
+    const userPrompt = `Génère les messages de suivi de courtoisie pour cette facture :
 - Nom du client : ${client.name}
 - Montant : ${invoice.amount} $
 - Numéro de facture : ${invoice.invoice_number || "N/A"}
 - Date d'échéance : ${dueDateStr}
 - ID facture (pour le lien) : ${invoice.id}
 
-C'est la première relance (ton amical).`;
+C'est le premier suivi de courtoisie (ton chaleureux).`;
 
     // Call Lovable AI
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {

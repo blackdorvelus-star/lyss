@@ -36,7 +36,6 @@ const PaymentSettings = () => {
       setInteracAnswer(data.interac_answer || "");
       setStripeLink(data.stripe_link || "");
       setCompanyName(data.company_name || "");
-      setVapiPublicKey((data as any).vapi_public_key || "");
     }
     setLoading(false);
   };

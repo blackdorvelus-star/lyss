@@ -169,6 +169,22 @@ const PaymentSettings = () => {
         </div>
       </div>
 
+      {/* Disputes toggle */}
+      <div className="bg-card border border-border rounded-xl p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <ShieldAlert className="w-4 h-4 text-accent" />
+            <div>
+              <h4 className="font-medium text-sm">Autoriser les contestations</h4>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Permet à tes clients de signaler un problème ou demander un délai via le portail et le widget.
+              </p>
+            </div>
+          </div>
+          <Switch checked={allowDisputes} onCheckedChange={setAllowDisputes} />
+        </div>
+      </div>
+
       <Button
         onClick={saveSettings}
         disabled={saving}

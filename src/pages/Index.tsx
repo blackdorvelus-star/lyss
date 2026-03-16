@@ -85,7 +85,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border px-5 py-3">
         <div className="max-w-lg mx-auto flex items-center justify-between">
-          <span className="font-display font-bold text-primary text-lg">Cash-Flow AI</span>
+          <span className="font-display font-bold text-primary text-lg">Lyss</span>
           <div className="flex items-center gap-3">
             {session && (
               <button

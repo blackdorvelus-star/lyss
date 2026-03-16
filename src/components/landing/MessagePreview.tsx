@@ -21,7 +21,7 @@ const MessagePreview = () => {
           <div className="flex items-center gap-2 mb-4">
             <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary text-xs font-bold">IA</div>
             <div>
-              <p className="text-sm font-medium">Cash-Flow AI</p>
+              <p className="text-sm font-medium">Lyss</p>
               <p className="text-xs text-muted-foreground">SMS automatisé</p>
             </div>
           </div>
@@ -34,7 +34,7 @@ const MessagePreview = () => {
               On comprend que ça peut arriver ! Si tu préfères, on peut diviser ça en 2 paiements Interac. Clique ici pour régler ça en 2 minutes 👇
             </p>
             <p className="mt-2 text-primary font-medium">
-              → payer.cashflow-ai.ca/f/1247
+              → payer.lyss.ca/f/1247
             </p>
           </div>
 

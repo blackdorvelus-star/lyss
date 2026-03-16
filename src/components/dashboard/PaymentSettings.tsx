@@ -12,6 +12,7 @@ const PaymentSettings = () => {
   const [interacAnswer, setInteracAnswer] = useState("");
   const [stripeLink, setStripeLink] = useState("");
   const [companyName, setCompanyName] = useState("");
+  const [vapiPublicKey, setVapiPublicKey] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 

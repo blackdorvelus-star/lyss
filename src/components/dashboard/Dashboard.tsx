@@ -104,6 +104,25 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
         }
       }
     }
+
+    // Fetch call logs
+    const { data: calls } = await supabase
+      .from("call_logs" as any)
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (calls) setCallLogs(calls as any as CallLog[]);
+
+    // Fetch vapi public key
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data: settings } = await supabase
+        .from("payment_settings")
+        .select("*")
+        .eq("user_id", user.id)
+        .single();
+      if (settings) setVapiPublicKey((settings as any).vapi_public_key || null);
+    }
+
     setLoading(false);
   };
 

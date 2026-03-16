@@ -219,7 +219,7 @@ const InvoiceUpload = ({ onBack, onLogout }: InvoiceUploadProps) => {
                 Déconnexion
               </button>
             )}
-            <span className="font-display font-bold text-primary text-sm">Cash-Flow AI</span>
+            <span className="font-display font-bold text-primary text-sm">Lyss</span>
           </div>
         </div>
       </header>

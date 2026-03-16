@@ -59,7 +59,7 @@ const AuthPage = ({ onAuth }: AuthPageProps) => {
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="px-5 py-4">
-        <span className="font-display font-bold text-primary text-lg">Cash-Flow AI</span>
+        <span className="font-display font-bold text-primary text-lg">Lyss</span>
       </header>
 
       <div className="flex-1 flex items-center justify-center px-5 pb-12">

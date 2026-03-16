@@ -3,10 +3,10 @@ const Footer = () => (
     <div className="max-w-lg mx-auto text-center">
       <p className="font-display font-bold text-primary text-lg mb-1">Lyss</p>
       <p className="text-xs text-muted-foreground">
-        Recouvrement amiable automatisé · Québec, Canada
+        Assistant administratif de suivi de facturation · Québec, Canada
       </p>
       <p className="text-xs text-muted-foreground mt-3">
-        Conforme à la Loi sur le recouvrement de certaines créances (RLRQ, c. R-2.2)
+        Service de messagerie automatisée pour le suivi de factures impayées.
       </p>
     </div>
   </footer>

@@ -13,6 +13,16 @@ interface VapiCallButtonProps {
   amount: number;
   invoiceNumber: string | null;
   vapiPublicKey: string | null;
+  vapiConfig?: {
+    voiceId?: string;
+    voiceProvider?: string;
+    personality?: string;
+    customInstructions?: string;
+    firstMessageTemplate?: string;
+    assistantName?: string;
+    assistantRole?: string;
+    companyName?: string;
+  };
   onCallEnd?: () => void;
 }
 

@@ -200,7 +200,7 @@ const AssistantIdentity = () => {
                 <p className="mt-2">
                   On comprend que ça peut arriver ! Si tu préfères, on peut diviser ça en 2 paiements Interac.
                 </p>
-                <p className="mt-2 text-primary font-medium">→ payer.lyss.ca/f/1247</p>
+                <p className="mt-2 text-primary font-medium">→ Lien de paiement sécurisé</p>
               </div>
             </div>
 

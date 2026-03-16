@@ -92,29 +92,43 @@ const VapiCallButton = ({
       const vapi = new Vapi(vapiPublicKey);
       vapiRef.current = vapi;
 
-      vapi.on("call-start", () => {
+      vapi.on("call-start", async () => {
         setStatus("active");
         setDuration(0);
         timerRef.current = setInterval(() => {
           setDuration((d) => d + 1);
         }, 1000);
+
+        // Create call log immediately with vapi call id
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (user) {
+          const vapiCallId = (vapi as any).call?.id || null;
+          const { data } = await supabase.from("call_logs").insert({
+            user_id: user.id,
+            invoice_id: invoiceId,
+            status: "active",
+            vapi_call_id: vapiCallId,
+          }).select("id").single();
+          if (data) callLogIdRef.current = data.id;
+        }
       });
 
       vapi.on("call-end", async () => {
         cleanup();
         setStatus("ended");
 
-        // Save call log
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-        if (user) {
-          await supabase.from("call_logs" as any).insert({
-            user_id: user.id,
-            invoice_id: invoiceId,
-            status: "completed",
-            duration_seconds: duration,
-          } as any);
+        // Update call log with local duration (webhook will overwrite with accurate data)
+        if (callLogIdRef.current) {
+          await supabase.from("call_logs")
+            .update({
+              status: "completed",
+              duration_seconds: duration,
+              ended_at: new Date().toISOString(),
+            })
+            .eq("id", callLogIdRef.current);
+          callLogIdRef.current = null;
         }
 
         setTimeout(() => {

@@ -225,9 +225,9 @@ const InvoiceUpload = ({ onBack, onLogout }: InvoiceUploadProps) => {
       </header>
 
       <div className="max-w-lg mx-auto px-5 py-8">
-        <h1 className="font-display text-2xl font-bold mb-1">Nouvelle relance</h1>
+        <h1 className="font-display text-2xl font-bold mb-1">Nouveau suivi</h1>
         <p className="text-sm text-muted-foreground mb-8">
-          Ajoute les détails de la facture impayée. L'IA s'occupe du reste.
+          Ajoute les détails de la facture impayée. L'assistant s'occupe du reste.
         </p>
 
         {/* Invoice tabs */}

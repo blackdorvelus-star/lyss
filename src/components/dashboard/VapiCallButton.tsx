@@ -35,6 +35,7 @@ const VapiCallButton = ({
   amount,
   invoiceNumber,
   vapiPublicKey,
+  vapiConfig,
   onCallEnd,
 }: VapiCallButtonProps) => {
   const [status, setStatus] = useState<CallStatus>("idle");

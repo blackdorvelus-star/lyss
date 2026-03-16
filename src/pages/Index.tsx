@@ -86,7 +86,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border px-5 py-3">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
-          <img src={logoLyss} alt="Lyss" className="h-9 object-contain" />
+          <img src="/logo-lyss.png" alt="Lyss" className="h-9 object-contain brightness-150 contrast-125 drop-shadow-[0_0_10px_hsl(160,30%,46%,0.6)]" />
           <div className="flex items-center gap-3">
             {session && (
               <button

@@ -14,6 +14,56 @@ export type Database = {
   }
   public: {
     Tables: {
+      call_logs: {
+        Row: {
+          call_result: string | null
+          client_sentiment: string | null
+          created_at: string
+          duration_seconds: number | null
+          ended_at: string | null
+          id: string
+          invoice_id: string
+          status: string
+          summary: string | null
+          user_id: string
+          vapi_call_id: string | null
+        }
+        Insert: {
+          call_result?: string | null
+          client_sentiment?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          ended_at?: string | null
+          id?: string
+          invoice_id: string
+          status?: string
+          summary?: string | null
+          user_id: string
+          vapi_call_id?: string | null
+        }
+        Update: {
+          call_result?: string | null
+          client_sentiment?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          ended_at?: string | null
+          id?: string
+          invoice_id?: string
+          status?: string
+          summary?: string | null
+          user_id?: string
+          vapi_call_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "call_logs_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clients: {
         Row: {
           created_at: string
@@ -149,6 +199,7 @@ export type Database = {
           stripe_link: string | null
           updated_at: string
           user_id: string
+          vapi_public_key: string | null
         }
         Insert: {
           assistant_name?: string | null
@@ -163,6 +214,7 @@ export type Database = {
           stripe_link?: string | null
           updated_at?: string
           user_id: string
+          vapi_public_key?: string | null
         }
         Update: {
           assistant_name?: string | null
@@ -177,6 +229,7 @@ export type Database = {
           stripe_link?: string | null
           updated_at?: string
           user_id?: string
+          vapi_public_key?: string | null
         }
         Relationships: []
       }

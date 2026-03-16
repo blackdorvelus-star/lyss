@@ -255,9 +255,17 @@ const PricingSection = () => {
         </motion.div>
 
         {/* Bottom note */}
-        <p className="text-center text-xs text-muted-foreground mt-8">
-          Tous les prix sont en dollars canadiens. Taxes en sus. Annulation en tout temps.
-        </p>
+        <div className="text-center mt-8 space-y-2">
+          <div className="inline-flex items-center gap-2 bg-primary/5 border border-primary/20 rounded-xl px-4 py-2.5">
+            <Sparkles className="w-4 h-4 text-primary flex-shrink-0" />
+            <p className="text-xs text-muted-foreground text-left">
+              <span className="font-medium text-foreground">Chaque dossier inclut tout :</span> appels vocaux IA, SMS et courriels de suivi, négociation, tableau de bord — aucun frais caché.
+            </p>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Tous les prix sont en dollars canadiens. Taxes en sus. Annulation en tout temps.
+          </p>
+        </div>
       </div>
     </section>
   );

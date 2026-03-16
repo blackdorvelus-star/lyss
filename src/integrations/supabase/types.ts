@@ -405,6 +405,39 @@ export type Database = {
         }
         Relationships: []
       }
+      subscriptions: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          max_dossiers: number
+          plan: Database["public"]["Enums"]["app_plan"]
+          started_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          max_dossiers?: number
+          plan?: Database["public"]["Enums"]["app_plan"]
+          started_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          max_dossiers?: number
+          plan?: Database["public"]["Enums"]["app_plan"]
+          started_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -431,6 +464,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_user_plan: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["app_plan"]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -440,6 +477,7 @@ export type Database = {
       }
     }
     Enums: {
+      app_plan: "free" | "solo" | "pro" | "enterprise"
       app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
@@ -568,6 +606,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_plan: ["free", "solo", "pro", "enterprise"],
       app_role: ["admin", "moderator", "user"],
     },
   },

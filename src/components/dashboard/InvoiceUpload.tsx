@@ -254,17 +254,13 @@ const InvoiceUpload = ({ onBack, onLogout }: InvoiceUploadProps) => {
           <CsvImport onComplete={onBack} />
         )}
 
-        {/* API placeholder */}
+        {/* API - QuickBooks */}
         {method === "api" && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center py-12 space-y-3">
-            <Code className="w-10 h-10 text-muted-foreground mx-auto opacity-40" />
-            <h3 className="font-display font-bold text-base">Intégration API comptable</h3>
-            <p className="text-sm text-muted-foreground max-w-sm mx-auto">
-              Connecte QuickBooks, FreshBooks, Sage ou Wave pour synchroniser automatiquement tes factures.
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+            <QuickBooksConnect />
+            <p className="text-xs text-muted-foreground text-center">
+              D'autres intégrations (FreshBooks, Sage, Wave) seront disponibles prochainement.
             </p>
-            <span className="inline-block text-xs text-primary font-medium px-3 py-1 rounded-full border border-primary/30 bg-primary/10">
-              Bientôt disponible
-            </span>
           </motion.div>
         )}
 

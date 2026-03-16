@@ -24,6 +24,7 @@ import FinancialHealth from "./FinancialHealth";
 import PersonalitySelector, { type Personality } from "./PersonalitySelector";
 import WeeklyProductivity from "./WeeklyProductivity";
 import AssistantIdentity from "./AssistantIdentity";
+import PaymentSettings from "./PaymentSettings";
 
 interface DashboardProps {
   onBack: () => void;

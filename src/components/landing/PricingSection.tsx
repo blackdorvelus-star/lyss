@@ -77,7 +77,7 @@ const PricingSection = () => {
     return 149 + (invoiceCount - 10) * 15;
   };
   const lyssMonthlyCost = getLyssCost();
-  const savings = humanMonthlyCost - adminFlowMonthlyCost;
+  const savings = humanMonthlyCost - lyssMonthlyCost;
   const savingsPercent = humanMonthlyCost > 0 ? Math.round((savings / humanMonthlyCost) * 100) : 0;
   const potentialRecovery = invoiceCount * avgAmount * 0.7; // 70% recovery rate
 

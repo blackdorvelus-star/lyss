@@ -21,7 +21,7 @@ const MessagePreview = () => {
           <div className="flex items-center gap-2 mb-4">
             <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary text-xs font-bold">IA</div>
             <div>
-              <p className="text-sm font-medium">Cash-Flow AI</p>
+              <p className="text-sm font-medium">Lyss</p>
               <p className="text-xs text-muted-foreground">SMS automatisé</p>
             </div>
           </div>

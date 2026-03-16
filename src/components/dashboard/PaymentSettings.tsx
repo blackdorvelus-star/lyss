@@ -37,6 +37,7 @@ const PaymentSettings = () => {
       setInteracAnswer(data.interac_answer || "");
       setStripeLink(data.stripe_link || "");
       setCompanyName(data.company_name || "");
+      setAllowDisputes((data as any).allow_disputes ?? false);
     }
     setLoading(false);
   };

@@ -57,6 +57,19 @@ const AppSidebar = ({ activeSection, onSectionChange, onLogout }: AppSidebarProp
             </button>
           );
         })}
+        {isAdmin && (
+          <button
+            onClick={() => navigate("/admin")}
+            className={cn(
+              "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+              "text-primary hover:bg-sidebar-accent/50"
+            )}
+            title={collapsed ? "Administration" : undefined}
+          >
+            <Shield className="w-4.5 h-4.5 flex-shrink-0" />
+            {!collapsed && <span className="truncate">Administration</span>}
+          </button>
+        )}
       </nav>
 
       {/* Bottom */}

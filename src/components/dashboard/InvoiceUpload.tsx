@@ -259,10 +259,18 @@ const InvoiceUpload = ({ onBack, onLogout }: InvoiceUploadProps) => {
         {method === "api" && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
             <QuickBooksConnect />
-            <FreshBooksConnect />
-            <p className="text-xs text-muted-foreground text-center">
-              D'autres intégrations (Sage, Wave) seront disponibles prochainement.
-            </p>
+            <SageConnect />
+            <div className="bg-card border border-border rounded-xl p-5 opacity-60">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
+                  <span className="text-sm font-bold text-muted-foreground">W</span>
+                </div>
+                <div>
+                  <h4 className="font-display font-bold text-sm">Wave</h4>
+                  <p className="text-xs text-muted-foreground">API fermée depuis 2023 — non disponible</p>
+                </div>
+              </div>
+            </div>
           </motion.div>
         )}
 

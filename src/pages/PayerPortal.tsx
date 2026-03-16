@@ -436,7 +436,7 @@ const PayerPortal = () => {
                           );
                           setShowProblem(false);
                           setProblemText("");
-                        }
+                        }}
                       >
                         Envoyer le message
                       </Button>

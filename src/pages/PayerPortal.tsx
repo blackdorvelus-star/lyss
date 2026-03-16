@@ -417,27 +417,26 @@ const PayerPortal = () => {
                         className="bg-primary text-primary-foreground font-display w-full"
                         onClick={async () => {
                           try {
-                            const res = await fetch(
+                            await fetch(
                               `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/widget-dispute`,
                               {
                                 method: "POST",
                                 headers: { "Content-Type": "application/json", apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
                                 body: JSON.stringify({
-                                  user_id: data!.invoice ? undefined : undefined,
-                                  invoice_id: undefined,
+                                  user_id: data!.user_id,
+                                  invoice_id: data!.invoice_id,
                                   client_name: client.name,
                                   message: problemText.trim(),
                                 }),
                               }
                             );
-                            // We need the user_id from token data - let's use a simpler approach
                           } catch {}
                           toast.success(
                             "Message envoyé. L'entreprise vous reviendra sous peu."
                           );
                           setShowProblem(false);
                           setProblemText("");
-                        }}
+                        }
                       >
                         Envoyer le message
                       </Button>

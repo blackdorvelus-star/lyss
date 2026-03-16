@@ -199,7 +199,12 @@ export type Database = {
           stripe_link: string | null
           updated_at: string
           user_id: string
+          vapi_custom_instructions: string | null
+          vapi_first_message_template: string | null
+          vapi_personality: string | null
           vapi_public_key: string | null
+          vapi_voice_id: string | null
+          vapi_voice_provider: string | null
         }
         Insert: {
           assistant_name?: string | null
@@ -214,7 +219,12 @@ export type Database = {
           stripe_link?: string | null
           updated_at?: string
           user_id: string
+          vapi_custom_instructions?: string | null
+          vapi_first_message_template?: string | null
+          vapi_personality?: string | null
           vapi_public_key?: string | null
+          vapi_voice_id?: string | null
+          vapi_voice_provider?: string | null
         }
         Update: {
           assistant_name?: string | null
@@ -229,7 +239,12 @@ export type Database = {
           stripe_link?: string | null
           updated_at?: string
           user_id?: string
+          vapi_custom_instructions?: string | null
+          vapi_first_message_template?: string | null
+          vapi_personality?: string | null
           vapi_public_key?: string | null
+          vapi_voice_id?: string | null
+          vapi_voice_provider?: string | null
         }
         Relationships: []
       }

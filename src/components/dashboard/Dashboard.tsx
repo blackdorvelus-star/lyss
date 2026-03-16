@@ -28,6 +28,7 @@ import AssistantIdentity from "./AssistantIdentity";
 import PaymentSettings from "./PaymentSettings";
 import VapiCallButton from "./VapiCallButton";
 import CallHistory, { type CallLog } from "./CallHistory";
+import VapiAssistantConfig from "./VapiAssistantConfig";
 
 interface DashboardProps {
   onBack: () => void;
@@ -68,6 +69,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
   const [reminders, setReminders] = useState<Record<string, Reminder[]>>({});
   const [callLogs, setCallLogs] = useState<CallLog[]>([]);
   const [vapiPublicKey, setVapiPublicKey] = useState<string | null>(null);
+  const [vapiConfig, setVapiConfig] = useState<any>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [recoveryId, setRecoveryId] = useState<string | null>(null);
@@ -120,7 +122,20 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
         .select("*")
         .eq("user_id", user.id)
         .single();
-      if (settings) setVapiPublicKey((settings as any).vapi_public_key || null);
+      if (settings) {
+        const s = settings as any;
+        setVapiPublicKey(s.vapi_public_key || null);
+        setVapiConfig({
+          voiceId: s.vapi_voice_id,
+          voiceProvider: s.vapi_voice_provider,
+          personality: s.vapi_personality,
+          customInstructions: s.vapi_custom_instructions,
+          firstMessageTemplate: s.vapi_first_message_template,
+          assistantName: s.assistant_name,
+          assistantRole: s.assistant_role,
+          companyName: s.company_name,
+        });
+      }
     }
 
     setLoading(false);
@@ -359,6 +374,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                                       amount={inv.amount}
                                       invoiceNumber={inv.invoice_number}
                                       vapiPublicKey={vapiPublicKey}
+                                      vapiConfig={vapiConfig}
                                       onCallEnd={fetchData}
                                     />
                                   </div>
@@ -423,6 +439,9 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
           ) : activeSection === "settings" ? (
             <div className="max-w-2xl space-y-10">
               <AssistantIdentity />
+              <div className="border-t border-border pt-8">
+                <VapiAssistantConfig />
+              </div>
               <div className="border-t border-border pt-8">
                 <PaymentSettings />
               </div>

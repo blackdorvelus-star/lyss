@@ -13,6 +13,16 @@ interface VapiCallButtonProps {
   amount: number;
   invoiceNumber: string | null;
   vapiPublicKey: string | null;
+  vapiConfig?: {
+    voiceId?: string;
+    voiceProvider?: string;
+    personality?: string;
+    customInstructions?: string;
+    firstMessageTemplate?: string;
+    assistantName?: string;
+    assistantRole?: string;
+    companyName?: string;
+  };
   onCallEnd?: () => void;
 }
 
@@ -25,6 +35,7 @@ const VapiCallButton = ({
   amount,
   invoiceNumber,
   vapiPublicKey,
+  vapiConfig,
   onCallEnd,
 }: VapiCallButtonProps) => {
   const [status, setStatus] = useState<CallStatus>("idle");
@@ -119,7 +130,36 @@ const VapiCallButton = ({
         toast.error("Erreur lors de l'appel. Vérifie ta configuration Vapi.");
       });
 
-      // Start the call with an assistant configuration
+      const voiceId = vapiConfig?.voiceId || "21m00Tcm4TlvDq8ikWAM";
+      const voiceProvider = vapiConfig?.voiceProvider || "elevenlabs";
+      const personality = vapiConfig?.personality || "chaleureuse";
+      const assistantName = vapiConfig?.assistantName || "Lyss";
+      const assistantRole = vapiConfig?.assistantRole || "adjointe administrative";
+      const companyName = vapiConfig?.companyName || "";
+      const customInstructions = vapiConfig?.customInstructions || "";
+
+      const personalityPrompts: Record<string, string> = {
+        chaleureuse: "Parle en français québécois professionnel, naturel et chaleureux. Tutoie le client. Sois empathique et compréhensif.",
+        professionnelle: "Parle en français formel et structuré. Vouvoie le client. Reste courtois et professionnel en tout temps.",
+        perseverante: "Parle en français québécois professionnel. Tutoie le client. Sois direct mais respectueux, orienté vers la résolution rapide.",
+      };
+
+      const companyContext = companyName ? ` chez ${companyName}` : "";
+
+      // Build first message
+      let firstMessage = vapiConfig?.firstMessageTemplate || "";
+      if (firstMessage) {
+        firstMessage = firstMessage
+          .replace("{prénom}", clientName.split(" ")[0])
+          .replace("{montant}", formatMoney(amount))
+          .replace("{facture}", invoiceNumber || "N/A")
+          .replace("{nom_assistant}", assistantName)
+          .replace("{rôle}", assistantRole)
+          .replace("{entreprise}", companyName || "l'entreprise");
+      } else {
+        firstMessage = `Bonjour ${clientName.split(" ")[0]}, c'est ${assistantName}, ${assistantRole}${companyContext}. Je t'appelle pour un petit suivi de courtoisie concernant ta facture${invoiceNumber ? ` numéro ${invoiceNumber}` : ""} de ${formatMoney(amount)}. As-tu quelques minutes?`;
+      }
+
       await vapi.start({
         model: {
           provider: "openai",
@@ -127,30 +167,31 @@ const VapiCallButton = ({
           messages: [
             {
               role: "system",
-              content: `Tu es Lyss, adjointe administrative IA pour une PME au Québec. Tu fais un appel de suivi de courtoisie pour une facture en attente.
+              content: `Tu es ${assistantName}, ${assistantRole}${companyContext}. Tu fais un appel de suivi de courtoisie pour une facture en attente.
 
 CONTEXTE :
 - Nom du client : ${clientName}
 - Montant dû : ${formatMoney(amount)}
 - Numéro de facture : ${invoiceNumber || "N/A"}
 
+PERSONNALITÉ :
+${personalityPrompts[personality] || personalityPrompts.chaleureuse}
+
 RÈGLES :
-- Parle en français québécois professionnel, naturel et chaleureux
-- Tutoie le client
-- Sois empathique et compréhensif
 - Propose des solutions flexibles (paiement en plusieurs fois, virement Interac)
 - Ne menace JAMAIS, ne parle JAMAIS de conséquences légales
 - Utilise le terme "suivi de courtoisie"
-- Garde l'appel court et efficace (2-3 minutes max)`,
+- Garde l'appel court et efficace (2-3 minutes max)
+${customInstructions ? `\nINSTRUCTIONS SUPPLÉMENTAIRES :\n${customInstructions}` : ""}`,
             },
           ],
         },
         voice: {
-          provider: "11labs",
-          voiceId: "21m00Tcm4TlvDq8ikWAM",
+          provider: voiceProvider as any,
+          voiceId,
         },
         name: `Suivi - ${clientName}`,
-        firstMessage: `Bonjour ${clientName.split(" ")[0]}, c'est Lyss, l'adjointe administrative. Je t'appelle pour un petit suivi de courtoisie concernant ta facture${invoiceNumber ? ` numéro ${invoiceNumber}` : ""} de ${formatMoney(amount)}. As-tu quelques minutes?`,
+        firstMessage,
       });
     } catch (error) {
       console.error("Failed to start Vapi call:", error);

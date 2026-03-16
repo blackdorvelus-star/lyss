@@ -2,3 +2,9 @@ project_id = "jpulnascpktoteamjspw"
 
 [functions.generate-reminder]
 verify_jwt = false
+
+[functions.get-vapi-key]
+verify_jwt = false
+
+[functions.vapi-webhook]
+verify_jwt = false

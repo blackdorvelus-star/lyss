@@ -84,7 +84,7 @@ const PricingSection = () => {
     new Intl.NumberFormat("fr-CA", { style: "currency", currency: "CAD", maximumFractionDigits: 0 }).format(n);
 
   return (
-    <section className="px-5 py-20" id="pricing">
+    <section className="px-5 py-20">
       <div className="max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

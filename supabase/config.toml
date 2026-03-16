@@ -18,11 +18,11 @@ verify_jwt = false
 [functions.quickbooks-sync]
 verify_jwt = false
 
-[functions.freshbooks-auth]
+[functions.sage-auth]
 verify_jwt = false
 
-[functions.freshbooks-callback]
+[functions.sage-callback]
 verify_jwt = false
 
-[functions.freshbooks-sync]
+[functions.sage-sync]
 verify_jwt = false

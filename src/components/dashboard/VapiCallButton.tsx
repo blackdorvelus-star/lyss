@@ -43,6 +43,7 @@ const VapiCallButton = ({
   const [duration, setDuration] = useState(0);
   const vapiRef = useRef<Vapi | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const callLogIdRef = useRef<string | null>(null);
 
   const cleanup = useCallback(() => {
     if (timerRef.current) {

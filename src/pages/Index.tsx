@@ -110,6 +110,7 @@ const Index = () => {
       <HowItWorks />
       <MessagePreview />
       <PricingSection />
+      <FAQSection />
       <Footer />
     </div>
   );

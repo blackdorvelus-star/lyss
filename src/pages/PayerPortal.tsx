@@ -433,7 +433,7 @@ const PayerPortal = () => {
       {/* Footer */}
       <footer className="border-t border-border px-5 py-5 mt-8">
         <div className="max-w-lg mx-auto flex flex-col items-center gap-2">
-          <img src="/logo-lyss.png" alt="Lyss" className="h-8 object-contain opacity-80" style={{ filter: 'brightness(3) contrast(1.2) drop-shadow(0 0 10px hsl(160 30% 46% / 0.6))' }} />
+          <img src="/logo-lyss.png" alt="Lyss" className="h-8 object-contain opacity-80" />
           <p className="text-xs text-muted-foreground">
             Portail sécurisé propulsé par Lyss · Adjointe administrative IA
           </p>

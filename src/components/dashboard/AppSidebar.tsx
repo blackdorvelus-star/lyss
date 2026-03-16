@@ -29,7 +29,7 @@ const AppSidebar = ({ activeSection, onSectionChange, onLogout }: AppSidebarProp
     >
       {/* Brand */}
       <div className="flex items-center px-2 py-3 border-b border-sidebar-border">
-        <img src="/logo-lyss.png" alt="Lyss" className={cn("flex-shrink-0 object-contain", collapsed ? "h-8" : "h-10")} style={{ filter: 'brightness(3) contrast(1.2) drop-shadow(0 0 10px hsl(160 30% 46% / 0.6))' }} />
+        <img src="/logo-lyss.png" alt="Lyss" className={cn("flex-shrink-0 object-contain", collapsed ? "h-8" : "h-10")} />
       </div>
 
       {/* Nav */}

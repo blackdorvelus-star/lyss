@@ -71,13 +71,13 @@ const PricingSection = () => {
   const humanMonthlyCost = invoiceCount * hoursPerInvoice * humanCostPerHour;
   const humanYearlyCost = humanMonthlyCost * 12;
 
-  const getAdminFlowCost = () => {
+  const getLyssCost = () => {
     if (invoiceCount <= 3) return 49;
     if (invoiceCount <= 10) return 149 + Math.max(0, invoiceCount - 10) * 15;
     return 149 + (invoiceCount - 10) * 15;
   };
-  const adminFlowMonthlyCost = getAdminFlowCost();
-  const savings = humanMonthlyCost - adminFlowMonthlyCost;
+  const lyssMonthlyCost = getLyssCost();
+  const savings = humanMonthlyCost - lyssMonthlyCost;
   const savingsPercent = humanMonthlyCost > 0 ? Math.round((savings / humanMonthlyCost) * 100) : 0;
   const potentialRecovery = invoiceCount * avgAmount * 0.7; // 70% recovery rate
 
@@ -232,9 +232,9 @@ const PricingSection = () => {
               </div>
 
               <div className="bg-primary/10 border border-primary/20 rounded-xl p-4">
-                <p className="text-xs text-primary mb-1">Coût avec Admin-Flow</p>
+                <p className="text-xs text-primary mb-1">Coût avec Lyss</p>
                 <p className="font-display text-xl font-bold text-primary">
-                  {formatMoney(adminFlowMonthlyCost)}<span className="text-sm font-normal text-muted-foreground">/mois</span>
+                  {formatMoney(lyssMonthlyCost)}<span className="text-sm font-normal text-muted-foreground">/mois</span>
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
                   Forfait {invoiceCount <= 3 ? "Solo" : "Pro"} + dossiers

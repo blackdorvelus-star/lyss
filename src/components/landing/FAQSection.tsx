@@ -8,12 +8,12 @@ import {
 
 const faqs = [
   {
-    q: "C'est quoi exactement Admin-Flow ?",
-    a: "Admin-Flow est une adjointe administrative propulsée par l'intelligence artificielle. Elle s'occupe de tes suivis de facturation — messages de courtoisie par SMS, courriel et appels — pour que tu te concentres sur ton métier au lieu de courir après tes paiements.",
+    q: "C'est quoi exactement Lyss ?",
+    a: "Lyss est une adjointe administrative propulsée par l'intelligence artificielle. Elle s'occupe de tes suivis de facturation — messages de courtoisie par SMS, courriel et appels — pour que tu te concentres sur ton métier au lieu de courir après tes paiements.",
   },
   {
     q: "Est-ce que c'est légal au Québec ?",
-    a: "Absolument. Admin-Flow est un service de messagerie administrative, pas une agence de recouvrement. L'adjointe envoie des suivis de courtoisie professionnels. Nos messages respectent la Loi sur le recouvrement de certaines créances (RLRQ, c. R-2.2) : aucune menace, aucun harcèlement, jamais.",
+    a: "Absolument. Lyss est un service de messagerie administrative, pas une agence de recouvrement. L'adjointe envoie des suivis de courtoisie professionnels. Nos messages respectent la Loi sur le recouvrement de certaines créances (RLRQ, c. R-2.2) : aucune menace, aucun harcèlement, jamais.",
   },
   {
     q: "Comment l'adjointe contacte mes clients ?",

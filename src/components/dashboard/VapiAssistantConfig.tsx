@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bot, Mic2, Sparkles, Save, Loader2, Check, FileText } from "lucide-react";
+import { Bot, Mic2, Sparkles, Save, Loader2, Check, FileText, Key } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";

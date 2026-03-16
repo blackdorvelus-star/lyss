@@ -54,6 +54,7 @@ const PaymentSettings = () => {
       interac_answer: interacAnswer || null,
       stripe_link: stripeLink || null,
       company_name: companyName || null,
+      allow_disputes: allowDisputes,
     } as any;
 
     const { error } = await supabase

@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import logoLyss from "@/assets/logo-lyss.png";
 import { supabase } from "@/integrations/supabase/client";
 import type { Session } from "@supabase/supabase-js";
 import HeroSection from "@/components/landing/HeroSection";

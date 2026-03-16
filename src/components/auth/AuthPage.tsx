@@ -1,5 +1,4 @@
 import { useState } from "react";
-import logoLyss from "@/assets/logo-lyss.png";
 import { motion } from "framer-motion";
 import { Mail, Lock, ArrowRight, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";

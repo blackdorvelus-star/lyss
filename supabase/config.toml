@@ -17,3 +17,12 @@ verify_jwt = false
 
 [functions.quickbooks-sync]
 verify_jwt = false
+
+[functions.freshbooks-auth]
+verify_jwt = false
+
+[functions.freshbooks-callback]
+verify_jwt = false
+
+[functions.freshbooks-sync]
+verify_jwt = false

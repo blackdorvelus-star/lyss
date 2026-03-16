@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import CsvImport from "./CsvImport";
 import QuickBooksConnect from "./QuickBooksConnect";
+import FreshBooksConnect from "./FreshBooksConnect";
 
 interface InvoiceForm {
   id: string;
@@ -254,12 +255,13 @@ const InvoiceUpload = ({ onBack, onLogout }: InvoiceUploadProps) => {
           <CsvImport onComplete={onBack} />
         )}
 
-        {/* API - QuickBooks */}
+        {/* API - Integrations */}
         {method === "api" && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
             <QuickBooksConnect />
+            <FreshBooksConnect />
             <p className="text-xs text-muted-foreground text-center">
-              D'autres intégrations (FreshBooks, Sage, Wave) seront disponibles prochainement.
+              D'autres intégrations (Sage, Wave) seront disponibles prochainement.
             </p>
           </motion.div>
         )}

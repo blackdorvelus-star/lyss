@@ -66,6 +66,7 @@ const VapiAssistantConfig = ({ onConfigChange }: VapiAssistantConfigProps) => {
 
     if (data) {
       const d = data as any;
+      setVapiPublicKey(d.vapi_public_key || "");
       setVoiceId(d.vapi_voice_id || "21m00Tcm4TlvDq8ikWAM");
       setPersonality(d.vapi_personality || "chaleureuse");
       setCustomInstructions(d.vapi_custom_instructions || "");

@@ -120,11 +120,26 @@ const ClientWidget = () => {
     setChatMessages([]);
   };
 
-  const handleDispute = () => {
+  const handleDispute = async () => {
     if (!disputeText.trim()) return;
-    toast.success("Votre message a été transmis. L'entreprise vous reviendra sous peu.");
-    setDisputeText("");
-    setView("results");
+    try {
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/widget-dispute`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", apikey: SUPABASE_KEY },
+        body: JSON.stringify({
+          user_id: userId,
+          invoice_id: selectedInvoice?.id || null,
+          client_name: selectedInvoice?.client_name || null,
+          message: disputeText.trim(),
+        }),
+      });
+      if (!res.ok) throw new Error("Erreur");
+      toast.success("Votre message a été transmis. L'entreprise vous reviendra sous peu.");
+      setDisputeText("");
+      setView("results");
+    } catch {
+      toast.error("Impossible d'envoyer le message. Réessayez.");
+    }
   };
 
   if (!userId) {

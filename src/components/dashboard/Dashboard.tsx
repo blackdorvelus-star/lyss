@@ -425,6 +425,9 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
             <div className="max-w-2xl space-y-10">
               <AssistantIdentity />
               <div className="border-t border-border pt-8">
+                <VapiAssistantConfig />
+              </div>
+              <div className="border-t border-border pt-8">
                 <PaymentSettings />
               </div>
             </div>

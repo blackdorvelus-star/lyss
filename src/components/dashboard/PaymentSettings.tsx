@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Banknote, CreditCard, Building2, Save, Loader2, Link2 } from "lucide-react";
+import { Banknote, CreditCard, Building2, Save, Loader2, Link2, ShieldAlert } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";

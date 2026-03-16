@@ -210,7 +210,7 @@ const InvoiceUpload = ({ onBack, onLogout }: InvoiceUploadProps) => {
                 Déconnexion
               </button>
             )}
-            <span className="font-display font-bold text-primary text-sm">Admin-Flow</span>
+            <img src="/logo-lyss.png" alt="Admin-Flow" className="h-6" />
           </div>
         </div>
       </header>

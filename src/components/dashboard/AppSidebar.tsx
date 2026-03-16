@@ -28,10 +28,7 @@ const AppSidebar = ({ activeSection, onSectionChange, onLogout }: AppSidebarProp
     >
       {/* Brand */}
       <div className="flex items-center gap-2 px-4 py-4 border-b border-sidebar-border">
-        <Sparkles className="w-5 h-5 text-primary flex-shrink-0" />
-        {!collapsed && (
-          <span className="font-display font-bold text-primary text-base truncate">Admin-Flow</span>
-        )}
+        <img src="/logo-lyss.png" alt="Admin-Flow" className="h-7 flex-shrink-0" />
       </div>
 
       {/* Nav */}

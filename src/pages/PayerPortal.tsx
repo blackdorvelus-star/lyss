@@ -18,6 +18,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 
 interface PortalData {
+  user_id: string;
+  invoice_id: string;
   invoice: {
     invoice_number: string | null;
     amount: number;

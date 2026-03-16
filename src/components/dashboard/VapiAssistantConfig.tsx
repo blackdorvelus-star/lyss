@@ -41,6 +41,7 @@ interface VapiAssistantConfigProps {
 }
 
 const VapiAssistantConfig = ({ onConfigChange }: VapiAssistantConfigProps) => {
+  const [vapiPublicKey, setVapiPublicKey] = useState("");
   const [voiceId, setVoiceId] = useState("21m00Tcm4TlvDq8ikWAM");
   const [personality, setPersonality] = useState("chaleureuse");
   const [customInstructions, setCustomInstructions] = useState("");

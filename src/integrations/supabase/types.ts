@@ -94,42 +94,6 @@ export type Database = {
         }
         Relationships: []
       }
-      freshbooks_connections: {
-        Row: {
-          access_token: string
-          account_id: string
-          business_name: string | null
-          created_at: string
-          id: string
-          refresh_token: string
-          token_expires_at: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          access_token: string
-          account_id: string
-          business_name?: string | null
-          created_at?: string
-          id?: string
-          refresh_token: string
-          token_expires_at: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          access_token?: string
-          account_id?: string
-          business_name?: string | null
-          created_at?: string
-          id?: string
-          refresh_token?: string
-          token_expires_at?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       invoices: {
         Row: {
           amount: number
@@ -398,6 +362,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      sage_connections: {
+        Row: {
+          access_token: string
+          business_name: string | null
+          created_at: string
+          id: string
+          refresh_token: string
+          resource_owner_id: string
+          token_expires_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_token: string
+          business_name?: string | null
+          created_at?: string
+          id?: string
+          refresh_token: string
+          resource_owner_id: string
+          token_expires_at: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_token?: string
+          business_name?: string | null
+          created_at?: string
+          id?: string
+          refresh_token?: string
+          resource_owner_id?: string
+          token_expires_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
     }
     Views: {

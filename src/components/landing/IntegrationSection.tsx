@@ -23,8 +23,8 @@ const methods = [
   {
     icon: Link2,
     title: "Widget embarqué",
-    description: "Installe un widget sur ton site web pour que tes clients puissent consulter et régler leurs factures directement.",
-    status: "coming" as const,
+    description: "Installe un widget sur ton site web pour que tes clients puissent consulter leur solde et discuter avec l'adjointe IA.",
+    status: "available" as const,
   },
 ];
 

@@ -58,7 +58,7 @@ const AuthPage = ({ onAuth }: AuthPageProps) => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <header className="px-5 py-4">
-        <span className="font-display font-bold text-primary text-lg">Admin-Flow</span>
+        <img src="/logo-lyss.png" alt="Admin-Flow" className="h-8" />
       </header>
 
       <div className="flex-1 flex items-center justify-center px-5 pb-12">

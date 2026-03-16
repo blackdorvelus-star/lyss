@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Banknote, CreditCard, Building2, Save, Loader2, Link2, Phone } from "lucide-react";
+import { Banknote, CreditCard, Building2, Save, Loader2, Link2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,7 +12,6 @@ const PaymentSettings = () => {
   const [interacAnswer, setInteracAnswer] = useState("");
   const [stripeLink, setStripeLink] = useState("");
   const [companyName, setCompanyName] = useState("");
-  const [vapiPublicKey, setVapiPublicKey] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -36,7 +35,6 @@ const PaymentSettings = () => {
       setInteracAnswer(data.interac_answer || "");
       setStripeLink(data.stripe_link || "");
       setCompanyName(data.company_name || "");
-      setVapiPublicKey((data as any).vapi_public_key || "");
     }
     setLoading(false);
   };
@@ -53,7 +51,6 @@ const PaymentSettings = () => {
       interac_answer: interacAnswer || null,
       stripe_link: stripeLink || null,
       company_name: companyName || null,
-      vapi_public_key: vapiPublicKey || null,
     } as any;
 
     const { error } = await supabase
@@ -164,28 +161,6 @@ const PaymentSettings = () => {
           />
           <p className="text-xs text-muted-foreground">
             Crée un lien depuis ton tableau de bord Stripe → Payment Links.
-          </p>
-        </div>
-      </div>
-
-      {/* Vapi section */}
-      <div className="bg-card border border-border rounded-xl p-4 space-y-3">
-        <div className="flex items-center gap-2">
-          <Phone className="w-4 h-4 text-primary" />
-          <h4 className="font-medium text-sm">Agent vocal Vapi.ai</h4>
-        </div>
-        <div className="space-y-1.5">
-          <label className="text-xs text-muted-foreground">
-            Clé publique Vapi (Public Key)
-          </label>
-          <Input
-            value={vapiPublicKey}
-            onChange={(e) => setVapiPublicKey(e.target.value)}
-            placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-            className="bg-secondary font-mono text-xs"
-          />
-          <p className="text-xs text-muted-foreground">
-            Disponible dans ton tableau de bord Vapi → Settings → Public Key.
           </p>
         </div>
       </div>

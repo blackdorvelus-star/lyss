@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bot, Mic2, Sparkles, Save, Loader2, Check, FileText } from "lucide-react";
+import { Bot, Mic2, Sparkles, Save, Loader2, Check, FileText, Key } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -41,6 +41,7 @@ interface VapiAssistantConfigProps {
 }
 
 const VapiAssistantConfig = ({ onConfigChange }: VapiAssistantConfigProps) => {
+  const [vapiPublicKey, setVapiPublicKey] = useState("");
   const [voiceId, setVoiceId] = useState("21m00Tcm4TlvDq8ikWAM");
   const [personality, setPersonality] = useState("chaleureuse");
   const [customInstructions, setCustomInstructions] = useState("");
@@ -65,6 +66,7 @@ const VapiAssistantConfig = ({ onConfigChange }: VapiAssistantConfigProps) => {
 
     if (data) {
       const d = data as any;
+      setVapiPublicKey(d.vapi_public_key || "");
       setVoiceId(d.vapi_voice_id || "21m00Tcm4TlvDq8ikWAM");
       setPersonality(d.vapi_personality || "chaleureuse");
       setCustomInstructions(d.vapi_custom_instructions || "");
@@ -84,6 +86,7 @@ const VapiAssistantConfig = ({ onConfigChange }: VapiAssistantConfigProps) => {
       .from("payment_settings")
       .upsert({
         user_id: user.id,
+        vapi_public_key: vapiPublicKey || null,
         vapi_voice_provider: selectedVoice?.provider || "elevenlabs",
         vapi_voice_id: voiceId,
         vapi_personality: personality,
@@ -128,6 +131,23 @@ const VapiAssistantConfig = ({ onConfigChange }: VapiAssistantConfigProps) => {
         </h2>
         <p className="text-xs text-muted-foreground mt-1">
           Configure la voix, la personnalité et les instructions de ton agent de suivi téléphonique.
+        </p>
+      </div>
+
+      {/* Vapi Public Key */}
+      <div className="bg-card border border-border rounded-xl p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <Key className="w-4 h-4 text-primary" />
+          <h4 className="font-medium text-sm">Clé publique Vapi</h4>
+        </div>
+        <Input
+          value={vapiPublicKey}
+          onChange={(e) => setVapiPublicKey(e.target.value)}
+          placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+          className="bg-secondary font-mono text-xs"
+        />
+        <p className="text-xs text-muted-foreground">
+          Disponible dans ton tableau de bord Vapi → Settings → Public Key.
         </p>
       </div>
 

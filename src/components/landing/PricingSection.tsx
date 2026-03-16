@@ -129,15 +129,13 @@ const PricingSection = () => {
               <p className="text-xs text-muted-foreground mb-4">{plan.desc}</p>
 
               <div className="mb-4">
-                <span className="font-display text-3xl font-bold">
-                  {plan.price === "Sur mesure" ? "" : ""}
-                  {plan.price}
-                </span>
-                {plan.period && (
-                  <span className="text-sm text-muted-foreground">{plan.period}</span>
-                )}
-                {plan.price === "Sur mesure" && (
-                  <span className="text-sm text-muted-foreground ml-1"> $</span>
+                {plan.price === "Sur mesure" ? (
+                  <span className="font-display text-3xl font-bold">{plan.price}</span>
+                ) : (
+                  <>
+                    <span className="font-display text-3xl font-bold">{plan.price}</span>
+                    <span className="text-sm text-muted-foreground">{plan.period}</span>
+                  </>
                 )}
               </div>
 

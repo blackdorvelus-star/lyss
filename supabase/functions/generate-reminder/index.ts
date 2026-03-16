@@ -93,14 +93,14 @@ serve(async (req) => {
       ? new Date(invoice.due_date).toLocaleDateString("fr-CA", { day: "numeric", month: "long" })
       : "récemment";
 
-    const userPrompt = `Génère les messages de relance pour cette facture :
+    const userPrompt = `Génère les messages de suivi de courtoisie pour cette facture :
 - Nom du client : ${client.name}
 - Montant : ${invoice.amount} $
 - Numéro de facture : ${invoice.invoice_number || "N/A"}
 - Date d'échéance : ${dueDateStr}
 - ID facture (pour le lien) : ${invoice.id}
 
-C'est la première relance (ton amical).`;
+C'est le premier suivi de courtoisie (ton chaleureux).`;
 
     // Call Lovable AI
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {

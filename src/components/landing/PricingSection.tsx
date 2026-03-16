@@ -249,7 +249,7 @@ const PricingSection = () => {
                     {formatMoney(savings)}<span className="text-sm font-normal">/mois</span>
                   </p>
                   <p className="text-xs text-primary font-medium mt-1">
-                    {savingsPercent} % d'économie · {formatMoney(potentialRecovery)} de récupération potentielle
+                    {savingsPercent} % d'économie · {formatMoney(potentialRecovery)} en règlements potentiels
                   </p>
                 </div>
               )}

@@ -142,7 +142,7 @@ const MessagePreview = () => {
               <p>{variant.greeting}</p>
               <p className="mt-2">{variant.body}</p>
               <p className="mt-2 text-primary font-medium">
-                → payer.lyss.ca/f/1247
+                → Lien de paiement sécurisé
               </p>
             </motion.div>
           </AnimatePresence>

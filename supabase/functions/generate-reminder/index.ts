@@ -15,7 +15,7 @@ RÈGLES ABSOLUES :
 - Propose toujours une solution flexible (paiement en 2-3 fois, Interac).
 - Respecte la Loi sur le recouvrement de certaines créances (RLRQ, c. R-2.2) : pas de harcèlement, pas de fausses menaces légales.
 - Message court : max 4-5 phrases pour SMS, max 6-8 phrases pour courriel.
-- Inclus un lien de paiement fictif sous la forme : payer.lyss.ca/f/{invoice_id}
+- N'inclus AUCUN lien de paiement dans le message.
 - Ne mentionne JAMAIS d'intérêts de retard, de frais, ou de conséquences légales.
 - Utilise le terme "suivi de courtoisie" et non "relance" ou "recouvrement".
 - Ne mentionne JAMAIS d'intérêts de retard, de frais, ou de conséquences légales.

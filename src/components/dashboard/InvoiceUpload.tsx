@@ -64,15 +64,14 @@ const InvoiceUpload = ({ onBack, onLogout }: InvoiceUploadProps) => {
   };
 
   const handleSubmit = async () => {
-    // Validate all invoices
     for (const inv of invoices) {
       if (!inv.clientName.trim() || !inv.amount.trim()) {
-        toast.error("Remplis au minimum le nom du client et le montant pour chaque facture.");
+        toast.error("Remplis au minimum le nom du client et le montant pour chaque dossier.");
         return;
       }
       const amount = parseFloat(inv.amount);
       if (isNaN(amount) || amount <= 0) {
-        toast.error(`Montant invalide pour ${inv.clientName || "une facture"}.`);
+        toast.error(`Montant invalide pour ${inv.clientName || "un dossier"}.`);
         return;
       }
     }
@@ -80,16 +79,14 @@ const InvoiceUpload = ({ onBack, onLogout }: InvoiceUploadProps) => {
     setSending(true);
 
     try {
-      // Check auth
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        toast.error("Tu dois être connecté pour soumettre une facture.");
+        toast.error("Tu dois être connecté(e) pour soumettre un suivi.");
         setSending(false);
         return;
       }
 
       for (const inv of invoices) {
-        // 1. Upsert client
         const { data: existingClients } = await supabase
           .from("clients")
           .select("id")
@@ -101,7 +98,6 @@ const InvoiceUpload = ({ onBack, onLogout }: InvoiceUploadProps) => {
 
         if (existingClients && existingClients.length > 0) {
           clientId = existingClients[0].id;
-          // Update contact info if provided
           const updates: Record<string, string> = {};
           if (inv.email.trim()) updates.email = inv.email.trim();
           if (inv.phone.trim()) updates.phone = inv.phone.trim();
@@ -126,7 +122,6 @@ const InvoiceUpload = ({ onBack, onLogout }: InvoiceUploadProps) => {
           clientId = newClient.id;
         }
 
-        // 2. Upload file if present
         let fileUrl: string | null = null;
         if (inv.file) {
           const ext = inv.file.name.split(".").pop();
@@ -145,7 +140,6 @@ const InvoiceUpload = ({ onBack, onLogout }: InvoiceUploadProps) => {
           }
         }
 
-        // 3. Create invoice
         const { data: newInvoice, error: invoiceError } = await supabase
           .from("invoices")
           .insert({
@@ -159,10 +153,9 @@ const InvoiceUpload = ({ onBack, onLogout }: InvoiceUploadProps) => {
           .single();
 
         if (invoiceError || !newInvoice) {
-          throw new Error(invoiceError?.message || "Erreur création facture");
+          throw new Error(invoiceError?.message || "Erreur création dossier");
         }
 
-        // 4. Generate AI reminder
         try {
           const { data: session } = await supabase.auth.getSession();
           const token = session?.session?.access_token;
@@ -183,15 +176,14 @@ const InvoiceUpload = ({ onBack, onLogout }: InvoiceUploadProps) => {
             console.warn("Reminder generation issue:", errData);
           }
         } catch (reminderErr) {
-          // Non-blocking — invoice is saved, reminder gen is best-effort
           console.warn("Could not generate reminder:", reminderErr);
         }
       }
 
       toast.success(
         invoices.length === 1
-          ? "Facture soumise ! L'IA commence les relances sous 24h."
-          : `${invoices.length} factures soumises ! Relances en cours.`,
+          ? "Dossier soumis ! L'adjointe commence le suivi sous 24h."
+          : `${invoices.length} dossiers soumis ! Suivis en cours.`,
         { description: invoices.map((i) => `${i.clientName} — ${i.amount} $`).join(", ") }
       );
       setInvoices([emptyInvoice()]);
@@ -206,9 +198,8 @@ const InvoiceUpload = ({ onBack, onLogout }: InvoiceUploadProps) => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border px-5 py-3">
-        <div className="max-w-lg mx-auto flex items-center justify-between">
+        <div className="max-w-xl mx-auto flex items-center justify-between">
           <button onClick={onBack} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="w-4 h-4" />
             Retour
@@ -219,18 +210,17 @@ const InvoiceUpload = ({ onBack, onLogout }: InvoiceUploadProps) => {
                 Déconnexion
               </button>
             )}
-            <span className="font-display font-bold text-primary text-sm">Lyss</span>
+            <span className="font-display font-bold text-primary text-sm">Admin-Flow</span>
           </div>
         </div>
       </header>
 
-      <div className="max-w-lg mx-auto px-5 py-8">
-        <h1 className="font-display text-2xl font-bold mb-1">Nouveau suivi</h1>
+      <div className="max-w-xl mx-auto px-5 py-8">
+        <h1 className="font-display text-2xl font-bold mb-1">Nouveau suivi client</h1>
         <p className="text-sm text-muted-foreground mb-8">
-          Ajoute les détails de la facture impayée. L'assistant s'occupe du reste.
+          Ajoute les détails de la facture. L'adjointe s'occupe du reste.
         </p>
 
-        {/* Invoice tabs */}
         {invoices.length > 1 && (
           <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
             {invoices.map((inv, i) => (
@@ -243,7 +233,7 @@ const InvoiceUpload = ({ onBack, onLogout }: InvoiceUploadProps) => {
                     : "bg-secondary text-muted-foreground border border-transparent"
                 }`}
               >
-                Facture {i + 1}
+                Dossier {i + 1}
                 {invoices.length > 1 && (
                   <X
                     className="w-3 h-3 hover:text-destructive"
@@ -266,7 +256,6 @@ const InvoiceUpload = ({ onBack, onLogout }: InvoiceUploadProps) => {
             exit={{ opacity: 0, y: -10 }}
             className="space-y-5"
           >
-            {/* File upload */}
             <div
               onClick={() => fileRef.current?.click()}
               className="border-2 border-dashed border-border rounded-xl p-6 text-center cursor-pointer hover:border-primary/40 transition-colors"
@@ -286,7 +275,6 @@ const InvoiceUpload = ({ onBack, onLogout }: InvoiceUploadProps) => {
               )}
             </div>
 
-            {/* Fields */}
             <div className="space-y-4">
               <div>
                 <label className="text-sm font-medium mb-1.5 block">Nom du client *</label>
@@ -334,7 +322,6 @@ const InvoiceUpload = ({ onBack, onLogout }: InvoiceUploadProps) => {
           </motion.div>
         </AnimatePresence>
 
-        {/* Actions */}
         <div className="flex gap-3 mt-8">
           <Button variant="outline" onClick={addInvoice} className="flex-shrink-0">
             <Plus className="w-4 h-4 mr-1" />
@@ -350,15 +337,15 @@ const InvoiceUpload = ({ onBack, onLogout }: InvoiceUploadProps) => {
             ) : (
               <>
                 <Send className="w-4 h-4 mr-1" />
-                Activer l'assistant — 1 crédit
+                Lancer le suivi — 1 crédit
               </>
             )}
           </Button>
         </div>
 
         <p className="text-xs text-muted-foreground text-center mt-6">
-          L'assistant enverra le premier message dans les 24 heures.
-          Tu seras notifié à chaque réponse de ton client. 1 crédit = 1 facture traitée.
+          L'adjointe enverra le premier message dans les 24 heures.
+          Tu seras notifié(e) à chaque réponse de ton client.
         </p>
       </div>
     </div>

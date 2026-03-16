@@ -413,6 +413,8 @@ const InvoiceUpload = ({ onBack, onLogout }: InvoiceUploadProps) => {
           L'adjointe enverra le premier message dans les 24 heures.
           Tu seras notifié(e) à chaque réponse de ton client.
         </p>
+        </>
+        )}
       </div>
     </div>
   );

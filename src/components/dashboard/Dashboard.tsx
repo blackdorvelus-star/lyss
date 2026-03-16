@@ -11,6 +11,7 @@ import {
   Loader2,
   Banknote,
   Sparkles,
+  Phone,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +26,8 @@ import PersonalitySelector, { type Personality } from "./PersonalitySelector";
 import WeeklyProductivity from "./WeeklyProductivity";
 import AssistantIdentity from "./AssistantIdentity";
 import PaymentSettings from "./PaymentSettings";
+import VapiCallButton from "./VapiCallButton";
+import CallHistory, { type CallLog } from "./CallHistory";
 
 interface DashboardProps {
   onBack: () => void;

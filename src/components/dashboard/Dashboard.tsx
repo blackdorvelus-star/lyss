@@ -114,7 +114,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
       .order("created_at", { ascending: false });
     if (calls) setCallLogs(calls as any as CallLog[]);
 
-    // Fetch vapi public key
+    // Fetch vapi config
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
       const { data: settings } = await supabase
@@ -122,9 +122,22 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
         .select("*")
         .eq("user_id", user.id)
         .single();
+      
+      let publicKey = (settings as any)?.vapi_public_key || null;
+      
+      // If no user-level key, fetch the default from edge function
+      if (!publicKey) {
+        try {
+          const { data: keyData } = await supabase.functions.invoke("get-vapi-key");
+          if (keyData?.key) publicKey = keyData.key;
+        } catch (e) {
+          console.log("Could not fetch default Vapi key");
+        }
+      }
+      
+      setVapiPublicKey(publicKey);
       if (settings) {
         const s = settings as any;
-        setVapiPublicKey(s.vapi_public_key || null);
         setVapiConfig({
           voiceId: s.vapi_voice_id,
           voiceProvider: s.vapi_voice_provider,

@@ -34,7 +34,7 @@ const HeroSection = ({ onStart }: HeroSectionProps) => {
 
         <p className="text-muted-foreground text-lg leading-relaxed mb-8 max-w-md mx-auto">
           Suivi de facturation, gestion des rendez-vous, relations clients — 
-          Admin-Flow s'occupe de ton administratif pendant que tu te concentres sur ton métier.
+          Lyss s'occupe de ton administratif pendant que tu te concentres sur ton métier.
         </p>
 
         <motion.div

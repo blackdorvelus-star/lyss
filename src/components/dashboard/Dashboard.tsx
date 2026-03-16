@@ -193,7 +193,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
             </div>
             <div className="flex items-center gap-3">
               <NotificationBell />
-              <span className="text-xs text-muted-foreground font-medium">Admin-Flow</span>
+              <span className="text-xs text-muted-foreground font-medium">Lyss</span>
             </div>
           </div>
         </header>

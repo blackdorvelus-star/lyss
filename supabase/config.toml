@@ -8,3 +8,12 @@ verify_jwt = false
 
 [functions.vapi-webhook]
 verify_jwt = false
+
+[functions.quickbooks-auth]
+verify_jwt = false
+
+[functions.quickbooks-callback]
+verify_jwt = false
+
+[functions.quickbooks-sync]
+verify_jwt = false

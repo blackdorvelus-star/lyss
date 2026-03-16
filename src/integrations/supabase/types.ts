@@ -283,6 +283,42 @@ export type Database = {
           },
         ]
       }
+      quickbooks_connections: {
+        Row: {
+          access_token: string
+          company_name: string | null
+          created_at: string
+          id: string
+          realm_id: string
+          refresh_token: string
+          token_expires_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_token: string
+          company_name?: string | null
+          created_at?: string
+          id?: string
+          realm_id: string
+          refresh_token: string
+          token_expires_at: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_token?: string
+          company_name?: string | null
+          created_at?: string
+          id?: string
+          realm_id?: string
+          refresh_token?: string
+          token_expires_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       reminders: {
         Row: {
           channel: string

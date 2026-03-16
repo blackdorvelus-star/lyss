@@ -135,7 +135,9 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
   const totalOwed = invoices.reduce((s, i) => s + i.amount, 0);
   const totalRecovered = invoices.reduce((s, i) => s + (i.amount_recovered || 0), 0);
   const activeCount = invoices.filter((i) => i.status === "in_progress").length;
-  const totalReminders = Object.values(reminders).flat().length;
+  const creditsUsed = invoices.length;
+  const freeCredits = Math.max(0, 3 - creditsUsed);
+  const serviceCost = Math.max(0, creditsUsed - 3) * 20;
 
   const formatMoney = (n: number) =>
     new Intl.NumberFormat("fr-CA", { style: "currency", currency: "CAD", maximumFractionDigits: 0 }).format(n);

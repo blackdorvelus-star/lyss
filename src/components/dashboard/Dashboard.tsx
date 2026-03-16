@@ -17,12 +17,13 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import NotificationBell from "@/components/notifications/NotificationBell";
-import AppSidebar from "./AppSidebar";
+import AppSidebar, { type Section } from "./AppSidebar";
 import SavingsWidget from "./SavingsWidget";
 import ActivityHistory, { type ActivityItem } from "./ActivityHistory";
 import FinancialHealth from "./FinancialHealth";
 import PersonalitySelector, { type Personality } from "./PersonalitySelector";
 import WeeklyProductivity from "./WeeklyProductivity";
+import AssistantIdentity from "./AssistantIdentity";
 
 interface DashboardProps {
   onBack: () => void;

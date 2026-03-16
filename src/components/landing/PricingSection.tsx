@@ -1,12 +1,12 @@
 import { motion } from "framer-motion";
-import { Check, Shield } from "lucide-react";
+import { Check, Shield, Zap } from "lucide-react";
 
 const benefits = [
   "0 $ à l'inscription",
   "Aucun abonnement mensuel",
-  "Commission de 10 % seulement sur le montant récupéré",
-  "Si on récupère rien, tu paies rien",
-  "Conforme aux lois québécoises sur le recouvrement",
+  "20 $ par facture traitée — SMS, courriels et appels inclus",
+  "Paye seulement quand l'IA commence les relances",
+  "3 crédits gratuits pour essayer le service",
 ];
 
 const PricingSection = () => {
@@ -21,7 +21,14 @@ const PricingSection = () => {
         >
           <div className="flex items-center gap-2 mb-4">
             <Shield className="w-5 h-5 text-primary" />
-            <h2 className="font-display text-xl font-bold">Zéro risque</h2>
+            <h2 className="font-display text-xl font-bold">Simple et transparent</h2>
+          </div>
+
+          {/* Price card */}
+          <div className="bg-card rounded-xl p-5 border border-border mb-6 text-center">
+            <p className="text-xs text-muted-foreground mb-1">Par facture traitée</p>
+            <p className="font-display text-4xl font-bold text-primary">20 $</p>
+            <p className="text-xs text-muted-foreground mt-1">Jusqu'à 5 SMS + 3 courriels + 2 appels IA</p>
           </div>
 
           <div className="space-y-3 mb-6">
@@ -33,13 +40,25 @@ const PricingSection = () => {
             ))}
           </div>
 
-          <div className="bg-card rounded-xl p-4 border border-border">
+          {/* Free trial badge */}
+          <div className="bg-accent/10 border border-accent/20 rounded-xl p-4 flex items-center gap-3">
+            <Zap className="w-5 h-5 text-accent flex-shrink-0" />
+            <div>
+              <p className="text-sm font-semibold text-foreground">Pack de bienvenue</p>
+              <p className="text-xs text-muted-foreground">
+                Tes 3 premières factures sont gratuites. Aucune carte de crédit requise.
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-card rounded-xl p-4 border border-border mt-4">
             <p className="text-sm text-muted-foreground mb-1">Exemple concret</p>
             <p className="text-sm leading-relaxed">
-              Tu as <span className="text-accent font-semibold">12 000 $</span> de factures en retard. 
-              On en récupère <span className="text-primary font-semibold">8 500 $</span>. 
-              Tu nous donnes <span className="font-semibold">850 $</span>, tu gardes{" "}
-              <span className="text-primary font-bold">7 650 $</span> que t'avais déjà oublié.
+              Tu as une facture de <span className="text-accent font-semibold">1 200 $</span> en retard.
+              Tu paies <span className="font-semibold">20 $</span> pour activer l'assistant.
+              L'IA relance ton client et tu récupères{" "}
+              <span className="text-primary font-bold">1 200 $</span>. ROI :{" "}
+              <span className="text-primary font-bold">60x</span>.
             </p>
           </div>
         </motion.div>

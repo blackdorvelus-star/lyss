@@ -168,6 +168,17 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
 
       <div className="max-w-lg mx-auto px-5 py-6">
         {/* Stats */}
+        {/* Credits banner */}
+        {freeCredits > 0 && (
+          <div className="bg-accent/10 border border-accent/20 rounded-xl p-3 mb-4 flex items-center gap-3">
+            <span className="text-accent text-lg">⚡</span>
+            <p className="text-sm text-foreground">
+              <span className="font-semibold">{freeCredits} crédit{freeCredits > 1 ? "s" : ""} gratuit{freeCredits > 1 ? "s" : ""}</span>{" "}
+              restant{freeCredits > 1 ? "s" : ""}
+            </p>
+          </div>
+        )}
+
         <div className="grid grid-cols-2 gap-3 mb-8">
           <div className="bg-card border border-border rounded-xl p-4">
             <p className="text-xs text-muted-foreground mb-1">Total dû</p>
@@ -178,12 +189,17 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
             <p className="font-display text-xl font-bold text-primary">{formatMoney(totalRecovered)}</p>
           </div>
           <div className="bg-card border border-border rounded-xl p-4">
-            <p className="text-xs text-muted-foreground mb-1">Relances actives</p>
+            <p className="text-xs text-muted-foreground mb-1">Suivis actifs</p>
             <p className="font-display text-xl font-bold">{activeCount}</p>
           </div>
           <div className="bg-card border border-border rounded-xl p-4">
-            <p className="text-xs text-muted-foreground mb-1">Messages envoyés</p>
-            <p className="font-display text-xl font-bold">{totalReminders}</p>
+            <p className="text-xs text-muted-foreground mb-1">Coût du service</p>
+            <p className="font-display text-xl font-bold">{formatMoney(serviceCost)}</p>
+            {totalRecovered > 0 && (
+              <p className="text-xs text-primary mt-0.5">
+                ROI : {serviceCost > 0 ? `${Math.round(totalRecovered / serviceCost)}x` : "∞"}
+              </p>
+            )}
           </div>
         </div>
 

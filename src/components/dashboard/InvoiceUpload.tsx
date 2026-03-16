@@ -357,8 +357,8 @@ const InvoiceUpload = ({ onBack, onLogout }: InvoiceUploadProps) => {
         </div>
 
         <p className="text-xs text-muted-foreground text-center mt-6">
-          L'IA enverra le premier message dans les 24 heures.
-          Tu seras notifié à chaque réponse de ton client.
+          L'assistant enverra le premier message dans les 24 heures.
+          Tu seras notifié à chaque réponse de ton client. 1 crédit = 1 facture traitée.
         </p>
       </div>
     </div>

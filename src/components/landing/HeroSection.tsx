@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowRight, DollarSign } from "lucide-react";
+import { ArrowRight, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface HeroSectionProps {
@@ -25,8 +25,8 @@ const HeroSection = ({ onStart }: HeroSectionProps) => {
           transition={{ delay: 0.2 }}
           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/30 bg-primary/10 text-primary text-sm font-medium mb-8"
         >
-          <DollarSign className="w-3.5 h-3.5" />
-          Recouvrement amiable par IA
+          <Zap className="w-3.5 h-3.5" />
+          Assistant de suivi de facturation
         </motion.div>
 
         <h1 className="font-display text-4xl sm:text-5xl font-bold leading-[1.1] tracking-tight mb-5">
@@ -36,7 +36,7 @@ const HeroSection = ({ onStart }: HeroSectionProps) => {
 
         <p className="text-muted-foreground text-lg leading-relaxed mb-8 max-w-md mx-auto">
           Dépose tes factures en retard. L'IA relance tes clients avec le bon ton, négocie des plans de paiement, et te ramène ton cash.{" "}
-          <span className="text-accent font-semibold">Tu paies seulement si ça marche.</span>
+          <span className="text-accent font-semibold">3 factures gratuites pour essayer.</span>
         </p>
 
         <motion.div
@@ -62,7 +62,7 @@ const HeroSection = ({ onStart }: HeroSectionProps) => {
           transition={{ delay: 0.7 }}
           className="mt-8 text-sm text-muted-foreground"
         >
-          0 $ à payer d'avance · Commission de 10 % uniquement sur le montant récupéré
+          20 $ par facture · 3 premières gratuites · Aucun abonnement
         </motion.p>
       </motion.div>
     </section>

@@ -11,13 +11,13 @@ const steps = [
   {
     icon: MessageSquare,
     title: "L'IA relance ton client",
-    desc: "SMS et courriels dans un ton québécois pro. Poli mais persistant.",
+    desc: "SMS, courriels et appels dans un ton québécois pro. Poli mais persistant.",
     accent: false,
   },
   {
     icon: Banknote,
     title: "Tu reçois ton argent",
-    desc: "Paiement Interac, plan en 2-3 versements. On prend 10 % seulement.",
+    desc: "Paiement Interac ou plan en versements. 20 $ par facture traitée.",
     accent: true,
   },
 ];

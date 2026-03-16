@@ -23,6 +23,7 @@ const App = () => (
           <Route path="/payer/:token" element={<PayerPortal />} />
           <Route path="/widget/:userId" element={<ClientWidget />} />
           <Route path="/admin" element={<AdminPage />} />
+          <Route path="/tarifs" element={<TarifsPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

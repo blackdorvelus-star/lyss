@@ -40,6 +40,7 @@ const ClientWidget = () => {
   const [selectedInvoice, setSelectedInvoice] = useState<InvoiceResult | null>(null);
   const [businessName, setBusinessName] = useState("Entreprise");
   const [businessLogo, setBusinessLogo] = useState<string | null>(null);
+  const [allowDisputes, setAllowDisputes] = useState(false);
 
   // Chat state
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);

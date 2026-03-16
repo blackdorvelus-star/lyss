@@ -1,23 +1,23 @@
 import { motion } from "framer-motion";
-import { Upload, MessageSquare, Banknote } from "lucide-react";
+import { Upload, MessageSquare, CheckCircle } from "lucide-react";
 
 const steps = [
   {
     icon: Upload,
-    title: "Dépose ta facture",
-    desc: "PDF, photo ou lien QuickBooks. 30 secondes max.",
+    title: "Dépose ta tâche",
+    desc: "Facture impayée, rappel de rendez-vous ou suivi client. 30 secondes max.",
     accent: false,
   },
   {
     icon: MessageSquare,
-    title: "L'IA relance ton client",
-    desc: "SMS, courriels et appels dans un ton québécois pro. Poli mais persistant.",
+    title: "L'adjointe s'en occupe",
+    desc: "Messages professionnels en ton québécois. SMS, courriels et appels inclus.",
     accent: false,
   },
   {
-    icon: Banknote,
-    title: "Tu reçois ton argent",
-    desc: "Paiement Interac ou plan en versements. 20 $ par facture traitée.",
+    icon: CheckCircle,
+    title: "Résultat livré",
+    desc: "Paiement reçu, rendez-vous confirmé, client satisfait. Tu restes informé(e).",
     accent: true,
   },
 ];
@@ -25,7 +25,7 @@ const steps = [
 const HowItWorks = () => {
   return (
     <section className="px-5 py-16">
-      <div className="max-w-lg mx-auto">
+      <div className="max-w-xl mx-auto">
         <h2 className="font-display text-2xl font-bold text-center mb-10">
           Comment ça marche
         </h2>

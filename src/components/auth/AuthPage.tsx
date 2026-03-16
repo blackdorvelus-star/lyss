@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
+import { Mail, Lock, ArrowRight, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -36,7 +36,7 @@ const AuthPage = ({ onAuth }: AuthPageProps) => {
           options: { emailRedirectTo: window.location.origin },
         });
         if (error) throw error;
-        toast.success("Compte créé ! Tu es connecté.");
+        toast.success("Compte créé ! Tu es connecté(e).");
         onAuth();
       } else {
         const { error } = await supabase.auth.signInWithPassword({
@@ -57,9 +57,8 @@ const AuthPage = ({ onAuth }: AuthPageProps) => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
       <header className="px-5 py-4">
-        <span className="font-display font-bold text-primary text-lg">Lyss</span>
+        <span className="font-display font-bold text-primary text-lg">Admin-Flow</span>
       </header>
 
       <div className="flex-1 flex items-center justify-center px-5 pb-12">
@@ -68,13 +67,16 @@ const AuthPage = ({ onAuth }: AuthPageProps) => {
           animate={{ opacity: 1, y: 0 }}
           className="w-full max-w-sm"
         >
-          <h1 className="font-display text-2xl font-bold mb-2">
-            {mode === "login" ? "Bon retour 👋" : "Crée ton compte"}
-          </h1>
+          <div className="flex items-center gap-2 mb-2">
+            <Sparkles className="w-5 h-5 text-primary" />
+            <h1 className="font-display text-2xl font-bold">
+              {mode === "login" ? "Bon retour 👋" : "Crée ton compte"}
+            </h1>
+          </div>
           <p className="text-sm text-muted-foreground mb-8">
             {mode === "login"
-              ? "Connecte-toi pour gérer tes suivis de facturation."
-              : "Inscris-toi pour récupérer tes factures impayées. 3 crédits gratuits inclus."}
+              ? "Connecte-toi pour accéder à ton bureau virtuel."
+              : "Inscris-toi pour accéder à ton adjointe IA. 3 tâches gratuites incluses."}
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">

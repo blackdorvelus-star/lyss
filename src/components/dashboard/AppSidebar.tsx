@@ -1,5 +1,4 @@
 import { useState } from "react";
-import logoLyss from "@/assets/logo-lyss.png";
 import { Users, FileText, Calendar, Settings, LogOut, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -30,7 +29,7 @@ const AppSidebar = ({ activeSection, onSectionChange, onLogout }: AppSidebarProp
     >
       {/* Brand */}
       <div className="flex items-center px-2 py-3 border-b border-sidebar-border">
-        <img src={logoLyss} alt="Lyss" className={cn("flex-shrink-0 object-contain", collapsed ? "h-8" : "h-10")} />
+        <img src="/logo-lyss.png" alt="Lyss" className={cn("flex-shrink-0 object-contain", collapsed ? "h-8" : "h-10")} />
       </div>
 
       {/* Nav */}

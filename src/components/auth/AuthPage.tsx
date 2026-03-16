@@ -1,5 +1,4 @@
 import { useState } from "react";
-import logoLyss from "@/assets/logo-lyss.png";
 import { motion } from "framer-motion";
 import { Mail, Lock, ArrowRight, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -59,7 +58,7 @@ const AuthPage = ({ onAuth }: AuthPageProps) => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <header className="px-5 py-4">
-        <img src={logoLyss} alt="Lyss" className="h-10 object-contain" />
+        <img src="/logo-lyss.png" alt="Lyss" className="h-10 object-contain" />
       </header>
 
       <div className="flex-1 flex items-center justify-center px-5 pb-12">

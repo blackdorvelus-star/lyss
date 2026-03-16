@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { Users, FileText, Calendar, Settings, LogOut, ChevronLeft, ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Users, FileText, Calendar, Settings, LogOut, ChevronLeft, ChevronRight, Shield } from "lucide-react";
+import { useAdmin } from "@/hooks/useAdmin";
 import { cn } from "@/lib/utils";
 
 export type Section = "clients" | "billing" | "calendar" | "settings";

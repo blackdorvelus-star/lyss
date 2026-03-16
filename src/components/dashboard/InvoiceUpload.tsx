@@ -350,7 +350,7 @@ const InvoiceUpload = ({ onBack, onLogout }: InvoiceUploadProps) => {
             ) : (
               <>
                 <Send className="w-4 h-4 mr-1" />
-                Lancer la relance
+                Activer l'assistant — 1 crédit
               </>
             )}
           </Button>

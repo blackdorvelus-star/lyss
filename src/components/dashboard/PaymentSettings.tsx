@@ -166,28 +166,6 @@ const PaymentSettings = () => {
         </div>
       </div>
 
-      {/* Vapi section */}
-      <div className="bg-card border border-border rounded-xl p-4 space-y-3">
-        <div className="flex items-center gap-2">
-          <Phone className="w-4 h-4 text-primary" />
-          <h4 className="font-medium text-sm">Agent vocal Vapi.ai</h4>
-        </div>
-        <div className="space-y-1.5">
-          <label className="text-xs text-muted-foreground">
-            Clé publique Vapi (Public Key)
-          </label>
-          <Input
-            value={vapiPublicKey}
-            onChange={(e) => setVapiPublicKey(e.target.value)}
-            placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-            className="bg-secondary font-mono text-xs"
-          />
-          <p className="text-xs text-muted-foreground">
-            Disponible dans ton tableau de bord Vapi → Settings → Public Key.
-          </p>
-        </div>
-      </div>
-
       <Button
         onClick={saveSettings}
         disabled={saving}

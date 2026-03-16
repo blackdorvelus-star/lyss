@@ -45,6 +45,14 @@ serve(async (req) => {
       throw new Error(error.message);
     }
 
+    // Mark invoice as disputed to suspend auto-reminders
+    if (invoice_id) {
+      await supabase
+        .from('invoices')
+        .update({ status: 'disputed' })
+        .eq('id', invoice_id);
+    }
+
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });

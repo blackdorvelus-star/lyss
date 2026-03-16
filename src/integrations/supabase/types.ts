@@ -197,6 +197,7 @@ export type Database = {
           interac_answer: string | null
           interac_email: string | null
           interac_question: string | null
+          onboarding_completed: boolean
           stripe_link: string | null
           updated_at: string
           user_id: string
@@ -218,6 +219,7 @@ export type Database = {
           interac_answer?: string | null
           interac_email?: string | null
           interac_question?: string | null
+          onboarding_completed?: boolean
           stripe_link?: string | null
           updated_at?: string
           user_id: string
@@ -239,6 +241,7 @@ export type Database = {
           interac_answer?: string | null
           interac_email?: string | null
           interac_question?: string | null
+          onboarding_completed?: boolean
           stripe_link?: string | null
           updated_at?: string
           user_id?: string

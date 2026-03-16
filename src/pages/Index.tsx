@@ -11,8 +11,9 @@ import Footer from "@/components/landing/Footer";
 import InvoiceUpload from "@/components/dashboard/InvoiceUpload";
 import Dashboard from "@/components/dashboard/Dashboard";
 import AuthPage from "@/components/auth/AuthPage";
+import OnboardingWizard from "@/components/onboarding/OnboardingWizard";
 
-type View = "landing" | "auth" | "upload" | "dashboard";
+type View = "landing" | "auth" | "onboarding" | "upload" | "dashboard";
 
 const Index = () => {
   const [view, setView] = useState<View>("landing");
@@ -35,16 +36,31 @@ const Index = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const handleStart = () => {
+  const checkOnboarding = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return false;
+
+    const { data } = await supabase
+      .from("payment_settings")
+      .select("onboarding_completed")
+      .eq("user_id", user.id)
+      .single();
+
+    return (data as any)?.onboarding_completed === true;
+  };
+
+  const handleStart = async () => {
     if (session) {
-      setView("dashboard");
+      const completed = await checkOnboarding();
+      setView(completed ? "dashboard" : "onboarding");
     } else {
       setView("auth");
     }
   };
 
-  const handleAuth = () => {
-    setView("dashboard");
+  const handleAuth = async () => {
+    const completed = await checkOnboarding();
+    setView(completed ? "dashboard" : "onboarding");
   };
 
   const handleLogout = async () => {
@@ -62,6 +78,10 @@ const Index = () => {
 
   if (view === "auth" && !session) {
     return <AuthPage onAuth={handleAuth} />;
+  }
+
+  if (view === "onboarding") {
+    return <OnboardingWizard onComplete={() => setView("dashboard")} />;
   }
 
   if (view === "dashboard") {

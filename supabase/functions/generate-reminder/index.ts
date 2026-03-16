@@ -88,6 +88,14 @@ serve(async (req) => {
       });
     }
 
+    // Skip disputed invoices
+    if (invoice.status === 'disputed') {
+      return new Response(JSON.stringify({ error: "Facture contestée — relances suspendues" }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const client = invoice.clients;
     const dueDateStr = invoice.due_date
       ? new Date(invoice.due_date).toLocaleDateString("fr-CA", { day: "numeric", month: "long" })

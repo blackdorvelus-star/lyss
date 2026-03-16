@@ -29,6 +29,7 @@ import PaymentSettings from "./PaymentSettings";
 import VapiCallButton from "./VapiCallButton";
 import CallHistory, { type CallLog } from "./CallHistory";
 import VapiAssistantConfig from "./VapiAssistantConfig";
+import ClientManagement from "./ClientManagement";
 
 interface DashboardProps {
   onBack: () => void;
@@ -60,6 +61,7 @@ const statusConfig: Record<string, { label: string; icon: typeof Clock; color: s
   pending: { label: "En attente", icon: Clock, color: "text-accent" },
   in_progress: { label: "Suivi en cours", icon: MessageSquare, color: "text-primary" },
   recovered: { label: "Réglé", icon: CheckCircle2, color: "text-primary" },
+  disputed: { label: "Contesté", icon: XCircle, color: "text-accent" },
   failed: { label: "Non résolu", icon: XCircle, color: "text-destructive" },
   cancelled: { label: "Annulé", icon: XCircle, color: "text-muted-foreground" },
 };
@@ -448,7 +450,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
               )}
             </div>
           ) : activeSection === "clients" ? (
-            <PlaceholderSection title="Relations clients" desc="Les sondages de satisfaction et le suivi de la relation client arrivent bientôt." />
+            <ClientManagement />
           ) : activeSection === "settings" ? (
             <div className="max-w-2xl space-y-10">
               <AssistantIdentity />

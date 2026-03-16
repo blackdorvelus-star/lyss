@@ -65,6 +65,7 @@ const OnboardingWizard = ({ onComplete }: OnboardingWizardProps) => {
         user_id: user.id,
         company_name: companyName.trim(),
         interac_email: interacEmail.trim() || null,
+        stripe_link: stripeLink.trim() || null,
         assistant_name: assistantName.trim(),
         assistant_role: assistantRole.trim(),
         onboarding_completed: true,

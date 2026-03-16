@@ -210,7 +210,7 @@ const InvoiceUpload = ({ onBack, onLogout }: InvoiceUploadProps) => {
                 Déconnexion
               </button>
             )}
-            <img src="/logo-lyss.png" alt="Lyss" className="h-10 object-contain brightness-150 contrast-125 drop-shadow-[0_0_10px_hsl(160,30%,46%,0.6)]" />
+            <img src="/logo-lyss.png" alt="Lyss" className="h-10 object-contain" style={{ filter: 'brightness(3) contrast(1.2) drop-shadow(0 0 10px hsl(160 30% 46% / 0.6))' }} />
           </div>
         </div>
       </header>

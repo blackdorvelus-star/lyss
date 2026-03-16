@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { Users, FileText, Calendar, Settings, LogOut, ChevronLeft, ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Users, FileText, Calendar, Settings, LogOut, ChevronLeft, ChevronRight, Shield } from "lucide-react";
+import { useAdmin } from "@/hooks/useAdmin";
 import { cn } from "@/lib/utils";
 
 export type Section = "clients" | "billing" | "calendar" | "settings";
@@ -19,6 +21,8 @@ const navItems: { id: Section; label: string; icon: typeof Users }[] = [
 
 const AppSidebar = ({ activeSection, onSectionChange, onLogout }: AppSidebarProps) => {
   const [collapsed, setCollapsed] = useState(false);
+  const { isAdmin } = useAdmin();
+  const navigate = useNavigate();
 
   return (
     <aside
@@ -53,6 +57,19 @@ const AppSidebar = ({ activeSection, onSectionChange, onLogout }: AppSidebarProp
             </button>
           );
         })}
+        {isAdmin && (
+          <button
+            onClick={() => navigate("/admin")}
+            className={cn(
+              "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+              "text-primary hover:bg-sidebar-accent/50"
+            )}
+            title={collapsed ? "Administration" : undefined}
+          >
+            <Shield className="w-4.5 h-4.5 flex-shrink-0" />
+            {!collapsed && <span className="truncate">Administration</span>}
+          </button>
+        )}
       </nav>
 
       {/* Bottom */}

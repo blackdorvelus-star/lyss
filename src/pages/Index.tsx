@@ -5,6 +5,7 @@ import HeroSection from "@/components/landing/HeroSection";
 import HowItWorks from "@/components/landing/HowItWorks";
 import MessagePreview from "@/components/landing/MessagePreview";
 import PricingSection from "@/components/landing/PricingSection";
+import FAQSection from "@/components/landing/FAQSection";
 import Footer from "@/components/landing/Footer";
 import InvoiceUpload from "@/components/dashboard/InvoiceUpload";
 import Dashboard from "@/components/dashboard/Dashboard";
@@ -109,6 +110,7 @@ const Index = () => {
       <HowItWorks />
       <MessagePreview />
       <PricingSection />
+      <FAQSection />
       <Footer />
     </div>
   );

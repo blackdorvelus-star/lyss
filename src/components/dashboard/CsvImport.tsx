@@ -310,12 +310,12 @@ const CsvImport = ({ onComplete }: CsvImportProps) => {
               onClick={() => fileRef.current?.click()}
               className="border-2 border-dashed border-border rounded-xl p-8 text-center cursor-pointer hover:border-primary/40 transition-colors"
             >
-              <input ref={fileRef} type="file" accept=".csv,.txt" onChange={handleFile} className="hidden" />
+              <input ref={fileRef} type="file" accept=".csv,.txt,.xlsx,.xls" onChange={handleFile} className="hidden" />
               <FileSpreadsheet className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-              <p className="text-sm font-medium">Glisse ton fichier CSV ici</p>
+              <p className="text-sm font-medium">Glisse ton fichier CSV ou Excel ici</p>
               <p className="text-xs text-muted-foreground mt-1">ou clique pour sélectionner</p>
               <p className="text-xs text-muted-foreground mt-3">
-                Colonnes attendues : Nom du client, Montant, Courriel, Téléphone, # Facture, Date d'échéance
+                Formats acceptés : .csv, .xlsx, .xls
               </p>
             </div>
           </motion.div>

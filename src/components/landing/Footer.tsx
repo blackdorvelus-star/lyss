@@ -64,14 +64,14 @@ const Footer = () => {
             <h4 className="font-display font-semibold text-sm mb-3">Légal</h4>
             <ul className="space-y-2">
               <li>
-                <span className="text-xs text-muted-foreground">
+                <button onClick={() => navigate("/politique-confidentialite")} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
                   Politique de confidentialité
-                </span>
+                </button>
               </li>
               <li>
-                <span className="text-xs text-muted-foreground">
+                <button onClick={() => navigate("/conditions-utilisation")} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
                   Conditions d'utilisation
-                </span>
+                </button>
               </li>
             </ul>
           </div>

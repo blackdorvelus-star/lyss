@@ -8,6 +8,8 @@ import PayerPortal from "./pages/PayerPortal.tsx";
 import ClientWidget from "./pages/ClientWidget.tsx";
 import AdminPage from "./pages/AdminPage.tsx";
 import TarifsPage from "./pages/TarifsPage.tsx";
+import PrivacyPage from "./pages/PrivacyPage.tsx";
+import TermsPage from "./pages/TermsPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -24,6 +26,8 @@ const App = () => (
           <Route path="/widget/:userId" element={<ClientWidget />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/tarifs" element={<TarifsPage />} />
+          <Route path="/politique-confidentialite" element={<PrivacyPage />} />
+          <Route path="/conditions-utilisation" element={<TermsPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

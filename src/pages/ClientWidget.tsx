@@ -78,6 +78,7 @@ const ClientWidget = () => {
       setResults(data.results || []);
       setBusinessName(data.business?.company_name || "Entreprise");
       setBusinessLogo(data.business?.company_logo_url || null);
+      setAllowDisputes(data.business?.allow_disputes ?? false);
       setView("results");
     } catch (err: any) {
       toast.error(err.message || "Erreur de recherche");

@@ -122,7 +122,20 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
         .select("*")
         .eq("user_id", user.id)
         .single();
-      if (settings) setVapiPublicKey((settings as any).vapi_public_key || null);
+      if (settings) {
+        const s = settings as any;
+        setVapiPublicKey(s.vapi_public_key || null);
+        setVapiConfig({
+          voiceId: s.vapi_voice_id,
+          voiceProvider: s.vapi_voice_provider,
+          personality: s.vapi_personality,
+          customInstructions: s.vapi_custom_instructions,
+          firstMessageTemplate: s.vapi_first_message_template,
+          assistantName: s.assistant_name,
+          assistantRole: s.assistant_role,
+          companyName: s.company_name,
+        });
+      }
     }
 
     setLoading(false);

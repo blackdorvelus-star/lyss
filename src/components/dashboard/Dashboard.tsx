@@ -374,6 +374,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                                       amount={inv.amount}
                                       invoiceNumber={inv.invoice_number}
                                       vapiPublicKey={vapiPublicKey}
+                                      vapiConfig={vapiConfig}
                                       onCallEnd={fetchData}
                                     />
                                   </div>

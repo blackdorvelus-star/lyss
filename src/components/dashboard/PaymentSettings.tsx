@@ -13,7 +13,6 @@ const PaymentSettings = () => {
   const [stripeLink, setStripeLink] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [loading, setLoading] = useState(true);
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {

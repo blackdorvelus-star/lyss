@@ -33,6 +33,7 @@ interface PortalData {
     interac_question: string | null;
     interac_answer: string | null;
     stripe_link: string | null;
+    allow_disputes: boolean;
   };
 }
 
@@ -374,7 +375,8 @@ const PayerPortal = () => {
               )}
             </motion.div>
 
-            {/* Report a problem */}
+            {/* Report a problem - only if allowed */}
+            {business.allow_disputes && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -426,6 +428,7 @@ const PayerPortal = () => {
                 )}
               </AnimatePresence>
             </motion.div>
+            )}
           </>
         )}
       </main>

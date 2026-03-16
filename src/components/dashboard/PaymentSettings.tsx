@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Banknote, CreditCard, Building2, Save, Loader2, Link2 } from "lucide-react";
+import { Banknote, CreditCard, Building2, Save, Loader2, Link2, ShieldAlert } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -12,6 +13,7 @@ const PaymentSettings = () => {
   const [interacAnswer, setInteracAnswer] = useState("");
   const [stripeLink, setStripeLink] = useState("");
   const [companyName, setCompanyName] = useState("");
+  const [allowDisputes, setAllowDisputes] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -35,6 +37,7 @@ const PaymentSettings = () => {
       setInteracAnswer(data.interac_answer || "");
       setStripeLink(data.stripe_link || "");
       setCompanyName(data.company_name || "");
+      setAllowDisputes((data as any).allow_disputes ?? false);
     }
     setLoading(false);
   };
@@ -51,6 +54,7 @@ const PaymentSettings = () => {
       interac_answer: interacAnswer || null,
       stripe_link: stripeLink || null,
       company_name: companyName || null,
+      allow_disputes: allowDisputes,
     } as any;
 
     const { error } = await supabase
@@ -162,6 +166,22 @@ const PaymentSettings = () => {
           <p className="text-xs text-muted-foreground">
             Crée un lien depuis ton tableau de bord Stripe → Payment Links.
           </p>
+        </div>
+      </div>
+
+      {/* Disputes toggle */}
+      <div className="bg-card border border-border rounded-xl p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <ShieldAlert className="w-4 h-4 text-accent" />
+            <div>
+              <h4 className="font-medium text-sm">Autoriser les contestations</h4>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Permet à tes clients de signaler un problème ou demander un délai via le portail et le widget.
+              </p>
+            </div>
+          </div>
+          <Switch checked={allowDisputes} onCheckedChange={setAllowDisputes} />
         </div>
       </div>
 

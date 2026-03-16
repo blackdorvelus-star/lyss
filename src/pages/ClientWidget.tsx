@@ -40,6 +40,7 @@ const ClientWidget = () => {
   const [selectedInvoice, setSelectedInvoice] = useState<InvoiceResult | null>(null);
   const [businessName, setBusinessName] = useState("Entreprise");
   const [businessLogo, setBusinessLogo] = useState<string | null>(null);
+  const [allowDisputes, setAllowDisputes] = useState(false);
 
   // Chat state
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -77,6 +78,7 @@ const ClientWidget = () => {
       setResults(data.results || []);
       setBusinessName(data.business?.company_name || "Entreprise");
       setBusinessLogo(data.business?.company_logo_url || null);
+      setAllowDisputes(data.business?.allow_disputes ?? false);
       setView("results");
     } catch (err: any) {
       toast.error(err.message || "Erreur de recherche");
@@ -244,9 +246,11 @@ const ClientWidget = () => {
                   <Button onClick={() => { setView("chat"); setChatMessages([]); }} variant="default" className="flex-1">
                     <MessageSquare className="w-4 h-4 mr-2" /> Discuter avec l'adjointe
                   </Button>
+                  {allowDisputes && (
                   <Button onClick={() => setView("dispute")} variant="outline" className="flex-1">
                     <AlertCircle className="w-4 h-4 mr-2" /> Signaler un problème
                   </Button>
+                  )}
                 </motion.div>
               )}
             </motion.div>

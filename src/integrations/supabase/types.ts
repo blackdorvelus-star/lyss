@@ -187,6 +187,7 @@ export type Database = {
       }
       payment_settings: {
         Row: {
+          allow_disputes: boolean
           assistant_name: string | null
           assistant_role: string | null
           company_logo_url: string | null
@@ -207,6 +208,7 @@ export type Database = {
           vapi_voice_provider: string | null
         }
         Insert: {
+          allow_disputes?: boolean
           assistant_name?: string | null
           assistant_role?: string | null
           company_logo_url?: string | null
@@ -227,6 +229,7 @@ export type Database = {
           vapi_voice_provider?: string | null
         }
         Update: {
+          allow_disputes?: boolean
           assistant_name?: string | null
           assistant_role?: string | null
           company_logo_url?: string | null

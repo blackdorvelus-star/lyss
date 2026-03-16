@@ -64,7 +64,7 @@ serve(async (req) => {
     // Get business info for branding
     const { data: settings } = await supabase
       .from('payment_settings')
-      .select('company_name, company_logo_url')
+      .select('company_name, company_logo_url, allow_disputes')
       .eq('user_id', user_id)
       .single();
 
@@ -73,6 +73,7 @@ serve(async (req) => {
       business: {
         company_name: settings?.company_name || 'Entreprise',
         company_logo_url: settings?.company_logo_url || null,
+        allow_disputes: settings?.allow_disputes ?? false,
       }
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }

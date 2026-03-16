@@ -5,15 +5,15 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-interface FBConnection {
+interface SageConnection {
   id: string;
-  account_id: string;
+  resource_owner_id: string;
   business_name: string | null;
   updated_at: string;
 }
 
-const FreshBooksConnect = () => {
-  const [connection, setConnection] = useState<FBConnection | null>(null);
+const SageConnect = () => {
+  const [connection, setConnection] = useState<SageConnection | null>(null);
   const [loading, setLoading] = useState(true);
   const [connecting, setConnecting] = useState(false);
   const [syncing, setSyncing] = useState(false);
@@ -22,8 +22,8 @@ const FreshBooksConnect = () => {
   useEffect(() => {
     loadConnection();
     const params = new URLSearchParams(window.location.search);
-    if (params.get('fb_connected') === 'true') {
-      toast.success("FreshBooks connecté avec succès !");
+    if (params.get('sage_connected') === 'true') {
+      toast.success("Sage connecté avec succès !");
       window.history.replaceState({}, '', window.location.pathname);
       loadConnection();
     }
@@ -34,12 +34,12 @@ const FreshBooksConnect = () => {
     if (!user) return;
 
     const { data } = await (supabase
-      .from("freshbooks_connections" as any)
-      .select("id, account_id, business_name, updated_at")
+      .from("sage_connections" as any)
+      .select("id, resource_owner_id, business_name, updated_at")
       .eq("user_id", user.id)
       .single() as any);
 
-    setConnection(data as FBConnection | null);
+    setConnection(data as SageConnection | null);
     setLoading(false);
   };
 
@@ -50,7 +50,7 @@ const FreshBooksConnect = () => {
       const token = session?.session?.access_token;
 
       const res = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/freshbooks-auth`,
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/sage-auth`,
         {
           method: "POST",
           headers: {
@@ -77,7 +77,7 @@ const FreshBooksConnect = () => {
       const token = session?.session?.access_token;
 
       const res = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/freshbooks-sync`,
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/sage-sync`,
         {
           method: "POST",
           headers: {
@@ -108,12 +108,12 @@ const FreshBooksConnect = () => {
       if (!user) return;
 
       await (supabase
-        .from("freshbooks_connections" as any)
+        .from("sage_connections" as any)
         .delete()
         .eq("user_id", user.id) as any);
 
       setConnection(null);
-      toast.success("FreshBooks déconnecté.");
+      toast.success("Sage déconnecté.");
     } catch (err: any) {
       toast.error(`Erreur : ${err.message}`);
     } finally {
@@ -137,19 +137,19 @@ const FreshBooksConnect = () => {
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-[#0075DD]/10 flex items-center justify-center">
-            <span className="text-lg font-bold text-[#0075DD]">FB</span>
+          <div className="w-10 h-10 rounded-lg bg-[#00DC82]/10 flex items-center justify-center">
+            <span className="text-base font-bold text-[#00DC82]">Sage</span>
           </div>
           <div>
-            <h4 className="font-display font-bold text-sm">FreshBooks</h4>
+            <h4 className="font-display font-bold text-sm">Sage Business Cloud</h4>
             <p className="text-xs text-muted-foreground">
               {connection
-                ? `Connecté — ${connection.business_name || connection.account_id}`
+                ? `Connecté — ${connection.business_name || connection.resource_owner_id}`
                 : "Non connecté"}
             </p>
           </div>
         </div>
-        {connection && <CheckCircle2 className="w-5 h-5 text-[#0075DD]" />}
+        {connection && <CheckCircle2 className="w-5 h-5 text-[#00DC82]" />}
       </div>
 
       {connection ? (
@@ -163,17 +163,17 @@ const FreshBooksConnect = () => {
           </Button>
         </div>
       ) : (
-        <Button onClick={handleConnect} disabled={connecting} className="w-full bg-[#0075DD] hover:bg-[#005fb3] text-white">
+        <Button onClick={handleConnect} disabled={connecting} className="w-full bg-[#00DC82] hover:bg-[#00b86b] text-white">
           {connecting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <ExternalLink className="w-4 h-4 mr-2" />}
-          Connecter FreshBooks
+          Connecter Sage
         </Button>
       )}
 
       <p className="text-xs text-muted-foreground">
-        Synchronise automatiquement tes factures impayées depuis FreshBooks.
+        Synchronise automatiquement tes factures impayées depuis Sage Business Cloud.
       </p>
     </motion.div>
   );
 };
 
-export default FreshBooksConnect;
+export default SageConnect;

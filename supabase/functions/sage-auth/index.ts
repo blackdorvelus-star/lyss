@@ -11,11 +11,11 @@ serve(async (req) => {
   }
 
   try {
-    const clientId = Deno.env.get('FRESHBOOKS_CLIENT_ID');
-    if (!clientId) throw new Error('FRESHBOOKS_CLIENT_ID not configured');
+    const clientId = Deno.env.get('SAGE_CLIENT_ID');
+    if (!clientId) throw new Error('SAGE_CLIENT_ID not configured');
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const redirectUri = `${supabaseUrl}/functions/v1/freshbooks-callback`;
+    const redirectUri = `${supabaseUrl}/functions/v1/sage-callback`;
 
     const authHeader = req.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) {
@@ -39,20 +39,22 @@ serve(async (req) => {
       });
     }
 
-    const userId = claimsData.claims.sub;
-    const state = btoa(JSON.stringify({ user_id: userId }));
+    const state = btoa(JSON.stringify({ user_id: claimsData.claims.sub }));
 
-    const authUrl = `https://auth.freshbooks.com/oauth/authorize?` +
-      `client_id=${clientId}` +
+    const scopes = 'full_access';
+    const authUrl = `https://www.sageone.com/oauth2/auth/central?` +
+      `filter=apiv3.1` +
+      `&client_id=${clientId}` +
       `&redirect_uri=${encodeURIComponent(redirectUri)}` +
       `&response_type=code` +
+      `&scope=${scopes}` +
       `&state=${encodeURIComponent(state)}`;
 
     return new Response(JSON.stringify({ auth_url: authUrl }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
   } catch (error) {
-    console.error('FreshBooks auth error:', error);
+    console.error('Sage auth error:', error);
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });

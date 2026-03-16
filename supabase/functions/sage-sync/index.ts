@@ -12,13 +12,13 @@ async function refreshTokenIfNeeded(supabase: any, connection: any) {
     return connection.access_token;
   }
 
-  const res = await fetch('https://api.freshbooks.com/auth/oauth/token', {
+  const res = await fetch('https://oauth.accounting.sage.com/token', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
       grant_type: 'refresh_token',
-      client_id: Deno.env.get('FRESHBOOKS_CLIENT_ID')!,
-      client_secret: Deno.env.get('FRESHBOOKS_CLIENT_SECRET')!,
+      client_id: Deno.env.get('SAGE_CLIENT_ID')!,
+      client_secret: Deno.env.get('SAGE_CLIENT_SECRET')!,
       refresh_token: connection.refresh_token,
     }),
   });
@@ -26,10 +26,10 @@ async function refreshTokenIfNeeded(supabase: any, connection: any) {
   if (!res.ok) throw new Error(`Token refresh failed: ${await res.text()}`);
 
   const tokens = await res.json();
-  const newExpiresAt = new Date(Date.now() + tokens.expires_in * 1000).toISOString();
+  const newExpiresAt = new Date(Date.now() + (tokens.expires_in || 3600) * 1000).toISOString();
 
   await supabase
-    .from('freshbooks_connections')
+    .from('sage_connections')
     .update({
       access_token: tokens.access_token,
       refresh_token: tokens.refresh_token,
@@ -43,37 +43,34 @@ async function refreshTokenIfNeeded(supabase: any, connection: any) {
 async function syncForUser(supabaseService: any, connection: any) {
   const userId = connection.user_id;
   const accessToken = await refreshTokenIfNeeded(supabaseService, connection);
-  const accountId = connection.account_id;
 
-  // Fetch unpaid invoices from FreshBooks
-  const fbRes = await fetch(
-    `https://api.freshbooks.com/accounting/account/${accountId}/invoices/invoices?search[status]=unpaid&per_page=100`,
+  // Fetch outstanding sales invoices from Sage
+  const sageRes = await fetch(
+    'https://api.accounting.sage.com/v3.1/sales_invoices?attributes=items_count&status_id=UNPAID&items_per_page=100',
     {
       headers: {
         'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
+        'Accept': 'application/json',
       },
     }
   );
 
-  if (!fbRes.ok) {
-    const errText = await fbRes.text();
-    throw new Error(`FreshBooks API error [${fbRes.status}]: ${errText}`);
+  if (!sageRes.ok) {
+    const errText = await sageRes.text();
+    throw new Error(`Sage API error [${sageRes.status}]: ${errText}`);
   }
 
-  const fbData = await fbRes.json();
-  const fbInvoices = fbData.response?.result?.invoices || [];
+  const sageData = await sageRes.json();
+  const sageInvoices = sageData.$items || [];
 
   let imported = 0;
   let skipped = 0;
 
-  for (const fbInv of fbInvoices) {
-    const clientName = fbInv.organization || fbInv.fname
-      ? `${fbInv.fname || ''} ${fbInv.lname || ''}`.trim()
-      : 'Client inconnu';
-    const amount = parseFloat(fbInv.outstanding?.amount) || parseFloat(fbInv.amount?.amount) || 0;
-    const invoiceNumber = fbInv.invoice_number || null;
-    const dueDate = fbInv.due_date || null;
+  for (const inv of sageInvoices) {
+    const clientName = inv.contact_name || inv.contact?.name || 'Client inconnu';
+    const amount = parseFloat(inv.outstanding_amount) || parseFloat(inv.total_amount) || 0;
+    const invoiceNumber = inv.displayed_as?.split(' ')[0] || inv.invoice_number || null;
+    const dueDate = inv.due_date || null;
 
     // Find or create client
     const { data: existingClients } = await supabaseService
@@ -93,14 +90,13 @@ async function syncForUser(supabaseService: any, connection: any) {
         .select('id')
         .single();
       if (clientErr || !newClient) {
-        console.warn(`Skipping client ${clientName}:`, clientErr);
         skipped++;
         continue;
       }
       clientId = newClient.id;
     }
 
-    // Check if invoice already exists
+    // Check duplicates
     if (invoiceNumber) {
       const { data: existing } = await supabaseService
         .from('invoices')
@@ -130,15 +126,10 @@ async function syncForUser(supabaseService: any, connection: any) {
         status: 'pending',
       });
 
-    if (invErr) {
-      console.warn(`Error importing invoice ${invoiceNumber}:`, invErr);
-      skipped++;
-    } else {
-      imported++;
-    }
+    if (invErr) { skipped++; } else { imported++; }
   }
 
-  return { imported, skipped, total: fbInvoices.length };
+  return { imported, skipped, total: sageInvoices.length };
 }
 
 serve(async (req) => {
@@ -154,12 +145,9 @@ serve(async (req) => {
     try { body = await req.json(); } catch {}
 
     if (body.scheduled) {
-      const { data: connections } = await supabaseService
-        .from('freshbooks_connections')
-        .select('*');
-
+      const { data: connections } = await supabaseService.from('sage_connections').select('*');
       if (!connections?.length) {
-        return new Response(JSON.stringify({ success: true, message: 'No FB connections' }), {
+        return new Response(JSON.stringify({ success: true, message: 'No Sage connections' }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         });
       }
@@ -170,7 +158,7 @@ serve(async (req) => {
           const result = await syncForUser(supabaseService, conn);
           results.push({ user_id: conn.user_id, ...result });
         } catch (err) {
-          console.error(`FreshBooks sync failed for user ${conn.user_id}:`, err.message);
+          console.error(`Sage sync failed for user ${conn.user_id}:`, err.message);
           results.push({ user_id: conn.user_id, error: err.message });
         }
       }
@@ -180,7 +168,7 @@ serve(async (req) => {
       });
     }
 
-    // Manual: authenticate user
+    // Manual sync
     const authHeader = req.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
@@ -200,13 +188,13 @@ serve(async (req) => {
     }
 
     const { data: connection } = await supabaseService
-      .from('freshbooks_connections')
+      .from('sage_connections')
       .select('*')
       .eq('user_id', claimsData.claims.sub)
       .single();
 
     if (!connection) {
-      return new Response(JSON.stringify({ error: 'FreshBooks non connecté' }), {
+      return new Response(JSON.stringify({ error: 'Sage non connecté' }), {
         status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
@@ -216,7 +204,7 @@ serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
   } catch (error) {
-    console.error('FreshBooks sync error:', error);
+    console.error('Sage sync error:', error);
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });

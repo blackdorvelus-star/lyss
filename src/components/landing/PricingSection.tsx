@@ -71,7 +71,7 @@ const PricingSection = () => {
   const humanMonthlyCost = invoiceCount * hoursPerInvoice * humanCostPerHour;
   const humanYearlyCost = humanMonthlyCost * 12;
 
-  const getAdminFlowCost = () => {
+  const getLyssCost = () => {
     if (invoiceCount <= 3) return 49;
     if (invoiceCount <= 10) return 149 + Math.max(0, invoiceCount - 10) * 15;
     return 149 + (invoiceCount - 10) * 15;

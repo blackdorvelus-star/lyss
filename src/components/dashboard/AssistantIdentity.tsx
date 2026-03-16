@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { UserCircle, Building2, BadgeCheck, MessageSquare, Phone } from "lucide-react";
+import { UserCircle, Building2, BadgeCheck, MessageSquare, Phone, Save, Loader2, Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -9,6 +10,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const roles = [
   { value: "adjointe", label: "Adjointe administrative" },
@@ -20,12 +23,69 @@ const AssistantIdentity = () => {
   const [name, setName] = useState("Lyss");
   const [role, setRole] = useState("adjointe");
   const [company, setCompany] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    loadSettings();
+  }, []);
+
+  const loadSettings = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { setLoading(false); return; }
+
+    const { data } = await supabase
+      .from("payment_settings")
+      .select("assistant_name, assistant_role, company_name")
+      .eq("user_id", user.id)
+      .single();
+
+    if (data) {
+      setName(data.assistant_name || "Lyss");
+      setRole(data.assistant_role || "adjointe");
+      setCompany(data.company_name || "");
+    }
+    setLoading(false);
+  };
+
+  const saveSettings = async () => {
+    setSaving(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { error } = await supabase
+      .from("payment_settings")
+      .upsert({
+        user_id: user.id,
+        assistant_name: name || "Lyss",
+        assistant_role: role,
+        company_name: company || null,
+      }, { onConflict: "user_id" });
+
+    if (error) {
+      toast.error("Erreur lors de la sauvegarde.");
+    } else {
+      setSaved(true);
+      toast.success("Identité de l'adjointe sauvegardée !");
+      setTimeout(() => setSaved(false), 2000);
+    }
+    setSaving(false);
+  };
 
   const roleLabel = roles.find((r) => r.value === role)?.label || "Adjointe administrative";
   const companyDisplay = company || "Votre entreprise";
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-2xl space-y-6">
+    <div className="space-y-6">
       <div>
         <h2 className="font-display text-lg font-bold">Identité de l'adjointe</h2>
         <p className="text-xs text-muted-foreground">
@@ -35,7 +95,6 @@ const AssistantIdentity = () => {
 
       {/* Config fields */}
       <div className="grid sm:grid-cols-2 gap-4">
-        {/* Name */}
         <div className="space-y-2">
           <label className="text-sm font-medium flex items-center gap-2">
             <UserCircle className="w-4 h-4 text-primary" />
@@ -52,7 +111,6 @@ const AssistantIdentity = () => {
           </p>
         </div>
 
-        {/* Company */}
         <div className="space-y-2">
           <label className="text-sm font-medium flex items-center gap-2">
             <Building2 className="w-4 h-4 text-primary" />
@@ -69,7 +127,6 @@ const AssistantIdentity = () => {
           </p>
         </div>
 
-        {/* Role */}
         <div className="space-y-2 sm:col-span-2">
           <label className="text-sm font-medium flex items-center gap-2">
             <BadgeCheck className="w-4 h-4 text-primary" />
@@ -93,13 +150,28 @@ const AssistantIdentity = () => {
         </div>
       </div>
 
+      {/* Save button */}
+      <Button
+        onClick={saveSettings}
+        disabled={saving}
+        className="bg-primary text-primary-foreground font-display w-full"
+      >
+        {saving ? (
+          <Loader2 className="w-4 h-4 animate-spin mr-2" />
+        ) : saved ? (
+          <Check className="w-4 h-4 mr-2" />
+        ) : (
+          <Save className="w-4 h-4 mr-2" />
+        )}
+        {saved ? "Sauvegardé !" : "Sauvegarder l'identité"}
+      </Button>
+
       {/* Live preview */}
       <div className="space-y-3">
         <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
           Prévisualisation en temps réel
         </p>
 
-        {/* SMS preview */}
         <AnimatePresence mode="wait">
           <motion.div
             key={`${name}-${role}-${company}`}
@@ -109,7 +181,6 @@ const AssistantIdentity = () => {
             transition={{ duration: 0.2 }}
             className="bg-card border border-border rounded-2xl p-5 space-y-4"
           >
-            {/* SMS */}
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <MessageSquare className="w-4 h-4 text-primary" />
@@ -133,7 +204,6 @@ const AssistantIdentity = () => {
               </div>
             </div>
 
-            {/* Call intro */}
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <Phone className="w-4 h-4 text-accent" />

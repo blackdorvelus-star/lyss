@@ -137,6 +137,8 @@ export type Database = {
       }
       payment_settings: {
         Row: {
+          assistant_name: string | null
+          assistant_role: string | null
           company_logo_url: string | null
           company_name: string | null
           created_at: string
@@ -149,6 +151,8 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          assistant_name?: string | null
+          assistant_role?: string | null
           company_logo_url?: string | null
           company_name?: string | null
           created_at?: string
@@ -161,6 +165,8 @@ export type Database = {
           user_id: string
         }
         Update: {
+          assistant_name?: string | null
+          assistant_role?: string | null
           company_logo_url?: string | null
           company_name?: string | null
           created_at?: string

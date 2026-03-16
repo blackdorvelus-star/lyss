@@ -450,7 +450,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
               )}
             </div>
           ) : activeSection === "clients" ? (
-            <PlaceholderSection title="Relations clients" desc="Les sondages de satisfaction et le suivi de la relation client arrivent bientôt." />
+            <ClientManagement />
           ) : activeSection === "settings" ? (
             <div className="max-w-2xl space-y-10">
               <AssistantIdentity />

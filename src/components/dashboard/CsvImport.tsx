@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import * as XLSX from "xlsx";
 import { Upload, FileSpreadsheet, AlertCircle, CheckCircle2, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {

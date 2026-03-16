@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Users, FileText, Calendar, Sparkles, LogOut, ChevronLeft, ChevronRight } from "lucide-react";
+import { Users, FileText, Calendar, Settings, LogOut, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type Section = "clients" | "billing" | "calendar";
+export type Section = "clients" | "billing" | "calendar" | "settings";
 
 interface AppSidebarProps {
   activeSection: Section;
@@ -14,6 +14,7 @@ const navItems: { id: Section; label: string; icon: typeof Users }[] = [
   { id: "clients", label: "Relations clients", icon: Users },
   { id: "billing", label: "Suivi de facturation", icon: FileText },
   { id: "calendar", label: "Gestion d'agenda", icon: Calendar },
+  { id: "settings", label: "Réglages", icon: Settings },
 ];
 
 const AppSidebar = ({ activeSection, onSectionChange, onLogout }: AppSidebarProps) => {

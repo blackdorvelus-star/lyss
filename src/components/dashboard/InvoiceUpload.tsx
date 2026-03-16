@@ -1,10 +1,11 @@
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload, FileText, X, Send, ArrowLeft, Plus } from "lucide-react";
+import { Upload, FileText, X, Send, ArrowLeft, Plus, FileSpreadsheet, Pencil, Link2, Code } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import CsvImport from "./CsvImport";
 
 interface InvoiceForm {
   id: string;
@@ -28,7 +29,10 @@ const emptyInvoice = (): InvoiceForm => ({
   phone: "",
 });
 
+type ImportMethod = "manual" | "csv" | "api" | "widget";
+
 const InvoiceUpload = ({ onBack, onLogout }: InvoiceUploadProps) => {
+  const [method, setMethod] = useState<ImportMethod>("manual");
   const [invoices, setInvoices] = useState<InvoiceForm[]>([emptyInvoice()]);
   const [sending, setSending] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -217,9 +221,69 @@ const InvoiceUpload = ({ onBack, onLogout }: InvoiceUploadProps) => {
 
       <div className="max-w-xl mx-auto px-5 py-8">
         <h1 className="font-display text-2xl font-bold mb-1">Nouveau suivi client</h1>
-        <p className="text-sm text-muted-foreground mb-8">
-          Ajoute les détails de la facture. L'adjointe s'occupe du reste.
+        <p className="text-sm text-muted-foreground mb-6">
+          Choisis comment ajouter tes dossiers. L'adjointe s'occupe du reste.
         </p>
+
+        {/* Method selector */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-8">
+          {([
+            { id: "manual" as const, icon: Pencil, label: "Manuel" },
+            { id: "csv" as const, icon: FileSpreadsheet, label: "Import CSV" },
+            { id: "api" as const, icon: Code, label: "API comptable" },
+            { id: "widget" as const, icon: Link2, label: "Widget web" },
+          ]).map((m) => (
+            <button
+              key={m.id}
+              onClick={() => setMethod(m.id)}
+              className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border text-xs font-medium transition-all ${
+                method === m.id
+                  ? "border-primary bg-primary/5 text-primary"
+                  : "border-border bg-card text-muted-foreground hover:border-primary/30"
+              }`}
+            >
+              <m.icon className="w-5 h-5" />
+              {m.label}
+            </button>
+          ))}
+        </div>
+
+        {/* CSV Import */}
+        {method === "csv" && (
+          <CsvImport onComplete={onBack} />
+        )}
+
+        {/* API placeholder */}
+        {method === "api" && (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center py-12 space-y-3">
+            <Code className="w-10 h-10 text-muted-foreground mx-auto opacity-40" />
+            <h3 className="font-display font-bold text-base">Intégration API comptable</h3>
+            <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+              Connecte QuickBooks, FreshBooks, Sage ou Wave pour synchroniser automatiquement tes factures.
+            </p>
+            <span className="inline-block text-xs text-primary font-medium px-3 py-1 rounded-full border border-primary/30 bg-primary/10">
+              Bientôt disponible
+            </span>
+          </motion.div>
+        )}
+
+        {/* Widget placeholder */}
+        {method === "widget" && (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center py-12 space-y-3">
+            <Link2 className="w-10 h-10 text-muted-foreground mx-auto opacity-40" />
+            <h3 className="font-display font-bold text-base">Widget embarqué</h3>
+            <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+              Installe un widget sur ton site web pour que tes clients puissent soumettre des factures directement.
+            </p>
+            <span className="inline-block text-xs text-primary font-medium px-3 py-1 rounded-full border border-primary/30 bg-primary/10">
+              Bientôt disponible
+            </span>
+          </motion.div>
+        )}
+
+        {/* Manual form (existing) */}
+        {method === "manual" && (
+        <>
 
         {invoices.length > 1 && (
           <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
@@ -347,6 +411,8 @@ const InvoiceUpload = ({ onBack, onLogout }: InvoiceUploadProps) => {
           L'adjointe enverra le premier message dans les 24 heures.
           Tu seras notifié(e) à chaque réponse de ton client.
         </p>
+        </>
+        )}
       </div>
     </div>
   );

@@ -86,6 +86,7 @@ const VapiAssistantConfig = ({ onConfigChange }: VapiAssistantConfigProps) => {
       .from("payment_settings")
       .upsert({
         user_id: user.id,
+        vapi_public_key: vapiPublicKey || null,
         vapi_voice_provider: selectedVoice?.provider || "elevenlabs",
         vapi_voice_id: voiceId,
         vapi_personality: personality,

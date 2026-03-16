@@ -39,6 +39,14 @@ const InvoiceUpload = ({ onBack, onLogout }: InvoiceUploadProps) => {
   const [sending, setSending] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const [activeIdx, setActiveIdx] = useState(0);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) setUserId(user.id);
+    });
+  }, []);
 
   const active = invoices[activeIdx];
 

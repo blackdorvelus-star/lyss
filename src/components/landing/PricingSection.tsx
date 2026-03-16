@@ -12,7 +12,7 @@ const plans = [
     period: "/mois",
     desc: "Pour les travailleurs autonomes et micro-entreprises.",
     included: "3 dossiers inclus",
-    extra: "25 $/dossier supplémentaire",
+    extra: "20 $/dossier supplémentaire",
     features: [
       "Adjointe IA disponible 24/7",
       "SMS + courriels automatisés",
@@ -29,12 +29,12 @@ const plans = [
     period: "/mois",
     desc: "Pour les PME avec plusieurs clients à suivre.",
     included: "10 dossiers inclus",
-    extra: "15 $/dossier supplémentaire",
+    extra: "20 $/dossier supplémentaire",
     features: [
       "Tout le plan Solo, plus :",
       "Appels vocaux IA avancés",
       "Négociation de plans de paiement",
-      "Message d'accueil personnalisé",
+      "Intégration QuickBooks & Sage",
       "Rapports hebdomadaires",
       "Priorité sur le support",
     ],
@@ -47,10 +47,10 @@ const plans = [
     period: "",
     desc: "Pour les entreprises avec un volume élevé.",
     included: "Dossiers illimités",
-    extra: "Tarification sur mesure",
+    extra: "Tarification dégressive",
     features: [
       "Tout le plan Pro, plus :",
-      "Intégration QuickBooks / Xero",
+      "Synchronisation comptable avancée",
       "API complète",
       "Gestionnaire de compte dédié",
       "SLA garanti",
@@ -60,7 +60,6 @@ const plans = [
     popular: false,
   },
 ];
-
 const PricingSection = () => {
   const [invoiceCount, setInvoiceCount] = useState(10);
   const [avgAmount, setAvgAmount] = useState(1500);
@@ -73,8 +72,8 @@ const PricingSection = () => {
 
   const getLyssCost = () => {
     if (invoiceCount <= 3) return 49;
-    if (invoiceCount <= 10) return 149 + Math.max(0, invoiceCount - 10) * 15;
-    return 149 + (invoiceCount - 10) * 15;
+    if (invoiceCount <= 10) return 149;
+    return 149 + (invoiceCount - 10) * 20;
   };
   const lyssMonthlyCost = getLyssCost();
   const savings = humanMonthlyCost - lyssMonthlyCost;

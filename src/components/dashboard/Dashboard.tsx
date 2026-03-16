@@ -28,6 +28,7 @@ import AssistantIdentity from "./AssistantIdentity";
 import PaymentSettings from "./PaymentSettings";
 import VapiCallButton from "./VapiCallButton";
 import CallHistory, { type CallLog } from "./CallHistory";
+import VapiAssistantConfig from "./VapiAssistantConfig";
 
 interface DashboardProps {
   onBack: () => void;

@@ -275,16 +275,97 @@ const InvoiceUpload = ({ onBack, onLogout }: InvoiceUploadProps) => {
         )}
 
         {/* Widget placeholder */}
-        {method === "widget" && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center py-12 space-y-3">
-            <Link2 className="w-10 h-10 text-muted-foreground mx-auto opacity-40" />
-            <h3 className="font-display font-bold text-base">Widget embarqué</h3>
-            <p className="text-sm text-muted-foreground max-w-sm mx-auto">
-              Installe un widget sur ton site web pour que tes clients puissent soumettre des factures directement.
-            </p>
-            <span className="inline-block text-xs text-primary font-medium px-3 py-1 rounded-full border border-primary/30 bg-primary/10">
-              Bientôt disponible
-            </span>
+        {method === "widget" && userId && (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+            <div>
+              <h3 className="font-display font-bold text-base mb-1">Widget embarqué</h3>
+              <p className="text-sm text-muted-foreground">
+                Tes clients peuvent consulter leur solde, discuter avec l'adjointe IA et signaler un problème — directement depuis ton site ou par lien.
+              </p>
+            </div>
+
+            {/* Shareable link */}
+            <div className="bg-card border border-border rounded-xl p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <Link2 className="w-4 h-4 text-primary" />
+                <h4 className="font-display font-bold text-sm">Lien partageable</h4>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Envoie ce lien par courriel ou SMS à tes clients pour qu'ils accèdent à leur espace.
+              </p>
+              <div className="flex gap-2">
+                <Input
+                  readOnly
+                  value={`${window.location.origin}/widget/${userId}`}
+                  className="bg-secondary text-xs font-mono"
+                />
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => {
+                    navigator.clipboard.writeText(`${window.location.origin}/widget/${userId}`);
+                    setCopied(true);
+                    toast.success("Lien copié !");
+                    setTimeout(() => setCopied(false), 2000);
+                  }}
+                >
+                  {copied ? <Check className="w-4 h-4 text-primary" /> : <Copy className="w-4 h-4" />}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => window.open(`/widget/${userId}`, '_blank')}
+                >
+                  <ExternalLink className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+
+            {/* HTML Snippet */}
+            <div className="bg-card border border-border rounded-xl p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <Code className="w-4 h-4 text-primary" />
+                <h4 className="font-display font-bold text-sm">Snippet HTML</h4>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Colle ce code dans ton site web (WordPress, Wix, Squarespace, etc.) pour embarquer le widget.
+              </p>
+              <div className="bg-secondary rounded-lg p-3 overflow-x-auto">
+                <pre className="text-xs font-mono text-foreground whitespace-pre-wrap break-all">
+{`<iframe
+  src="${window.location.origin}/widget/${userId}"
+  width="100%"
+  height="600"
+  frameborder="0"
+  style="border: 1px solid #e5e7eb; border-radius: 12px;"
+></iframe>`}
+                </pre>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full"
+                onClick={() => {
+                  navigator.clipboard.writeText(
+`<iframe src="${window.location.origin}/widget/${userId}" width="100%" height="600" frameborder="0" style="border: 1px solid #e5e7eb; border-radius: 12px;"></iframe>`
+                  );
+                  toast.success("Code copié !");
+                }}
+              >
+                <Copy className="w-4 h-4 mr-2" /> Copier le code
+              </Button>
+            </div>
+
+            {/* Features list */}
+            <div className="bg-primary/5 border border-primary/20 rounded-xl p-4">
+              <h4 className="font-display font-bold text-sm mb-2 text-primary">Ce que vos clients peuvent faire :</h4>
+              <ul className="text-xs text-muted-foreground space-y-1.5">
+                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-primary" /> Rechercher leur facture par nom ou numéro</li>
+                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-primary" /> Consulter leur solde en temps réel</li>
+                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-primary" /> Discuter avec l'adjointe IA</li>
+                <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-primary" /> Signaler un problème ou demander un délai</li>
+              </ul>
+            </div>
           </motion.div>
         )}
 

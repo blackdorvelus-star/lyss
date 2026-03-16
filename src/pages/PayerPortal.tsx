@@ -18,6 +18,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 
 interface PortalData {
+  user_id: string;
+  invoice_id: string;
   invoice: {
     invoice_number: string | null;
     amount: number;
@@ -413,7 +415,22 @@ const PayerPortal = () => {
                         size="sm"
                         disabled={!problemText.trim()}
                         className="bg-primary text-primary-foreground font-display w-full"
-                        onClick={() => {
+                        onClick={async () => {
+                          try {
+                            await fetch(
+                              `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/widget-dispute`,
+                              {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json", apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+                                body: JSON.stringify({
+                                  user_id: data!.user_id,
+                                  invoice_id: data!.invoice_id,
+                                  client_name: client.name,
+                                  message: problemText.trim(),
+                                }),
+                              }
+                            );
+                          } catch {}
                           toast.success(
                             "Message envoyé. L'entreprise vous reviendra sous peu."
                           );

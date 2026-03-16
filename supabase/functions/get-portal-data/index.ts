@@ -59,6 +59,8 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({
+        user_id: tokenData.user_id,
+        invoice_id: invoice?.id,
         invoice: {
           invoice_number: invoice?.invoice_number,
           amount: invoice?.amount,

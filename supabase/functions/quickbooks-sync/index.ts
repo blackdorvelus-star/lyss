@@ -9,7 +9,6 @@ const corsHeaders = {
 async function refreshTokenIfNeeded(supabase: any, connection: any) {
   const expiresAt = new Date(connection.token_expires_at);
   const now = new Date();
-  // Refresh if less than 5 minutes left
   if (expiresAt.getTime() - now.getTime() > 5 * 60 * 1000) {
     return connection.access_token;
   }
@@ -50,12 +49,145 @@ async function refreshTokenIfNeeded(supabase: any, connection: any) {
   return tokens.access_token;
 }
 
+async function syncForUser(supabaseService: any, connection: any) {
+  const userId = connection.user_id;
+  const accessToken = await refreshTokenIfNeeded(supabaseService, connection);
+
+  const query = encodeURIComponent("SELECT * FROM Invoice WHERE Balance > '0' ORDERBY DueDate DESC MAXRESULTS 100");
+  const qbRes = await fetch(
+    `https://quickbooks.api.intuit.com/v3/company/${connection.realm_id}/query?query=${query}&minorversion=65`,
+    {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Accept': 'application/json',
+      },
+    }
+  );
+
+  if (!qbRes.ok) {
+    const errText = await qbRes.text();
+    throw new Error(`QuickBooks API error [${qbRes.status}]: ${errText}`);
+  }
+
+  const qbData = await qbRes.json();
+  const qbInvoices = qbData.QueryResponse?.Invoice || [];
+
+  let imported = 0;
+  let skipped = 0;
+
+  for (const qbInv of qbInvoices) {
+    const clientName = qbInv.CustomerRef?.name || 'Client inconnu';
+    const amount = parseFloat(qbInv.Balance) || 0;
+    const invoiceNumber = qbInv.DocNumber || null;
+    const dueDate = qbInv.DueDate || null;
+
+    const { data: existingClients } = await supabaseService
+      .from('clients')
+      .select('id')
+      .eq('name', clientName)
+      .eq('user_id', userId)
+      .limit(1);
+
+    let clientId: string;
+    if (existingClients && existingClients.length > 0) {
+      clientId = existingClients[0].id;
+    } else {
+      const { data: newClient, error: clientErr } = await supabaseService
+        .from('clients')
+        .insert({ user_id: userId, name: clientName })
+        .select('id')
+        .single();
+      if (clientErr || !newClient) {
+        console.warn(`Skipping client ${clientName}:`, clientErr);
+        skipped++;
+        continue;
+      }
+      clientId = newClient.id;
+    }
+
+    if (invoiceNumber) {
+      const { data: existing } = await supabaseService
+        .from('invoices')
+        .select('id')
+        .eq('invoice_number', invoiceNumber)
+        .eq('user_id', userId)
+        .limit(1);
+
+      if (existing && existing.length > 0) {
+        await supabaseService
+          .from('invoices')
+          .update({ amount, due_date: dueDate })
+          .eq('id', existing[0].id);
+        skipped++;
+        continue;
+      }
+    }
+
+    const { error: invErr } = await supabaseService
+      .from('invoices')
+      .insert({
+        user_id: userId,
+        client_id: clientId,
+        amount,
+        invoice_number: invoiceNumber,
+        due_date: dueDate,
+        status: 'pending',
+      });
+
+    if (invErr) {
+      console.warn(`Error importing invoice ${invoiceNumber}:`, invErr);
+      skipped++;
+    } else {
+      imported++;
+    }
+  }
+
+  return { imported, skipped, total: qbInvoices.length };
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseService = createClient(supabaseUrl, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+
+    // Check if this is a scheduled call (no specific user) or manual
+    let body: any = {};
+    try { body = await req.json(); } catch {}
+
+    if (body.scheduled) {
+      // Scheduled: sync ALL connected users
+      const { data: connections, error: connErr } = await supabaseService
+        .from('quickbooks_connections')
+        .select('*');
+
+      if (connErr || !connections?.length) {
+        return new Response(JSON.stringify({ success: true, message: 'No QB connections to sync' }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      const results = [];
+      for (const conn of connections) {
+        try {
+          const result = await syncForUser(supabaseService, conn);
+          results.push({ user_id: conn.user_id, ...result });
+          console.log(`Synced user ${conn.user_id}: ${result.imported} imported, ${result.skipped} skipped`);
+        } catch (err) {
+          console.error(`Sync failed for user ${conn.user_id}:`, err.message);
+          results.push({ user_id: conn.user_id, error: err.message });
+        }
+      }
+
+      return new Response(JSON.stringify({ success: true, results }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Manual: authenticate user
     const authHeader = req.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
@@ -63,11 +195,7 @@ serve(async (req) => {
       });
     }
 
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseAnon = Deno.env.get('SUPABASE_ANON_KEY')!;
-    const supabaseService = createClient(supabaseUrl, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
-
-    // Validate user
     const userClient = createClient(supabaseUrl, supabaseAnon, {
       global: { headers: { Authorization: authHeader } }
     });
@@ -80,7 +208,6 @@ serve(async (req) => {
     }
     const userId = claimsData.claims.sub;
 
-    // Get QB connection
     const { data: connection, error: connError } = await supabaseService
       .from('quickbooks_connections')
       .select('*')
@@ -93,107 +220,9 @@ serve(async (req) => {
       });
     }
 
-    const accessToken = await refreshTokenIfNeeded(supabaseService, connection);
+    const result = await syncForUser(supabaseService, connection);
 
-    // Fetch unpaid invoices from QuickBooks
-    const query = encodeURIComponent("SELECT * FROM Invoice WHERE Balance > '0' ORDERBY DueDate DESC MAXRESULTS 100");
-    const qbRes = await fetch(
-      `https://quickbooks.api.intuit.com/v3/company/${connection.realm_id}/query?query=${query}&minorversion=65`,
-      {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Accept': 'application/json',
-        },
-      }
-    );
-
-    if (!qbRes.ok) {
-      const errText = await qbRes.text();
-      throw new Error(`QuickBooks API error [${qbRes.status}]: ${errText}`);
-    }
-
-    const qbData = await qbRes.json();
-    const qbInvoices = qbData.QueryResponse?.Invoice || [];
-
-    let imported = 0;
-    let skipped = 0;
-
-    for (const qbInv of qbInvoices) {
-      const clientName = qbInv.CustomerRef?.name || 'Client inconnu';
-      const amount = parseFloat(qbInv.Balance) || 0;
-      const invoiceNumber = qbInv.DocNumber || null;
-      const dueDate = qbInv.DueDate || null;
-
-      // Find or create client
-      const { data: existingClients } = await supabaseService
-        .from('clients')
-        .select('id')
-        .eq('name', clientName)
-        .eq('user_id', userId)
-        .limit(1);
-
-      let clientId: string;
-      if (existingClients && existingClients.length > 0) {
-        clientId = existingClients[0].id;
-      } else {
-        const { data: newClient, error: clientErr } = await supabaseService
-          .from('clients')
-          .insert({ user_id: userId, name: clientName })
-          .select('id')
-          .single();
-        if (clientErr || !newClient) {
-          console.warn(`Skipping client ${clientName}:`, clientErr);
-          skipped++;
-          continue;
-        }
-        clientId = newClient.id;
-      }
-
-      // Check if invoice already exists (by invoice_number)
-      if (invoiceNumber) {
-        const { data: existing } = await supabaseService
-          .from('invoices')
-          .select('id')
-          .eq('invoice_number', invoiceNumber)
-          .eq('user_id', userId)
-          .limit(1);
-
-        if (existing && existing.length > 0) {
-          // Update amount if changed
-          await supabaseService
-            .from('invoices')
-            .update({ amount, due_date: dueDate })
-            .eq('id', existing[0].id);
-          skipped++;
-          continue;
-        }
-      }
-
-      const { error: invErr } = await supabaseService
-        .from('invoices')
-        .insert({
-          user_id: userId,
-          client_id: clientId,
-          amount,
-          invoice_number: invoiceNumber,
-          due_date: dueDate,
-          status: 'pending',
-        });
-
-      if (invErr) {
-        console.warn(`Error importing invoice ${invoiceNumber}:`, invErr);
-        skipped++;
-      } else {
-        imported++;
-      }
-    }
-
-    return new Response(JSON.stringify({
-      success: true,
-      imported,
-      skipped,
-      total: qbInvoices.length,
-    }), {
+    return new Response(JSON.stringify({ success: true, ...result }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
   } catch (error) {

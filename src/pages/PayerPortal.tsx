@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import logoLyss from "@/assets/logo-lyss.png";
 import { useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";

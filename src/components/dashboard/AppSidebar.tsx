@@ -1,4 +1,5 @@
 import { useState } from "react";
+import logoLyss from "@/assets/logo-lyss.png";
 import { Users, FileText, Calendar, Settings, LogOut, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 

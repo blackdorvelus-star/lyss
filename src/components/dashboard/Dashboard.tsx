@@ -349,6 +349,21 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                                   {inv.due_date && <p><span className="font-medium text-foreground">Échéance :</span> {formatDate(inv.due_date)}</p>}
                                 </div>
 
+                                {/* Vapi Call Button */}
+                                {inv.status !== "recovered" && inv.clients.phone && (
+                                  <div className="pt-1">
+                                    <VapiCallButton
+                                      invoiceId={inv.id}
+                                      clientName={inv.clients.name}
+                                      clientPhone={inv.clients.phone}
+                                      amount={inv.amount}
+                                      invoiceNumber={inv.invoice_number}
+                                      vapiPublicKey={vapiPublicKey}
+                                      onCallEnd={fetchData}
+                                    />
+                                  </div>
+                                )}
+
                                 {inv.status !== "recovered" && (
                                   <div className="bg-primary/5 border border-primary/15 rounded-lg p-3">
                                     {recoveryId === inv.id ? (

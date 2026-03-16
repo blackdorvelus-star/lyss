@@ -246,9 +246,11 @@ const ClientWidget = () => {
                   <Button onClick={() => { setView("chat"); setChatMessages([]); }} variant="default" className="flex-1">
                     <MessageSquare className="w-4 h-4 mr-2" /> Discuter avec l'adjointe
                   </Button>
+                  {allowDisputes && (
                   <Button onClick={() => setView("dispute")} variant="outline" className="flex-1">
                     <AlertCircle className="w-4 h-4 mr-2" /> Signaler un problème
                   </Button>
+                  )}
                 </motion.div>
               )}
             </motion.div>

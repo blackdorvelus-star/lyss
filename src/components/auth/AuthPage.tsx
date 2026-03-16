@@ -73,8 +73,8 @@ const AuthPage = ({ onAuth }: AuthPageProps) => {
           </h1>
           <p className="text-sm text-muted-foreground mb-8">
             {mode === "login"
-              ? "Connecte-toi pour gérer tes relances."
-              : "Inscris-toi pour récupérer tes factures impayées."}
+              ? "Connecte-toi pour gérer tes suivis de facturation."
+              : "Inscris-toi pour récupérer tes factures impayées. 3 crédits gratuits inclus."}
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">

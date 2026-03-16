@@ -51,7 +51,7 @@ interface Reminder {
 
 const statusConfig: Record<string, { label: string; icon: typeof Clock; color: string }> = {
   pending: { label: "En attente", icon: Clock, color: "text-accent" },
-  in_progress: { label: "Relances en cours", icon: MessageSquare, color: "text-primary" },
+  in_progress: { label: "Suivi en cours", icon: MessageSquare, color: "text-primary" },
   recovered: { label: "Récupéré", icon: CheckCircle2, color: "text-primary" },
   failed: { label: "Échoué", icon: XCircle, color: "text-destructive" },
   cancelled: { label: "Annulé", icon: XCircle, color: "text-muted-foreground" },

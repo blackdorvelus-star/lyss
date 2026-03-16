@@ -76,6 +76,7 @@ serve(async (req) => {
           interac_question: settings?.interac_question,
           interac_answer: settings?.interac_answer,
           stripe_link: settings?.stripe_link,
+          allow_disputes: settings?.allow_disputes ?? false,
         },
       }),
       {

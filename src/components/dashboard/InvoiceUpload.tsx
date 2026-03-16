@@ -29,7 +29,10 @@ const emptyInvoice = (): InvoiceForm => ({
   phone: "",
 });
 
+type ImportMethod = "manual" | "csv" | "api" | "widget";
+
 const InvoiceUpload = ({ onBack, onLogout }: InvoiceUploadProps) => {
+  const [method, setMethod] = useState<ImportMethod>("manual");
   const [invoices, setInvoices] = useState<InvoiceForm[]>([emptyInvoice()]);
   const [sending, setSending] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);

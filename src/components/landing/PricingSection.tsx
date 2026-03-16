@@ -232,9 +232,9 @@ const PricingSection = () => {
               </div>
 
               <div className="bg-primary/10 border border-primary/20 rounded-xl p-4">
-                <p className="text-xs text-primary mb-1">Coût avec Admin-Flow</p>
+                <p className="text-xs text-primary mb-1">Coût avec Lyss</p>
                 <p className="font-display text-xl font-bold text-primary">
-                  {formatMoney(adminFlowMonthlyCost)}<span className="text-sm font-normal text-muted-foreground">/mois</span>
+                  {formatMoney(lyssMonthlyCost)}<span className="text-sm font-normal text-muted-foreground">/mois</span>
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
                   Forfait {invoiceCount <= 3 ? "Solo" : "Pro"} + dossiers

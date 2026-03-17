@@ -379,7 +379,7 @@ const SettingsWizard = () => {
                 {/* Summary */}
                 <div className="bg-primary/5 border border-primary/15 rounded-xl p-4 space-y-2">
                   <h4 className="text-sm font-medium text-primary">Récapitulatif</h4>
-                  <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-muted-foreground">
                     <p>Adjointe : <span className="text-foreground font-medium">{name || "Lyss"}</span></p>
                     <p>Entreprise : <span className="text-foreground font-medium">{companyDisplay}</span></p>
                     <p>Titre : <span className="text-foreground font-medium">{roleLabel}</span></p>

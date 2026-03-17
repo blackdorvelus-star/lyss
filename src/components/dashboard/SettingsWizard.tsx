@@ -138,6 +138,10 @@ const SettingsWizard = () => {
       // Vapi key no longer loaded
       setCustomInstructions(d.vapi_custom_instructions || "");
       setFirstMessageTemplate(d.vapi_first_message_template || "");
+      setUseCustomTemplates(d.use_custom_templates ?? false);
+      setSmsTemplate(d.sms_template || "");
+      setEmailSubjectTemplate(d.email_subject_template || "");
+      setEmailBodyTemplate(d.email_body_template || "");
       setAiProposePlan(d.ai_propose_payment_plan ?? true);
       setAiNegotiate(d.ai_negotiate ?? false);
       setAiMaxDiscount(d.ai_max_discount_percent ?? 0);

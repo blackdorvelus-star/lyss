@@ -511,7 +511,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                         {inProgressCount} suivi{inProgressCount !== 1 ? "s" : ""} actif{inProgressCount !== 1 ? "s" : ""} · {pendingCount} en attente
                       </p>
                     </div>
-                    <Button size="sm" onClick={onNewInvoice} className="bg-primary text-primary-foreground font-display text-xs sm:text-sm flex-shrink-0">
+                    <Button size="sm" onClick={() => setActiveSection("import")} className="bg-primary text-primary-foreground font-display text-xs sm:text-sm flex-shrink-0">
                       <Plus className="w-4 h-4 sm:mr-1" />
                       <span className="hidden sm:inline">Confier un dossier</span>
                     </Button>

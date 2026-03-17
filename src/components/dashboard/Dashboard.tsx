@@ -20,6 +20,7 @@ import PersonalitySelector, { type Personality } from "./PersonalitySelector";
 import VapiCallButton from "./VapiCallButton";
 import CallHistory, { type CallLog } from "./CallHistory";
 import ClientManagement from "./ClientManagement";
+import DisputeCenter from "./DisputeCenter";
 
 interface DashboardProps {
   onBack: () => void;
@@ -274,6 +275,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
               <h1 className="font-display font-bold text-base">
                 {activeSection === "clients" && "Relations clients"}
                 {activeSection === "billing" && "Centre de commandement"}
+                {activeSection === "disputes" && "Centre de litiges"}
                 {activeSection === "calendar" && "Gestion d'agenda"}
                 {activeSection === "settings" && "Réglages"}
               </h1>
@@ -489,6 +491,8 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
             </div>
           ) : activeSection === "clients" ? (
             <ClientManagement />
+          ) : activeSection === "disputes" ? (
+            <DisputeCenter />
           ) : activeSection === "settings" ? (
             <SettingsWizard />
           ) : (

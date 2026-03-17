@@ -43,6 +43,7 @@ const personalities = [
 const STEPS = [
   { id: "identity", label: "Identité", icon: UserCircle },
   { id: "voice", label: "Voix & ton", icon: Mic2 },
+  { id: "sequences", label: "Séquences", icon: CalendarClock },
   { id: "payment", label: "Paiement", icon: Banknote },
   { id: "preview", label: "Aperçu", icon: Sparkles },
 ] as const;

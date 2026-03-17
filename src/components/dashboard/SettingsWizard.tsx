@@ -135,8 +135,7 @@ const SettingsWizard = () => {
       setWorkStart(d.working_hours_start || "08:00");
       setWorkEnd(d.working_hours_end || "18:00");
       setWorkDays(d.working_days || ["lun", "mar", "mer", "jeu", "ven"]);
-      setVapiPublicKey(d.vapi_public_key || "");
-      setVoiceId(d.vapi_voice_id || "21m00Tcm4TlvDq8ikWAM");
+      // Vapi key no longer loaded
       setCustomInstructions(d.vapi_custom_instructions || "");
       setFirstMessageTemplate(d.vapi_first_message_template || "");
       setAiProposePlan(d.ai_propose_payment_plan ?? true);

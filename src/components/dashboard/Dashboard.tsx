@@ -21,6 +21,7 @@ import VapiCallButton from "./VapiCallButton";
 import CallHistory, { type CallLog } from "./CallHistory";
 import ClientManagement from "./ClientManagement";
 import DisputeCenter from "./DisputeCenter";
+import MonthlyReports from "./MonthlyReports";
 
 interface DashboardProps {
   onBack: () => void;
@@ -296,6 +297,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                 {activeSection === "clients" && "Relations clients"}
                 {activeSection === "billing" && "Centre de commandement"}
                 {activeSection === "disputes" && "Centre de litiges"}
+                {activeSection === "reports" && "Rapports mensuels"}
                 {activeSection === "calendar" && "Gestion d'agenda"}
                 {activeSection === "settings" && "Réglages"}
               </h1>
@@ -539,6 +541,8 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
             <ClientManagement />
           ) : activeSection === "disputes" ? (
             <DisputeCenter />
+          ) : activeSection === "reports" ? (
+            <MonthlyReports />
           ) : activeSection === "settings" ? (
             <SettingsWizard />
           ) : (

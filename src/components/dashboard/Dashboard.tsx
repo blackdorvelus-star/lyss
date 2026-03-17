@@ -14,13 +14,11 @@ import PerformanceCards from "./PerformanceCards";
 import LiveActivityFeed, { type FeedItem } from "./LiveActivityFeed";
 import IntegrationStatus from "./IntegrationStatus";
 import ActiveDossierIndicator from "./ActiveDossierIndicator";
+import SettingsWizard from "./SettingsWizard";
 import FinancialHealth from "./FinancialHealth";
 import PersonalitySelector, { type Personality } from "./PersonalitySelector";
-import AssistantIdentity from "./AssistantIdentity";
-import PaymentSettings from "./PaymentSettings";
 import VapiCallButton from "./VapiCallButton";
 import CallHistory, { type CallLog } from "./CallHistory";
-import VapiAssistantConfig from "./VapiAssistantConfig";
 import ClientManagement from "./ClientManagement";
 
 interface DashboardProps {
@@ -492,15 +490,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
           ) : activeSection === "clients" ? (
             <ClientManagement />
           ) : activeSection === "settings" ? (
-            <div className="max-w-2xl space-y-10">
-              <AssistantIdentity />
-              <div className="border-t border-border pt-8">
-                <VapiAssistantConfig />
-              </div>
-              <div className="border-t border-border pt-8">
-                <PaymentSettings />
-              </div>
-            </div>
+            <SettingsWizard />
           ) : (
             <PlaceholderSection title="Gestion d'agenda" desc="La prise de rendez-vous et les confirmations automatiques arrivent bientôt." />
           )}

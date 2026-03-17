@@ -73,7 +73,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
   const [saving, setSaving] = useState(false);
   const [activeSection, setActiveSection] = useState<Section>("billing");
   const [personality, setPersonality] = useState<Personality>("chaleureuse");
-
+  const [sendingSmsId, setSendingSmsId] = useState<string | null>(null);
   useEffect(() => { fetchData(); }, []);
 
   const fetchData = async () => {

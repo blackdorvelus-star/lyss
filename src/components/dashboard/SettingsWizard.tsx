@@ -295,7 +295,7 @@ const SettingsWizard = () => {
                     <h4 className="font-medium text-sm">Virement Interac</h4>
                   </div>
                   <Input value={interacEmail} onChange={e => setInteracEmail(e.target.value)} placeholder="paiements@entreprise.ca" className="bg-secondary" />
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                     <div className="space-y-1">
                       <label className="text-xs text-muted-foreground">Question</label>
                       <Input value={interacQuestion} onChange={e => setInteracQuestion(e.target.value)} placeholder="Paiement" className="bg-secondary" />

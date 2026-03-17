@@ -52,6 +52,14 @@ const SageConnect = () => {
       const { data: session } = await supabase.auth.getSession();
       const token = session?.session?.access_token;
 
+      if (!token) {
+        toast.error("Tu dois être connecté pour lier Sage.");
+        setConnecting(false);
+        return;
+      }
+
+      console.log("Sage: initiating OAuth with token", token.substring(0, 10) + "...");
+
       const res = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/sage-auth`,
         {
@@ -65,9 +73,11 @@ const SageConnect = () => {
       );
 
       const data = await res.json();
+      console.log("Sage auth response:", res.status, data);
       if (!res.ok) throw new Error(data.error || "Erreur");
       window.location.href = data.auth_url;
     } catch (err: any) {
+      console.error("Sage connect error:", err);
       toast.error(`Erreur : ${err.message}`);
       setConnecting(false);
     }

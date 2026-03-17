@@ -15,6 +15,7 @@ interface AppSidebarProps {
 const navItems: { id: Section; label: string; icon: typeof Users }[] = [
   { id: "billing", label: "Facturation", icon: FileText },
   { id: "clients", label: "Clients", icon: Users },
+  { id: "widget", label: "Widget", icon: Globe },
   { id: "integrations", label: "Intégrations", icon: Link2 },
   { id: "disputes", label: "Litiges", icon: ShieldAlert },
   { id: "reports", label: "Rapports", icon: FileBarChart },

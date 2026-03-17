@@ -32,21 +32,24 @@ serve(async (req) => {
       });
     }
 
-    const token = authHeader.replace("Bearer ", "").trim();
     const supabase = createClient(supabaseUrl, supabaseAnonKey, {
       auth: { persistSession: false, autoRefreshToken: false },
       global: { headers: { Authorization: authHeader } },
     });
 
-    const { data, error } = await supabase.auth.getClaims(token);
-    if (error || !data?.claims?.sub) {
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
+
+    if (error || !user?.id) {
       return new Response(JSON.stringify({ error: "Non autorisé" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const state = btoa(JSON.stringify({ user_id: data.claims.sub }));
+    const state = btoa(JSON.stringify({ user_id: user.id }));
     const authUrl = `https://appcenter.intuit.com/connect/oauth2?${new URLSearchParams({
       client_id: clientId,
       redirect_uri: redirectUri,

@@ -21,6 +21,7 @@ import VapiCallButton from "./VapiCallButton";
 import CallHistory, { type CallLog } from "./CallHistory";
 import ClientManagement from "./ClientManagement";
 import DisputeCenter from "./DisputeCenter";
+import MonthlyReports from "./MonthlyReports";
 
 interface DashboardProps {
   onBack: () => void;

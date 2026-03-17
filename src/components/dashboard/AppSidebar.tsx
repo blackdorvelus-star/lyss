@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Users, FileText, Calendar, Settings, LogOut, ChevronLeft, ChevronRight, Shield, ShieldAlert, Menu, X } from "lucide-react";
+import { Users, FileText, Calendar, Settings, LogOut, ChevronLeft, ChevronRight, Shield, ShieldAlert, Menu, X, FileBarChart } from "lucide-react";
 import { useAdmin } from "@/hooks/useAdmin";
 import { cn } from "@/lib/utils";
 
-export type Section = "clients" | "billing" | "disputes" | "calendar" | "settings";
+export type Section = "clients" | "billing" | "disputes" | "reports" | "calendar" | "settings";
 
 interface AppSidebarProps {
   activeSection: Section;

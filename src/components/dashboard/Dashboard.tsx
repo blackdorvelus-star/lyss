@@ -28,6 +28,7 @@ const CallHistory = lazy(() => import("./CallHistory"));
 const QuickBooksConnect = lazy(() => import("./QuickBooksConnect"));
 const SageConnect = lazy(() => import("./SageConnect"));
 const WidgetConfigurator = lazy(() => import("./WidgetConfigurator"));
+const ImportHub = lazy(() => import("./ImportHub"));
 
 const SectionLoader = () => (
   <div className="flex items-center justify-center py-16">
@@ -259,7 +260,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
   const [saving, setSaving] = useState(false);
   const [activeSection, setActiveSection] = useState<Section>(() => {
     const hash = window.location.hash.replace("#", "");
-    const validSections: Section[] = ["clients", "billing", "disputes", "reports", "calendar", "settings", "integrations", "widget"];
+    const validSections: Section[] = ["clients", "billing", "disputes", "reports", "calendar", "settings", "integrations", "widget", "import"];
     return validSections.includes(hash as Section) ? (hash as Section) : "billing";
   });
   const [personality, setPersonality] = useState<import("./PersonalitySelector").Personality>("chaleureuse");
@@ -463,6 +464,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                 {activeSection === "settings" && "Réglages"}
                 {activeSection === "integrations" && "Intégrations comptables"}
                 {activeSection === "widget" && "Widget embarqué"}
+                {activeSection === "import" && "Confier un dossier"}
               </h1>
             </div>
             <div className="flex items-center gap-2 sm:gap-4">
@@ -585,6 +587,10 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
               ) : activeSection === "widget" ? (
                 <Suspense fallback={<SectionLoader />}>
                   <WidgetConfigurator />
+                </Suspense>
+              ) : activeSection === "import" ? (
+                <Suspense fallback={<SectionLoader />}>
+                  <ImportHub onComplete={() => { setActiveSection("billing"); fetchData(); }} />
                 </Suspense>
               ) : (
                 <PlaceholderSection title="Gestion d'agenda" desc="La prise de rendez-vous et les confirmations automatiques arrivent bientôt." />

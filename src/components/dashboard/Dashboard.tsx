@@ -254,7 +254,11 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
   const [recoveryId, setRecoveryId] = useState<string | null>(null);
   const [recoveryAmount, setRecoveryAmount] = useState("");
   const [saving, setSaving] = useState(false);
-  const [activeSection, setActiveSection] = useState<Section>("billing");
+  const [activeSection, setActiveSection] = useState<Section>(() => {
+    const hash = window.location.hash.replace("#", "");
+    const validSections: Section[] = ["clients", "billing", "disputes", "reports", "calendar", "settings", "integrations"];
+    return validSections.includes(hash as Section) ? (hash as Section) : "billing";
+  });
   const [personality, setPersonality] = useState<import("./PersonalitySelector").Personality>("chaleureuse");
   const [sendingSmsId, setSendingSmsId] = useState<string | null>(null);
 

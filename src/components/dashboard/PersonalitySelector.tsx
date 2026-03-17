@@ -36,7 +36,7 @@ const PersonalitySelector = ({ value, onChange }: PersonalitySelectorProps) => {
         Personnalité de l'adjointe
       </h3>
 
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
         {personalities.map((p) => {
           const isActive = value === p.id;
           return (

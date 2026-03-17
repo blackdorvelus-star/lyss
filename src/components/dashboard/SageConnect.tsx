@@ -18,14 +18,21 @@ const SageConnect = () => {
   const [connecting, setConnecting] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [disconnecting, setDisconnecting] = useState(false);
+  const [fallbackUrl, setFallbackUrl] = useState<string | null>(null);
 
   useEffect(() => {
     loadConnection();
     const params = new URLSearchParams(window.location.search);
-    if (params.get('sage_connected') === 'true') {
+    const hash = window.location.hash;
+    if (params.get('sage_connected') === 'true' || hash.includes('sage_connected=true')) {
       toast.success("Sage connecté avec succès !");
-      window.history.replaceState({}, '', window.location.pathname);
+      window.history.replaceState({}, '', window.location.pathname + '#integrations');
       loadConnection();
+    }
+    if (params.get('sage_error') || hash.includes('sage_error')) {
+      const err = params.get('sage_error') || new URLSearchParams(hash.replace('#integrations?', '')).get('sage_error');
+      toast.error(`Erreur Sage : ${err === 'token_exchange_failed' ? "Échange de jeton échoué" : err === 'db_error' ? "Erreur de sauvegarde" : err}`);
+      window.history.replaceState({}, '', window.location.pathname + '#integrations');
     }
   }, []);
 
@@ -46,8 +53,30 @@ const SageConnect = () => {
     setLoading(false);
   };
 
+  const openOAuthUrl = (url: string) => {
+    try {
+      if (window.top && window.top !== window) {
+        window.top.location.href = url;
+        return;
+      }
+    } catch (e) {
+      // Cross-origin iframe
+    }
+
+    const popup = window.open(url, "_blank", "noopener,noreferrer");
+    if (!popup) {
+      setFallbackUrl(url);
+      setConnecting(false);
+      toast.error("La fenêtre a été bloquée. Utilise le lien ci-dessous.");
+      return;
+    }
+
+    window.location.href = url;
+  };
+
   const handleConnect = async () => {
     setConnecting(true);
+    setFallbackUrl(null);
     try {
       const { data: session } = await supabase.auth.getSession();
       const token = session?.session?.access_token;
@@ -57,8 +86,6 @@ const SageConnect = () => {
         setConnecting(false);
         return;
       }
-
-      console.log("Sage: initiating OAuth with token", token.substring(0, 10) + "...");
 
       const res = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/sage-auth`,
@@ -73,9 +100,9 @@ const SageConnect = () => {
       );
 
       const data = await res.json();
-      console.log("Sage auth response:", res.status, data);
       if (!res.ok) throw new Error(data.error || "Erreur");
-      window.location.href = data.auth_url;
+
+      openOAuthUrl(data.auth_url);
     } catch (err: any) {
       console.error("Sage connect error:", err);
       toast.error(`Erreur : ${err.message}`);
@@ -176,10 +203,22 @@ const SageConnect = () => {
           </Button>
         </div>
       ) : (
-        <Button onClick={handleConnect} disabled={connecting} className="w-full bg-[#00DC82] hover:bg-[#00b86b] text-white">
-          {connecting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <ExternalLink className="w-4 h-4 mr-2" />}
-          Connecter Sage
-        </Button>
+        <div className="space-y-2">
+          <Button onClick={handleConnect} disabled={connecting} className="w-full bg-[#00DC82] hover:bg-[#00b86b] text-white">
+            {connecting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <ExternalLink className="w-4 h-4 mr-2" />}
+            Connecter Sage
+          </Button>
+          {fallbackUrl && (
+            <a
+              href={fallbackUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block text-center text-xs text-primary underline hover:text-primary/80"
+            >
+              Ouvrir Sage dans un nouvel onglet →
+            </a>
+          )}
+        </div>
       )}
 
       <p className="text-xs text-muted-foreground">

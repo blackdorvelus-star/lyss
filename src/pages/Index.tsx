@@ -89,16 +89,6 @@ const Index = () => {
     return (
       <Dashboard
         onBack={() => setView("landing")}
-        onNewInvoice={() => setView("upload")}
-        onLogout={handleLogout}
-      />
-    );
-  }
-
-  if (view === "upload") {
-    return (
-      <InvoiceUpload
-        onBack={() => setView("dashboard")}
         onLogout={handleLogout}
       />
     );

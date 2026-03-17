@@ -193,18 +193,31 @@ export type Database = {
       }
       payment_settings: {
         Row: {
+          active_channels: Json | null
+          ai_max_discount_percent: number | null
+          ai_negotiate: boolean | null
+          ai_propose_payment_plan: boolean | null
           allow_disputes: boolean
           assistant_name: string | null
           assistant_role: string | null
           company_logo_url: string | null
           company_name: string | null
           created_at: string
+          email_signature: string | null
+          follow_up_closing: string | null
+          greeting_style: string | null
           id: string
           interac_answer: string | null
           interac_email: string | null
           interac_question: string | null
+          notify_on_dispute: boolean | null
+          notify_on_negative_sentiment: boolean | null
+          notify_on_payment: boolean | null
+          notify_on_response: boolean | null
           onboarding_completed: boolean
+          sms_signature: string | null
           stripe_link: string | null
+          tone: string | null
           updated_at: string
           user_id: string
           vapi_custom_instructions: string | null
@@ -213,20 +226,36 @@ export type Database = {
           vapi_public_key: string | null
           vapi_voice_id: string | null
           vapi_voice_provider: string | null
+          working_days: Json | null
+          working_hours_end: string | null
+          working_hours_start: string | null
         }
         Insert: {
+          active_channels?: Json | null
+          ai_max_discount_percent?: number | null
+          ai_negotiate?: boolean | null
+          ai_propose_payment_plan?: boolean | null
           allow_disputes?: boolean
           assistant_name?: string | null
           assistant_role?: string | null
           company_logo_url?: string | null
           company_name?: string | null
           created_at?: string
+          email_signature?: string | null
+          follow_up_closing?: string | null
+          greeting_style?: string | null
           id?: string
           interac_answer?: string | null
           interac_email?: string | null
           interac_question?: string | null
+          notify_on_dispute?: boolean | null
+          notify_on_negative_sentiment?: boolean | null
+          notify_on_payment?: boolean | null
+          notify_on_response?: boolean | null
           onboarding_completed?: boolean
+          sms_signature?: string | null
           stripe_link?: string | null
+          tone?: string | null
           updated_at?: string
           user_id: string
           vapi_custom_instructions?: string | null
@@ -235,20 +264,36 @@ export type Database = {
           vapi_public_key?: string | null
           vapi_voice_id?: string | null
           vapi_voice_provider?: string | null
+          working_days?: Json | null
+          working_hours_end?: string | null
+          working_hours_start?: string | null
         }
         Update: {
+          active_channels?: Json | null
+          ai_max_discount_percent?: number | null
+          ai_negotiate?: boolean | null
+          ai_propose_payment_plan?: boolean | null
           allow_disputes?: boolean
           assistant_name?: string | null
           assistant_role?: string | null
           company_logo_url?: string | null
           company_name?: string | null
           created_at?: string
+          email_signature?: string | null
+          follow_up_closing?: string | null
+          greeting_style?: string | null
           id?: string
           interac_answer?: string | null
           interac_email?: string | null
           interac_question?: string | null
+          notify_on_dispute?: boolean | null
+          notify_on_negative_sentiment?: boolean | null
+          notify_on_payment?: boolean | null
+          notify_on_response?: boolean | null
           onboarding_completed?: boolean
+          sms_signature?: string | null
           stripe_link?: string | null
+          tone?: string | null
           updated_at?: string
           user_id?: string
           vapi_custom_instructions?: string | null
@@ -257,6 +302,9 @@ export type Database = {
           vapi_public_key?: string | null
           vapi_voice_id?: string | null
           vapi_voice_provider?: string | null
+          working_days?: Json | null
+          working_hours_end?: string | null
+          working_hours_start?: string | null
         }
         Relationships: []
       }

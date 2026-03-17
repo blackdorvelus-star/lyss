@@ -109,39 +109,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
       .order("created_at", { ascending: false });
     if (calls) setCallLogs(calls as any as CallLog[]);
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      const { data: settings } = await supabase
-        .from("payment_settings")
-        .select("*")
-        .eq("user_id", user.id)
-        .single();
-
-      let publicKey = (settings as any)?.vapi_public_key || null;
-      if (!publicKey) {
-        try {
-          const { data: keyData } = await supabase.functions.invoke("get-vapi-key");
-          if (keyData?.key) publicKey = keyData.key;
-        } catch (e) {
-          console.log("Could not fetch default Vapi key");
-        }
-      }
-
-      setVapiPublicKey(publicKey);
-      if (settings) {
-        const s = settings as any;
-        setVapiConfig({
-          voiceId: s.vapi_voice_id,
-          voiceProvider: s.vapi_voice_provider,
-          personality: s.vapi_personality,
-          customInstructions: s.vapi_custom_instructions,
-          firstMessageTemplate: s.vapi_first_message_template,
-          assistantName: s.assistant_name,
-          assistantRole: s.assistant_role,
-          companyName: s.company_name,
-        });
-      }
-    }
+    // Settings loaded via individual components as needed
 
     setLoading(false);
   };

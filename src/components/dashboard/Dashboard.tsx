@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Plus, Clock, CheckCircle2, XCircle, MessageSquare, ChevronDown, ChevronUp,
-  Loader2, Banknote, Sparkles, Phone,
+  Loader2, Banknote, Sparkles, Phone, Send,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,6 +46,9 @@ interface Reminder {
   status: string;
   sent_at: string | null;
   created_at: string;
+  delivery_status?: string | null;
+  sms_response?: string | null;
+  sms_response_at?: string | null;
 }
 
 const statusConfig: Record<string, { label: string; icon: typeof Clock; color: string }> = {
@@ -70,7 +73,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
   const [saving, setSaving] = useState(false);
   const [activeSection, setActiveSection] = useState<Section>("billing");
   const [personality, setPersonality] = useState<Personality>("chaleureuse");
-
+  const [sendingSmsId, setSendingSmsId] = useState<string | null>(null);
   useEffect(() => { fetchData(); }, []);
 
   const fetchData = async () => {
@@ -166,6 +169,23 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
       fetchData();
     }
     setSaving(false);
+  };
+
+  const sendSms = async (reminderId: string) => {
+    setSendingSmsId(reminderId);
+    try {
+      const { data, error } = await supabase.functions.invoke("send-sms", {
+        body: { reminder_id: reminderId },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast.success(`SMS envoyé à ${data.to} ✓`);
+      fetchData();
+    } catch (e: any) {
+      toast.error(e.message || "Erreur lors de l'envoi du SMS");
+    } finally {
+      setSendingSmsId(null);
+    }
   };
 
   const totalRecovered = invoices.reduce((s, i) => s + (i.amount_recovered || 0), 0);
@@ -462,13 +482,37 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                                             <span className="text-xs text-muted-foreground">{rem.sent_at ? formatDate(rem.sent_at) : "Planifié"}</span>
                                             <span className={`text-xs ml-auto ${rem.status === "sent" || rem.status === "delivered" ? "text-primary" : rem.status === "failed" ? "text-destructive" : "text-muted-foreground"}`}>
                                               {rem.status === "scheduled" && "⏳ Planifié"}
-                                              {rem.status === "sent" && "✓ Envoyé"}
+                                              {rem.status === "sent" && `✓ Envoyé${rem.delivery_status === "delivered" ? " · Livré ✓✓" : rem.delivery_status === "failed" ? " · Échec livraison" : ""}`}
                                               {rem.status === "delivered" && "✓✓ Livré"}
                                               {rem.status === "replied" && "💬 Répondu"}
                                               {rem.status === "failed" && "✕ Échoué"}
                                             </span>
                                           </div>
                                           <p className="text-xs text-secondary-foreground leading-relaxed whitespace-pre-wrap">{rem.message_content}</p>
+                                          {rem.sms_response && (
+                                            <div className="mt-2 bg-primary/10 rounded-md p-2 border border-primary/20">
+                                              <p className="text-[10px] font-medium text-primary mb-0.5">Réponse du client :</p>
+                                              <p className="text-xs text-foreground">{rem.sms_response}</p>
+                                              {rem.sms_response_at && (
+                                                <p className="text-[10px] text-muted-foreground mt-1">{formatDate(rem.sms_response_at)}</p>
+                                              )}
+                                            </div>
+                                          )}
+                                          {rem.channel === "sms" && rem.status === "scheduled" && (
+                                            <Button
+                                              size="sm"
+                                              onClick={(e) => { e.stopPropagation(); sendSms(rem.id); }}
+                                              disabled={sendingSmsId === rem.id}
+                                              className="mt-2 bg-accent text-accent-foreground font-display text-xs h-8"
+                                            >
+                                              {sendingSmsId === rem.id ? (
+                                                <Loader2 className="w-3 h-3 animate-spin mr-1" />
+                                              ) : (
+                                                <Send className="w-3 h-3 mr-1" />
+                                              )}
+                                              Envoyer le SMS maintenant
+                                            </Button>
+                                          )}
                                         </div>
                                       ))
                                     )}

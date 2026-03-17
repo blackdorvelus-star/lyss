@@ -329,33 +329,48 @@ export type Database = {
         Row: {
           channel: string
           created_at: string
+          delivered_at: string | null
+          delivery_provider_id: string | null
+          delivery_status: string | null
           id: string
           invoice_id: string
           message_content: string
           response: string | null
           sent_at: string | null
+          sms_response: string | null
+          sms_response_at: string | null
           status: string
           user_id: string
         }
         Insert: {
           channel: string
           created_at?: string
+          delivered_at?: string | null
+          delivery_provider_id?: string | null
+          delivery_status?: string | null
           id?: string
           invoice_id: string
           message_content: string
           response?: string | null
           sent_at?: string | null
+          sms_response?: string | null
+          sms_response_at?: string | null
           status?: string
           user_id: string
         }
         Update: {
           channel?: string
           created_at?: string
+          delivered_at?: string | null
+          delivery_provider_id?: string | null
+          delivery_status?: string | null
           id?: string
           invoice_id?: string
           message_content?: string
           response?: string | null
           sent_at?: string | null
+          sms_response?: string | null
+          sms_response_at?: string | null
           status?: string
           user_id?: string
         }

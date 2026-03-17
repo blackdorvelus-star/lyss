@@ -426,10 +426,10 @@ const SettingsWizard = () => {
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 const StepCard = ({ title, subtitle, children }: { title: string; subtitle: string; children: React.ReactNode }) => (
-  <div className="space-y-5">
+  <div className="space-y-4 sm:space-y-5">
     <div>
-      <h2 className="font-display text-lg font-bold">{title}</h2>
-      <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>
+      <h2 className="font-display text-base sm:text-lg font-bold">{title}</h2>
+      <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">{subtitle}</p>
     </div>
     {children}
   </div>

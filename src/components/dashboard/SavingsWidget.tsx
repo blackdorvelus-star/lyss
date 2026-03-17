@@ -26,29 +26,29 @@ const SavingsWidget = ({
         Économies réalisées
       </h3>
       
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
         <div className="text-center">
-          <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-2">
-            <Clock className="w-4 h-4 text-primary" />
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-1.5 sm:mb-2">
+            <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
           </div>
-          <p className="font-display text-lg font-bold">{hoursSaved.toFixed(1)}h</p>
-          <p className="text-xs text-muted-foreground">Temps libéré</p>
+          <p className="font-display text-base sm:text-lg font-bold">{hoursSaved.toFixed(1)}h</p>
+          <p className="text-[9px] sm:text-xs text-muted-foreground leading-tight">Temps libéré</p>
         </div>
 
         <div className="text-center">
-          <div className="w-9 h-9 rounded-lg bg-accent/10 flex items-center justify-center mx-auto mb-2">
-            <DollarSign className="w-4 h-4 text-accent" />
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-accent/10 flex items-center justify-center mx-auto mb-1.5 sm:mb-2">
+            <DollarSign className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-accent" />
           </div>
-          <p className="font-display text-lg font-bold">{formatMoney(moneySaved)}</p>
-          <p className="text-xs text-muted-foreground">Valeur du temps</p>
+          <p className="font-display text-base sm:text-lg font-bold">{formatMoney(moneySaved)}</p>
+          <p className="text-[9px] sm:text-xs text-muted-foreground leading-tight">Valeur du temps</p>
         </div>
 
         <div className="text-center">
-          <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-2">
-            <TrendingUp className="w-4 h-4 text-primary" />
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-1.5 sm:mb-2">
+            <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
           </div>
-          <p className="font-display text-lg font-bold">{formatMoney(totalValue)}</p>
-          <p className="text-xs text-muted-foreground">Valeur totale</p>
+          <p className="font-display text-base sm:text-lg font-bold">{formatMoney(totalValue)}</p>
+          <p className="text-[9px] sm:text-xs text-muted-foreground leading-tight">Valeur totale</p>
         </div>
       </div>
 

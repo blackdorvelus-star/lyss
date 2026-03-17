@@ -51,7 +51,7 @@ const FinancialHealth = ({ invoices }: FinancialHealthProps) => {
       </div>
 
       {/* Legend */}
-      <div className="flex items-center gap-4 mb-4">
+      <div className="flex items-center gap-2 sm:gap-4 mb-4 flex-wrap">
         {segments.map((seg) => (
           <div key={seg.label} className="flex items-center gap-1.5">
             <div className={`w-2 h-2 rounded-full ${seg.color}`} />

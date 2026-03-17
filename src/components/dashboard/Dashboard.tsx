@@ -374,7 +374,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                                     {formatDate(inv.created_at)}
                                   </p>
                                 </div>
-                                <p className="font-display font-bold text-lg ml-3">{formatMoney(inv.amount)}</p>
+                                <p className="font-display font-bold text-base sm:text-lg ml-3">{formatMoney(inv.amount)}</p>
                               </div>
                               <div className="flex items-center justify-between">
                                 <div className={`flex items-center gap-1.5 text-xs font-medium ${config.color}`}>

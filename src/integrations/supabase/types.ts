@@ -203,7 +203,9 @@ export type Database = {
           company_logo_url: string | null
           company_name: string | null
           created_at: string
+          email_body_template: string | null
           email_signature: string | null
+          email_subject_template: string | null
           follow_up_closing: string | null
           greeting_style: string | null
           id: string
@@ -216,9 +218,11 @@ export type Database = {
           notify_on_response: boolean | null
           onboarding_completed: boolean
           sms_signature: string | null
+          sms_template: string | null
           stripe_link: string | null
           tone: string | null
           updated_at: string
+          use_custom_templates: boolean
           user_id: string
           vapi_custom_instructions: string | null
           vapi_first_message_template: string | null
@@ -241,7 +245,9 @@ export type Database = {
           company_logo_url?: string | null
           company_name?: string | null
           created_at?: string
+          email_body_template?: string | null
           email_signature?: string | null
+          email_subject_template?: string | null
           follow_up_closing?: string | null
           greeting_style?: string | null
           id?: string
@@ -254,9 +260,11 @@ export type Database = {
           notify_on_response?: boolean | null
           onboarding_completed?: boolean
           sms_signature?: string | null
+          sms_template?: string | null
           stripe_link?: string | null
           tone?: string | null
           updated_at?: string
+          use_custom_templates?: boolean
           user_id: string
           vapi_custom_instructions?: string | null
           vapi_first_message_template?: string | null
@@ -279,7 +287,9 @@ export type Database = {
           company_logo_url?: string | null
           company_name?: string | null
           created_at?: string
+          email_body_template?: string | null
           email_signature?: string | null
+          email_subject_template?: string | null
           follow_up_closing?: string | null
           greeting_style?: string | null
           id?: string
@@ -292,9 +302,11 @@ export type Database = {
           notify_on_response?: boolean | null
           onboarding_completed?: boolean
           sms_signature?: string | null
+          sms_template?: string | null
           stripe_link?: string | null
           tone?: string | null
           updated_at?: string
+          use_custom_templates?: boolean
           user_id?: string
           vapi_custom_instructions?: string | null
           vapi_first_message_template?: string | null

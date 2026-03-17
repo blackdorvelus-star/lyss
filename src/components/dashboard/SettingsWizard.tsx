@@ -4,7 +4,7 @@ import {
   UserCircle, Building2, BadgeCheck, Mic2, Sparkles, Key, FileText,
   Banknote, CreditCard, ShieldAlert, Link2,
   ChevronRight, ChevronLeft, Check, Loader2, Save,
-  MessageSquare, Phone,
+  MessageSquare, Phone, CalendarClock,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -16,6 +16,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import SequenceConfig from "./SequenceConfig";
 
 // ── Data ────────────────────────────────────────────────────────────────────
 

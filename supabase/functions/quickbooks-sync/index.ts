@@ -7,50 +7,47 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const getRequiredEnv = (name: string) => {
+  const value = Deno.env.get(name)?.trim();
+  if (!value) throw new Error(`${name} not configured`);
+  return value;
+};
+
 async function refreshTokenIfNeeded(supabase: any, connection: any) {
   const expiresAt = new Date(connection.token_expires_at);
-  const now = new Date();
-  if (expiresAt.getTime() - now.getTime() > 5 * 60 * 1000) {
+  if (expiresAt.getTime() - Date.now() > 5 * 60 * 1000) {
     return connection.access_token;
   }
 
-  const clientId = Deno.env.get("QUICKBOOKS_CLIENT_ID")!;
-  const clientSecret = Deno.env.get("QUICKBOOKS_CLIENT_SECRET")!;
+  const clientId = getRequiredEnv("QUICKBOOKS_CLIENT_ID");
+  const clientSecret = getRequiredEnv("QUICKBOOKS_CLIENT_SECRET");
   const basicAuth = btoa(`${clientId}:${clientSecret}`);
 
-  const res = await fetch(
-    "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer",
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Basic ${basicAuth}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-        Accept: "application/json",
-      },
-      body: new URLSearchParams({
-        grant_type: "refresh_token",
-        refresh_token: connection.refresh_token,
-      }),
-    }
-  );
+  const response = await fetch("https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer", {
+    method: "POST",
+    headers: {
+      Authorization: `Basic ${basicAuth}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+      Accept: "application/json",
+    },
+    body: new URLSearchParams({
+      grant_type: "refresh_token",
+      refresh_token: connection.refresh_token,
+    }),
+  });
 
-  if (!res.ok) {
-    throw new Error(`Token refresh failed: ${await res.text()}`);
+  if (!response.ok) {
+    throw new Error(`Token refresh failed: ${await response.text()}`);
   }
 
-  const tokens = await res.json();
-  const newExpiresAt = new Date(
-    Date.now() + tokens.expires_in * 1000
-  ).toISOString();
+  const tokens = await response.json();
+  const newExpiresAt = new Date(Date.now() + (tokens.expires_in ?? 3600) * 1000).toISOString();
 
-  await supabase
-    .from("quickbooks_connections")
-    .update({
-      access_token: tokens.access_token,
-      refresh_token: tokens.refresh_token,
-      token_expires_at: newExpiresAt,
-    })
-    .eq("id", connection.id);
+  await supabase.from("quickbooks_connections").update({
+    access_token: tokens.access_token,
+    refresh_token: tokens.refresh_token,
+    token_expires_at: newExpiresAt,
+  }).eq("id", connection.id);
 
   return tokens.access_token;
 }
@@ -58,10 +55,8 @@ async function refreshTokenIfNeeded(supabase: any, connection: any) {
 async function syncForUser(supabaseService: any, connection: any) {
   const userId = connection.user_id;
   const accessToken = await refreshTokenIfNeeded(supabaseService, connection);
+  const query = encodeURIComponent("SELECT * FROM Invoice WHERE Balance > '0' ORDERBY DueDate DESC MAXRESULTS 100");
 
-  const query = encodeURIComponent(
-    "SELECT * FROM Invoice WHERE Balance > '0' ORDERBY DueDate DESC MAXRESULTS 100"
-  );
   const qbRes = await fetch(
     `https://quickbooks.api.intuit.com/v3/company/${connection.realm_id}/query?query=${query}&minorversion=65`,
     {
@@ -73,13 +68,11 @@ async function syncForUser(supabaseService: any, connection: any) {
   );
 
   if (!qbRes.ok) {
-    const errText = await qbRes.text();
-    throw new Error(`QuickBooks API error [${qbRes.status}]: ${errText}`);
+    throw new Error(`QuickBooks API error [${qbRes.status}]: ${await qbRes.text()}`);
   }
 
   const qbData = await qbRes.json();
   const qbInvoices = qbData.QueryResponse?.Invoice || [];
-
   let imported = 0;
   let skipped = 0;
 
@@ -89,7 +82,6 @@ async function syncForUser(supabaseService: any, connection: any) {
     const invoiceNumber = qbInv.DocNumber || null;
     const dueDate = qbInv.DueDate || null;
 
-    // Find or create client
     const { data: existingClients } = await supabaseService
       .from("clients")
       .select("id")
@@ -98,7 +90,7 @@ async function syncForUser(supabaseService: any, connection: any) {
       .limit(1);
 
     let clientId: string;
-    if (existingClients && existingClients.length > 0) {
+    if (existingClients?.length) {
       clientId = existingClients[0].id;
     } else {
       const { data: newClient, error: clientErr } = await supabaseService
@@ -106,15 +98,16 @@ async function syncForUser(supabaseService: any, connection: any) {
         .insert({ user_id: userId, name: clientName })
         .select("id")
         .single();
+
       if (clientErr || !newClient) {
         console.warn(`Skipping client ${clientName}:`, clientErr);
         skipped++;
         continue;
       }
+
       clientId = newClient.id;
     }
 
-    // Check if invoice already exists
     if (invoiceNumber) {
       const { data: existing } = await supabaseService
         .from("invoices")
@@ -123,17 +116,14 @@ async function syncForUser(supabaseService: any, connection: any) {
         .eq("user_id", userId)
         .limit(1);
 
-      if (existing && existing.length > 0) {
-        await supabaseService
-          .from("invoices")
-          .update({ amount, due_date: dueDate })
-          .eq("id", existing[0].id);
+      if (existing?.length) {
+        await supabaseService.from("invoices").update({ amount, due_date: dueDate }).eq("id", existing[0].id);
         skipped++;
         continue;
       }
     }
 
-    const { error: invErr } = await supabaseService.from("invoices").insert({
+    const { error: invoiceError } = await supabaseService.from("invoices").insert({
       user_id: userId,
       client_id: clientId,
       amount,
@@ -142,8 +132,8 @@ async function syncForUser(supabaseService: any, connection: any) {
       status: "pending",
     });
 
-    if (invErr) {
-      console.warn(`Error importing invoice ${invoiceNumber}:`, invErr);
+    if (invoiceError) {
+      console.warn(`Error importing invoice ${invoiceNumber}:`, invoiceError);
       skipped++;
     } else {
       imported++;
@@ -159,50 +149,36 @@ serve(async (req) => {
   }
 
   try {
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseService = createClient(
-      supabaseUrl,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-    );
+    const supabaseUrl = getRequiredEnv("SUPABASE_URL");
+    const serviceRoleKey = getRequiredEnv("SUPABASE_SERVICE_ROLE_KEY");
+    const anonKey = getRequiredEnv("SUPABASE_ANON_KEY");
+    const supabaseService = createClient(supabaseUrl, serviceRoleKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
 
-    // Check if this is a scheduled call (no specific user) or manual
-    let body: any = {};
+    let body: { scheduled?: boolean } = {};
     try {
       body = await req.json();
-    } catch {}
+    } catch {
+      body = {};
+    }
 
     if (body.scheduled) {
-      // Scheduled: sync ALL connected users
-      const { data: connections, error: connErr } = await supabaseService
-        .from("quickbooks_connections")
-        .select("*");
-
+      const { data: connections, error: connErr } = await supabaseService.from("quickbooks_connections").select("*");
       if (connErr || !connections?.length) {
-        return new Response(
-          JSON.stringify({
-            success: true,
-            message: "No QB connections to sync",
-          }),
-          {
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          }
-        );
+        return new Response(JSON.stringify({ success: true, message: "No QB connections to sync" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
 
       const results = [];
       for (const conn of connections) {
         try {
-          const result = await syncForUser(supabaseService, conn);
-          results.push({ user_id: conn.user_id, ...result });
-          console.log(
-            `Synced user ${conn.user_id}: ${result.imported} imported, ${result.skipped} skipped`
-          );
-        } catch (err) {
-          console.error(
-            `Sync failed for user ${conn.user_id}:`,
-            err.message
-          );
-          results.push({ user_id: conn.user_id, error: err.message });
+          results.push({ user_id: conn.user_id, ...(await syncForUser(supabaseService, conn)) });
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          console.error(`QuickBooks sync failed for user ${conn.user_id}:`, errorMessage);
+          results.push({ user_id: conn.user_id, error: errorMessage });
         }
       }
 
@@ -211,7 +187,6 @@ serve(async (req) => {
       });
     }
 
-    // Manual: authenticate user
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
       return new Response(JSON.stringify({ error: "Non autorisé" }), {
@@ -220,17 +195,14 @@ serve(async (req) => {
       });
     }
 
-    const supabaseAnon = createClient(
-      supabaseUrl,
-      Deno.env.get("SUPABASE_ANON_KEY")!
-    );
-    const token = authHeader.replace("Bearer ", "");
-    const {
-      data: { user },
-      error: userError,
-    } = await supabaseAnon.auth.getUser(token);
+    const token = authHeader.replace("Bearer ", "").trim();
+    const supabaseAnon = createClient(supabaseUrl, anonKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+      global: { headers: { Authorization: authHeader } },
+    });
 
-    if (userError || !user) {
+    const { data, error } = await supabaseAnon.auth.getClaims(token);
+    if (error || !data?.claims?.sub) {
       return new Response(JSON.stringify({ error: "Non autorisé" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -240,27 +212,24 @@ serve(async (req) => {
     const { data: connection, error: connError } = await supabaseService
       .from("quickbooks_connections")
       .select("*")
-      .eq("user_id", user.id)
-      .single();
+      .eq("user_id", data.claims.sub)
+      .maybeSingle();
 
     if (connError || !connection) {
-      return new Response(
-        JSON.stringify({ error: "QuickBooks non connecté" }),
-        {
-          status: 404,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
-      );
+      return new Response(JSON.stringify({ error: "QuickBooks non connecté" }), {
+        status: 404,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     const result = await syncForUser(supabaseService, connection);
-
     return new Response(JSON.stringify({ success: true, ...result }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("QuickBooks sync error:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("QuickBooks sync error:", errorMessage);
+    return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

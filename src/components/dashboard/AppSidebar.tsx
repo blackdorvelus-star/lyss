@@ -4,7 +4,7 @@ import { Users, FileText, Calendar, Settings, LogOut, ChevronLeft, ChevronRight,
 import { useAdmin } from "@/hooks/useAdmin";
 import { cn } from "@/lib/utils";
 
-export type Section = "clients" | "billing" | "calendar" | "settings";
+export type Section = "clients" | "billing" | "disputes" | "calendar" | "settings";
 
 interface AppSidebarProps {
   activeSection: Section;

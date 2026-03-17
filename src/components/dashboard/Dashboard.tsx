@@ -565,6 +565,21 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                 <MonthlyReports />
               ) : activeSection === "settings" ? (
                 <SettingsWizard />
+              ) : activeSection === "integrations" ? (
+                <div className="max-w-2xl space-y-6">
+                  <p className="text-sm text-muted-foreground">
+                    Connecte ton logiciel comptable pour importer automatiquement tes factures impayées.
+                  </p>
+                  <Suspense fallback={<SectionLoader />}>
+                    <QuickBooksConnect />
+                  </Suspense>
+                  <Suspense fallback={<SectionLoader />}>
+                    <SageConnect />
+                  </Suspense>
+                  <p className="text-xs text-muted-foreground text-center pt-2">
+                    Tu utilises un autre logiciel ? <a href="mailto:info@lyss.ca" className="text-primary hover:underline">Écris-nous</a> pour qu'on l'ajoute.
+                  </p>
+                </div>
               ) : (
                 <PlaceholderSection title="Gestion d'agenda" desc="La prise de rendez-vous et les confirmations automatiques arrivent bientôt." />
               )}

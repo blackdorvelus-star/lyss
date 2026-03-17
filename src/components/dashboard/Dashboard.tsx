@@ -46,6 +46,9 @@ interface Reminder {
   status: string;
   sent_at: string | null;
   created_at: string;
+  delivery_status?: string | null;
+  sms_response?: string | null;
+  sms_response_at?: string | null;
 }
 
 const statusConfig: Record<string, { label: string; icon: typeof Clock; color: string }> = {

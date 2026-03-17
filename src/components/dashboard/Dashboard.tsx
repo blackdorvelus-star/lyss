@@ -491,6 +491,8 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
             </div>
           ) : activeSection === "clients" ? (
             <ClientManagement />
+          ) : activeSection === "disputes" ? (
+            <DisputeCenter />
           ) : activeSection === "settings" ? (
             <SettingsWizard />
           ) : (

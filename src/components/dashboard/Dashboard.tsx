@@ -260,7 +260,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
   const [saving, setSaving] = useState(false);
   const [activeSection, setActiveSection] = useState<Section>(() => {
     const hash = window.location.hash.replace("#", "");
-    const validSections: Section[] = ["clients", "billing", "disputes", "reports", "calendar", "settings", "integrations", "widget"];
+    const validSections: Section[] = ["clients", "billing", "disputes", "reports", "calendar", "settings", "integrations", "widget", "import"];
     return validSections.includes(hash as Section) ? (hash as Section) : "billing";
   });
   const [personality, setPersonality] = useState<import("./PersonalitySelector").Personality>("chaleureuse");

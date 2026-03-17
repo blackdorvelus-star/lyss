@@ -131,7 +131,33 @@ serve(async (req) => {
       ? new Date(invoice.due_date).toLocaleDateString("fr-CA", { day: "numeric", month: "long" })
       : "récemment";
 
-    const userPrompt = `Génère les messages de suivi de courtoisie pour cette facture :
+    const assistantName = settings.assistant_name || "Lyss";
+    const assistantRole = settings.assistant_role || "adjointe";
+    const companyName = settings.company_name || "l'entreprise";
+
+    let messages: { sms: string; email_subject: string; email_body: string };
+
+    // Check if user wants custom templates
+    if (settings.use_custom_templates && (settings.sms_template || settings.email_body_template)) {
+      const replaceVars = (tpl: string) =>
+        tpl
+          .replace(/{prénom}/g, client.name.split(" ")[0])
+          .replace(/{nom}/g, client.name)
+          .replace(/{montant}/g, String(invoice.amount))
+          .replace(/{facture}/g, invoice.invoice_number || "N/A")
+          .replace(/{date_échéance}/g, dueDateStr)
+          .replace(/{nom_assistant}/g, assistantName)
+          .replace(/{rôle}/g, assistantRole)
+          .replace(/{entreprise}/g, companyName);
+
+      messages = {
+        sms: settings.sms_template ? replaceVars(settings.sms_template) : "",
+        email_subject: settings.email_subject_template ? replaceVars(settings.email_subject_template) : "",
+        email_body: settings.email_body_template ? replaceVars(settings.email_body_template) : "",
+      };
+    } else {
+      // AI-generated messages
+      const userPrompt = `Génère les messages de suivi de courtoisie pour cette facture :
 - Nom du client : ${client.name}
 - Montant : ${invoice.amount} $
 - Numéro de facture : ${invoice.invoice_number || "N/A"}
@@ -140,50 +166,50 @@ serve(async (req) => {
 
 C'est le premier suivi de courtoisie.`;
 
-    const systemPrompt = buildSystemPrompt(settings);
+      const systemPrompt = buildSystemPrompt(settings);
 
-    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-      }),
-    });
+      const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-3-flash-preview",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt },
+          ],
+        }),
+      });
 
-    if (!aiResponse.ok) {
-      const status = aiResponse.status;
-      const body = await aiResponse.text();
-      console.error("AI gateway error:", status, body);
-      if (status === 429) {
-        return new Response(JSON.stringify({ error: "Trop de requêtes. Réessaie dans un moment." }), {
-          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+      if (!aiResponse.ok) {
+        const status = aiResponse.status;
+        const body = await aiResponse.text();
+        console.error("AI gateway error:", status, body);
+        if (status === 429) {
+          return new Response(JSON.stringify({ error: "Trop de requêtes. Réessaie dans un moment." }), {
+            status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+        if (status === 402) {
+          return new Response(JSON.stringify({ error: "Crédits IA épuisés." }), {
+            status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+        throw new Error(`AI gateway error [${status}]`);
       }
-      if (status === 402) {
-        return new Response(JSON.stringify({ error: "Crédits IA épuisés." }), {
-          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+
+      const aiData = await aiResponse.json();
+      const rawContent = aiData.choices?.[0]?.message?.content || "";
+
+      try {
+        const cleaned = rawContent.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+        messages = JSON.parse(cleaned);
+      } catch {
+        console.error("Failed to parse AI response:", rawContent);
+        throw new Error("L'IA n'a pas retourné un format valide.");
       }
-      throw new Error(`AI gateway error [${status}]`);
-    }
-
-    const aiData = await aiResponse.json();
-    const rawContent = aiData.choices?.[0]?.message?.content || "";
-
-    let messages;
-    try {
-      const cleaned = rawContent.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-      messages = JSON.parse(cleaned);
-    } catch {
-      console.error("Failed to parse AI response:", rawContent);
-      throw new Error("L'IA n'a pas retourné un format valide.");
     }
 
     // Only create reminders for active channels

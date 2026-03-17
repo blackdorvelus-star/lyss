@@ -25,6 +25,8 @@ const FinancialHealth = lazy(() => import("./FinancialHealth"));
 const PersonalitySelector = lazy(() => import("./PersonalitySelector"));
 const TelnyxCallButton = lazy(() => import("./TelnyxCallButton"));
 const CallHistory = lazy(() => import("./CallHistory"));
+const QuickBooksConnect = lazy(() => import("./QuickBooksConnect"));
+const SageConnect = lazy(() => import("./SageConnect"));
 
 const SectionLoader = () => (
   <div className="flex items-center justify-center py-16">
@@ -254,7 +256,11 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
   const [recoveryId, setRecoveryId] = useState<string | null>(null);
   const [recoveryAmount, setRecoveryAmount] = useState("");
   const [saving, setSaving] = useState(false);
-  const [activeSection, setActiveSection] = useState<Section>("billing");
+  const [activeSection, setActiveSection] = useState<Section>(() => {
+    const hash = window.location.hash.replace("#", "");
+    const validSections: Section[] = ["clients", "billing", "disputes", "reports", "calendar", "settings", "integrations"];
+    return validSections.includes(hash as Section) ? (hash as Section) : "billing";
+  });
   const [personality, setPersonality] = useState<import("./PersonalitySelector").Personality>("chaleureuse");
   const [sendingSmsId, setSendingSmsId] = useState<string | null>(null);
 
@@ -454,6 +460,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                 {activeSection === "reports" && "Rapports mensuels"}
                 {activeSection === "calendar" && "Gestion d'agenda"}
                 {activeSection === "settings" && "Réglages"}
+                {activeSection === "integrations" && "Intégrations comptables"}
               </h1>
             </div>
             <div className="flex items-center gap-2 sm:gap-4">
@@ -558,6 +565,21 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                 <MonthlyReports />
               ) : activeSection === "settings" ? (
                 <SettingsWizard />
+              ) : activeSection === "integrations" ? (
+                <div className="max-w-2xl space-y-6">
+                  <p className="text-sm text-muted-foreground">
+                    Connecte ton logiciel comptable pour importer automatiquement tes factures impayées.
+                  </p>
+                  <Suspense fallback={<SectionLoader />}>
+                    <QuickBooksConnect />
+                  </Suspense>
+                  <Suspense fallback={<SectionLoader />}>
+                    <SageConnect />
+                  </Suspense>
+                  <p className="text-xs text-muted-foreground text-center pt-2">
+                    Tu utilises un autre logiciel ? <a href="mailto:info@lyss.ca" className="text-primary hover:underline">Écris-nous</a> pour qu'on l'ajoute.
+                  </p>
+                </div>
               ) : (
                 <PlaceholderSection title="Gestion d'agenda" desc="La prise de rendez-vous et les confirmations automatiques arrivent bientôt." />
               )}

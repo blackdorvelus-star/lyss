@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Users, FileText, Calendar, Settings, LogOut, ChevronLeft, ChevronRight, Shield, ShieldAlert, Menu, X, FileBarChart } from "lucide-react";
+import { Users, FileText, Calendar, Settings, LogOut, ChevronLeft, ChevronRight, Shield, ShieldAlert, Menu, X, FileBarChart, Link2 } from "lucide-react";
 import { useAdmin } from "@/hooks/useAdmin";
 import { cn } from "@/lib/utils";
 
-export type Section = "clients" | "billing" | "disputes" | "reports" | "calendar" | "settings";
+export type Section = "clients" | "billing" | "disputes" | "reports" | "calendar" | "settings" | "integrations";
 
 interface AppSidebarProps {
   activeSection: Section;
@@ -15,6 +15,7 @@ interface AppSidebarProps {
 const navItems: { id: Section; label: string; icon: typeof Users }[] = [
   { id: "billing", label: "Facturation", icon: FileText },
   { id: "clients", label: "Clients", icon: Users },
+  { id: "integrations", label: "Intégrations", icon: Link2 },
   { id: "disputes", label: "Litiges", icon: ShieldAlert },
   { id: "reports", label: "Rapports", icon: FileBarChart },
   { id: "calendar", label: "Agenda", icon: Calendar },

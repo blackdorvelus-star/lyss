@@ -24,7 +24,7 @@ const iconMap = {
 
 const LiveActivityFeed = ({ items }: LiveActivityFeedProps) => {
   return (
-    <div className="bg-card border border-border rounded-xl p-5 h-full flex flex-col">
+    <div className="bg-card border border-border rounded-xl p-3.5 sm:p-5 h-full flex flex-col">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
           Journal d'activité

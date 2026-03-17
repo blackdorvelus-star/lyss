@@ -26,7 +26,7 @@ const FinancialHealth = ({ invoices }: FinancialHealthProps) => {
   const barTotal = Math.max(total, 1);
 
   return (
-    <div className="bg-card border border-border rounded-xl p-5">
+    <div className="bg-card border border-border rounded-xl p-3.5 sm:p-5">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
           Santé financière
@@ -51,7 +51,7 @@ const FinancialHealth = ({ invoices }: FinancialHealthProps) => {
       </div>
 
       {/* Legend */}
-      <div className="flex items-center gap-4 mb-4">
+      <div className="flex items-center gap-2 sm:gap-4 mb-4 flex-wrap">
         {segments.map((seg) => (
           <div key={seg.label} className="flex items-center gap-1.5">
             <div className={`w-2 h-2 rounded-full ${seg.color}`} />

@@ -364,7 +364,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                           >
                             <button
                               onClick={() => setExpandedId(isExpanded ? null : inv.id)}
-                              className="w-full text-left bg-card border border-border rounded-xl p-4 hover:border-primary/20 transition-colors"
+                              className="w-full text-left bg-card border border-border rounded-xl p-3 sm:p-4 hover:border-primary/20 transition-colors"
                             >
                               <div className="flex items-start justify-between mb-2">
                                 <div className="flex-1 min-w-0">
@@ -374,7 +374,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                                     {formatDate(inv.created_at)}
                                   </p>
                                 </div>
-                                <p className="font-display font-bold text-lg ml-3">{formatMoney(inv.amount)}</p>
+                                <p className="font-display font-bold text-base sm:text-lg ml-3">{formatMoney(inv.amount)}</p>
                               </div>
                               <div className="flex items-center justify-between">
                                 <div className={`flex items-center gap-1.5 text-xs font-medium ${config.color}`}>

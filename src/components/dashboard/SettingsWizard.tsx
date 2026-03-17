@@ -164,7 +164,7 @@ const SettingsWizard = () => {
   }
 
   return (
-    <div className="max-w-2xl space-y-6">
+    <div className="max-w-2xl space-y-4 sm:space-y-6">
       {/* Step indicator */}
       <div className="flex items-center gap-1">
         {STEPS.map((s, i) => {
@@ -178,17 +178,17 @@ const SettingsWizard = () => {
               className="flex-1 group"
             >
               <div className={cn(
-                "h-1 rounded-full mb-2 transition-all",
+                "h-1.5 sm:h-1 rounded-full mb-1.5 sm:mb-2 transition-all",
                 isActive ? "bg-primary" : isDone ? "bg-primary/40" : "bg-border"
               )} />
               <div className={cn(
-                "flex items-center gap-1.5 text-xs font-medium transition-colors",
+                "flex items-center justify-center sm:justify-start gap-1 sm:gap-1.5 text-[10px] sm:text-xs font-medium transition-colors",
                 isActive ? "text-primary" : isDone ? "text-foreground" : "text-muted-foreground"
               )}>
                 {isDone ? (
-                  <Check className="w-3.5 h-3.5 text-primary" />
+                  <Check className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-primary" />
                 ) : (
-                  <Icon className="w-3.5 h-3.5" />
+                  <Icon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                 )}
                 <span className="hidden sm:inline">{s.label}</span>
               </div>
@@ -239,21 +239,21 @@ const SettingsWizard = () => {
                 {/* Personality — big visual cards */}
                 <div>
                   <p className="text-sm font-medium mb-2">Personnalité</p>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
                     {personalities.map(p => (
                       <button
                         key={p.value}
                         onClick={() => setPersonality(p.value)}
                         className={cn(
-                          "flex flex-col items-center text-center p-4 rounded-xl border transition-all",
+                          "flex flex-col items-center text-center p-2.5 sm:p-4 rounded-xl border transition-all",
                           personality === p.value
                             ? "border-primary bg-primary/5 ring-1 ring-primary/20"
                             : "border-border bg-card hover:border-primary/30"
                         )}
                       >
-                        <span className="text-2xl mb-1">{p.label.split(" ")[0]}</span>
-                        <span className="text-xs font-semibold">{p.label.split(" ").slice(1).join(" ")}</span>
-                        <span className="text-[10px] text-muted-foreground mt-1">{p.description}</span>
+                        <span className="text-xl sm:text-2xl mb-0.5 sm:mb-1">{p.label.split(" ")[0]}</span>
+                        <span className="text-[10px] sm:text-xs font-semibold leading-tight">{p.label.split(" ").slice(1).join(" ")}</span>
+                        <span className="text-[9px] sm:text-[10px] text-muted-foreground mt-0.5 sm:mt-1 leading-tight hidden sm:block">{p.description}</span>
                       </button>
                     ))}
                   </div>
@@ -295,7 +295,7 @@ const SettingsWizard = () => {
                     <h4 className="font-medium text-sm">Virement Interac</h4>
                   </div>
                   <Input value={interacEmail} onChange={e => setInteracEmail(e.target.value)} placeholder="paiements@entreprise.ca" className="bg-secondary" />
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                     <div className="space-y-1">
                       <label className="text-xs text-muted-foreground">Question</label>
                       <Input value={interacQuestion} onChange={e => setInteracQuestion(e.target.value)} placeholder="Paiement" className="bg-secondary" />
@@ -379,7 +379,7 @@ const SettingsWizard = () => {
                 {/* Summary */}
                 <div className="bg-primary/5 border border-primary/15 rounded-xl p-4 space-y-2">
                   <h4 className="text-sm font-medium text-primary">Récapitulatif</h4>
-                  <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-muted-foreground">
                     <p>Adjointe : <span className="text-foreground font-medium">{name || "Lyss"}</span></p>
                     <p>Entreprise : <span className="text-foreground font-medium">{companyDisplay}</span></p>
                     <p>Titre : <span className="text-foreground font-medium">{roleLabel}</span></p>
@@ -426,10 +426,10 @@ const SettingsWizard = () => {
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 const StepCard = ({ title, subtitle, children }: { title: string; subtitle: string; children: React.ReactNode }) => (
-  <div className="space-y-5">
+  <div className="space-y-4 sm:space-y-5">
     <div>
-      <h2 className="font-display text-lg font-bold">{title}</h2>
-      <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>
+      <h2 className="font-display text-base sm:text-lg font-bold">{title}</h2>
+      <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">{subtitle}</p>
     </div>
     {children}
   </div>

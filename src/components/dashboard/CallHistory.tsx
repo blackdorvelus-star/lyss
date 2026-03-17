@@ -64,7 +64,7 @@ const CallHistory = ({ calls, getClientName }: CallHistoryProps) => {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-card border border-border rounded-xl p-6"
+      className="bg-card border border-border rounded-xl p-4 sm:p-6"
     >
       <div className="flex items-center gap-2 mb-4">
         <Phone className="w-4 h-4 text-primary" />

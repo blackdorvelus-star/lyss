@@ -13,7 +13,7 @@ import Dashboard from "@/components/dashboard/Dashboard";
 import AuthPage from "@/components/auth/AuthPage";
 import OnboardingWizard from "@/components/onboarding/OnboardingWizard";
 
-type View = "landing" | "auth" | "onboarding" | "upload" | "dashboard";
+type View = "landing" | "auth" | "onboarding" | "dashboard";
 
 const Index = () => {
   const [view, setView] = useState<View>("landing");

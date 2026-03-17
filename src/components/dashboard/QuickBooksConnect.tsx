@@ -57,6 +57,14 @@ const QuickBooksConnect = () => {
       const { data: session } = await supabase.auth.getSession();
       const token = session?.session?.access_token;
 
+      if (!token) {
+        toast.error("Tu dois être connecté pour lier QuickBooks.");
+        setConnecting(false);
+        return;
+      }
+
+      console.log("QuickBooks: initiating OAuth with token", token.substring(0, 10) + "...");
+
       const res = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/quickbooks-auth`,
         {
@@ -70,11 +78,13 @@ const QuickBooksConnect = () => {
       );
 
       const data = await res.json();
+      console.log("QuickBooks auth response:", res.status, data);
       if (!res.ok) throw new Error(data.error || "Erreur");
 
       // Redirect to QuickBooks OAuth
       window.location.href = data.auth_url;
     } catch (err: any) {
+      console.error("QuickBooks connect error:", err);
       toast.error(`Erreur : ${err.message}`);
       setConnecting(false);
     }

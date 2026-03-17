@@ -16,6 +16,7 @@ const navItems: { id: Section; label: string; icon: typeof Users }[] = [
   { id: "billing", label: "Facturation", icon: FileText },
   { id: "clients", label: "Clients", icon: Users },
   { id: "disputes", label: "Litiges", icon: ShieldAlert },
+  { id: "reports", label: "Rapports", icon: FileBarChart },
   { id: "calendar", label: "Agenda", icon: Calendar },
   { id: "settings", label: "Réglages", icon: Settings },
 ];

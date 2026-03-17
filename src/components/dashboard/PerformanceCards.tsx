@@ -56,23 +56,23 @@ const PerformanceCards = ({ hoursSaved, successRate, paymentPromises, predictedI
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
       {cards.map((card, i) => (
         <motion.div
           key={card.label}
           initial={{ opacity: 0, y: 15, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ delay: i * 0.08, type: "spring", stiffness: 200 }}
-          className={`relative bg-gradient-to-br ${card.gradient} border border-border rounded-xl p-4 overflow-hidden`}
+          className={`relative bg-gradient-to-br ${card.gradient} border border-border rounded-xl p-3 sm:p-4 overflow-hidden`}
         >
-          <div className="flex items-center justify-between mb-3">
-            <div className={`w-8 h-8 rounded-lg ${card.iconBg} flex items-center justify-center`}>
-              <card.icon className={`w-4 h-4 ${card.iconColor}`} />
+          <div className="flex items-center justify-between mb-2 sm:mb-3">
+            <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg ${card.iconBg} flex items-center justify-center`}>
+              <card.icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${card.iconColor}`} />
             </div>
           </div>
-          <p className={`font-display text-2xl font-bold ${card.valueColor}`}>{card.value}</p>
-          <p className="text-xs text-muted-foreground mt-0.5">{card.label}</p>
-          <p className="text-[10px] text-muted-foreground/60 mt-0.5">{card.sublabel}</p>
+          <p className={`font-display text-xl sm:text-2xl font-bold ${card.valueColor} leading-tight`}>{card.value}</p>
+          <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 leading-tight">{card.label}</p>
+          <p className="text-[9px] sm:text-[10px] text-muted-foreground/60 mt-0.5 hidden sm:block">{card.sublabel}</p>
         </motion.div>
       ))}
     </div>

@@ -18,19 +18,21 @@ const QuickBooksConnect = () => {
   const [connecting, setConnecting] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [disconnecting, setDisconnecting] = useState(false);
+  const [fallbackUrl, setFallbackUrl] = useState<string | null>(null);
 
   useEffect(() => {
     loadConnection();
     const params = new URLSearchParams(window.location.search);
-    if (params.get('qb_connected') === 'true') {
+    const hash = window.location.hash;
+    if (params.get('qb_connected') === 'true' || hash.includes('qb_connected=true')) {
       toast.success("QuickBooks connecté avec succès !");
-      window.history.replaceState({}, '', window.location.pathname);
+      window.history.replaceState({}, '', window.location.pathname + '#integrations');
       loadConnection();
     }
-    if (params.get('qb_error')) {
-      const err = params.get('qb_error');
+    if (params.get('qb_error') || hash.includes('qb_error')) {
+      const err = params.get('qb_error') || new URLSearchParams(hash.replace('#integrations?', '')).get('qb_error');
       toast.error(`Erreur QuickBooks : ${err === 'token_exchange_failed' ? "Échange de jeton échoué" : err === 'db_error' ? "Erreur de sauvegarde" : err}`);
-      window.history.replaceState({}, '', window.location.pathname);
+      window.history.replaceState({}, '', window.location.pathname + '#integrations');
     }
   }, []);
 
@@ -51,8 +53,34 @@ const QuickBooksConnect = () => {
     setLoading(false);
   };
 
+  const openOAuthUrl = (url: string) => {
+    try {
+      // Try top-level navigation to escape iframe
+      if (window.top && window.top !== window) {
+        window.top.location.href = url;
+        return;
+      }
+    } catch (e) {
+      // Cross-origin iframe, can't access window.top
+    }
+
+    // Try window.open as fallback
+    const popup = window.open(url, "_blank", "noopener,noreferrer");
+    if (!popup) {
+      // Popup blocked — show fallback link
+      setFallbackUrl(url);
+      setConnecting(false);
+      toast.error("La fenêtre a été bloquée. Utilise le lien ci-dessous.");
+      return;
+    }
+
+    // Direct navigation as last resort
+    window.location.href = url;
+  };
+
   const handleConnect = async () => {
     setConnecting(true);
+    setFallbackUrl(null);
     try {
       const { data: session } = await supabase.auth.getSession();
       const token = session?.session?.access_token;
@@ -62,8 +90,6 @@ const QuickBooksConnect = () => {
         setConnecting(false);
         return;
       }
-
-      console.log("QuickBooks: initiating OAuth with token", token.substring(0, 10) + "...");
 
       const res = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/quickbooks-auth`,
@@ -78,11 +104,9 @@ const QuickBooksConnect = () => {
       );
 
       const data = await res.json();
-      console.log("QuickBooks auth response:", res.status, data);
       if (!res.ok) throw new Error(data.error || "Erreur");
 
-      // Redirect to QuickBooks OAuth
-      window.location.href = data.auth_url;
+      openOAuthUrl(data.auth_url);
     } catch (err: any) {
       console.error("QuickBooks connect error:", err);
       toast.error(`Erreur : ${err.message}`);
@@ -178,45 +202,39 @@ const QuickBooksConnect = () => {
 
       {connection ? (
         <div className="flex gap-2">
-          <Button
-            onClick={handleSync}
-            disabled={syncing}
-            className="flex-1"
-            variant="default"
-          >
-            {syncing ? (
-              <Loader2 className="w-4 h-4 animate-spin mr-2" />
-            ) : (
-              <RefreshCw className="w-4 h-4 mr-2" />
-            )}
+          <Button onClick={handleSync} disabled={syncing} className="flex-1" variant="default">
+            {syncing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <RefreshCw className="w-4 h-4 mr-2" />}
             Synchroniser les factures
           </Button>
-          <Button
-            onClick={handleDisconnect}
-            disabled={disconnecting}
-            variant="outline"
-            size="icon"
-          >
-            {disconnecting ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Unplug className="w-4 h-4" />
-            )}
+          <Button onClick={handleDisconnect} disabled={disconnecting} variant="outline" size="icon">
+            {disconnecting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Unplug className="w-4 h-4" />}
           </Button>
         </div>
       ) : (
-        <Button
-          onClick={handleConnect}
-          disabled={connecting}
-          className="w-full bg-[#2CA01C] hover:bg-[#248a17] text-white"
-        >
-          {connecting ? (
-            <Loader2 className="w-4 h-4 animate-spin mr-2" />
-          ) : (
-            <ExternalLink className="w-4 h-4 mr-2" />
+        <div className="space-y-2">
+          <Button
+            onClick={handleConnect}
+            disabled={connecting}
+            className="w-full bg-[#2CA01C] hover:bg-[#248a17] text-white"
+          >
+            {connecting ? (
+              <Loader2 className="w-4 h-4 animate-spin mr-2" />
+            ) : (
+              <ExternalLink className="w-4 h-4 mr-2" />
+            )}
+            Connecter QuickBooks
+          </Button>
+          {fallbackUrl && (
+            <a
+              href={fallbackUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block text-center text-xs text-primary underline hover:text-primary/80"
+            >
+              Ouvrir QuickBooks dans un nouvel onglet →
+            </a>
           )}
-          Connecter QuickBooks
-        </Button>
+        </div>
       )}
 
       <p className="text-xs text-muted-foreground">

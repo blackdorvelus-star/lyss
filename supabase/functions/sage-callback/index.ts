@@ -12,7 +12,7 @@ const getAppUrl = () => Deno.env.get("APP_URL")?.trim() || "https://lyss.lovable
 const redirectWithStatus = (status: string) =>
   new Response(null, {
     status: 302,
-    headers: { Location: `${getAppUrl()}/?${status}` },
+    headers: { Location: `${getAppUrl()}/#integrations?${status}` },
   });
 
 serve(async (req) => {

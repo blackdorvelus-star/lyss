@@ -181,7 +181,6 @@ const SettingsWizard = () => {
         vapi_voice_provider: null,
         vapi_custom_instructions: customInstructions || null,
         vapi_first_message_template: firstMessageTemplate || null,
-        vapi_first_message_template: firstMessageTemplate || null,
         ai_propose_payment_plan: aiProposePlan,
         ai_negotiate: aiNegotiate,
         ai_max_discount_percent: aiMaxDiscount,

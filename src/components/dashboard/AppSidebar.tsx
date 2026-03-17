@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Users, FileText, Calendar, Settings, LogOut, ChevronLeft, ChevronRight, Shield, ShieldAlert, Menu, X, FileBarChart } from "lucide-react";
+import { Users, FileText, Calendar, Settings, LogOut, ChevronLeft, ChevronRight, Shield, ShieldAlert, Menu, X, FileBarChart, Link2 } from "lucide-react";
 import { useAdmin } from "@/hooks/useAdmin";
 import { cn } from "@/lib/utils";
 

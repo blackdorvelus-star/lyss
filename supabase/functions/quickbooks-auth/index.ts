@@ -1,52 +1,56 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
+  if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const clientId = Deno.env.get('QUICKBOOKS_CLIENT_ID');
-    if (!clientId) throw new Error('QUICKBOOKS_CLIENT_ID not configured');
+    const clientId = Deno.env.get("QUICKBOOKS_CLIENT_ID");
+    if (!clientId) throw new Error("QUICKBOOKS_CLIENT_ID not configured");
 
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const redirectUri = `${supabaseUrl}/functions/v1/quickbooks-callback`;
 
-    // Get user_id from auth header to pass as state
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Non autorisé" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2");
+    // Validate the user token
     const supabase = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_ANON_KEY')!,
-      { global: { headers: { Authorization: authHeader } } }
+      supabaseUrl,
+      Deno.env.get("SUPABASE_ANON_KEY")!
     );
+    const token = authHeader.replace("Bearer ", "");
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser(token);
 
-    const token = authHeader.replace('Bearer ', '');
-    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    if (userError || !user) {
+      return new Response(JSON.stringify({ error: "Non autorisé" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-
-    const userId = claimsData.claims.sub;
 
     // Encode user_id in state for the callback
-    const state = btoa(JSON.stringify({ user_id: userId }));
+    const state = btoa(JSON.stringify({ user_id: user.id }));
 
-    const scopes = 'com.intuit.quickbooks.accounting';
-    const authUrl = `https://appcenter.intuit.com/connect/oauth2?` +
+    const scopes = "com.intuit.quickbooks.accounting";
+    const authUrl =
+      `https://appcenter.intuit.com/connect/oauth2?` +
       `client_id=${clientId}` +
       `&redirect_uri=${encodeURIComponent(redirectUri)}` +
       `&response_type=code` +
@@ -54,12 +58,13 @@ serve(async (req) => {
       `&state=${encodeURIComponent(state)}`;
 
     return new Response(JSON.stringify({ auth_url: authUrl }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error('QuickBooks auth error:', error);
+    console.error("QuickBooks auth error:", error);
     return new Response(JSON.stringify({ error: error.message }), {
-      status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });

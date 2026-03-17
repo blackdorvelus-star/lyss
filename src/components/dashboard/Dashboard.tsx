@@ -25,6 +25,8 @@ const FinancialHealth = lazy(() => import("./FinancialHealth"));
 const PersonalitySelector = lazy(() => import("./PersonalitySelector"));
 const TelnyxCallButton = lazy(() => import("./TelnyxCallButton"));
 const CallHistory = lazy(() => import("./CallHistory"));
+const QuickBooksConnect = lazy(() => import("./QuickBooksConnect"));
+const SageConnect = lazy(() => import("./SageConnect"));
 
 const SectionLoader = () => (
   <div className="flex items-center justify-center py-16">

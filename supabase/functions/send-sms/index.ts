@@ -27,64 +27,102 @@ serve(async (req) => {
       throw new Error("Missing Supabase credentials");
     }
 
-    // Auth check
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
       return new Response(JSON.stringify({ error: "Non autorisé" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // Verify user
     const anonClient = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_PUBLISHABLE_KEY")!);
     const { data: { user }, error: authError } = await anonClient.auth.getUser(
       authHeader.replace("Bearer ", "")
     );
     if (authError || !user) {
       return new Response(JSON.stringify({ error: "Non autorisé" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     const { reminder_id } = await req.json();
     if (!reminder_id) {
       return new Response(JSON.stringify({ error: "reminder_id requis" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Fetch the reminder with invoice + client info
-    const { data: reminder, error: remError } = await supabase
-      .from("reminders")
-      .select("*, invoices(*, clients(*))")
-      .eq("id", reminder_id)
-      .eq("user_id", user.id)
-      .single();
+    // Fetch reminder AND user settings in parallel
+    const [remRes, settingsRes] = await Promise.all([
+      supabase
+        .from("reminders")
+        .select("*, invoices(*, clients(*))")
+        .eq("id", reminder_id)
+        .eq("user_id", user.id)
+        .single(),
+      supabase
+        .from("payment_settings")
+        .select("active_channels, working_hours_start, working_hours_end, working_days")
+        .eq("user_id", user.id)
+        .single(),
+    ]);
 
-    if (remError || !reminder) {
+    const reminder = remRes.data;
+    if (remRes.error || !reminder) {
       return new Response(JSON.stringify({ error: "Relance introuvable" }), {
-        status: 404,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     if (reminder.channel !== "sms") {
       return new Response(JSON.stringify({ error: "Cette relance n'est pas un SMS" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    }
+
+    // Check if SMS channel is active in user settings
+    const settings = settingsRes.data;
+    if (settings) {
+      const activeChannels = (settings.active_channels as string[]) || ["sms", "email", "phone"];
+      if (!activeChannels.includes("sms")) {
+        return new Response(JSON.stringify({ error: "Le canal SMS est désactivé dans vos réglages" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Check working hours
+      const now = new Date();
+      const montrealTime = new Date(now.toLocaleString("en-US", { timeZone: "America/Montreal" }));
+      const currentHour = `${String(montrealTime.getHours()).padStart(2, "0")}:${String(montrealTime.getMinutes()).padStart(2, "0")}`;
+      const start = settings.working_hours_start || "08:00";
+      const end = settings.working_hours_end || "18:00";
+
+      if (currentHour < start || currentHour > end) {
+        return new Response(JSON.stringify({
+          error: `Envoi hors des heures de travail (${start} - ${end}). Le SMS sera envoyé au prochain créneau.`,
+        }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Check working days
+      const dayMap = ["dim", "lun", "mar", "mer", "jeu", "ven", "sam"];
+      const currentDay = dayMap[montrealTime.getDay()];
+      const workingDays = (settings.working_days as string[]) || ["lun", "mar", "mer", "jeu", "ven"];
+      if (!workingDays.includes(currentDay)) {
+        return new Response(JSON.stringify({
+          error: "Envoi hors des jours de travail configurés. Le SMS sera envoyé au prochain jour ouvrable.",
+        }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
     }
 
     const clientPhone = reminder.invoices?.clients?.phone;
     if (!clientPhone) {
       return new Response(JSON.stringify({ error: "Le client n'a pas de numéro de téléphone" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
@@ -114,7 +152,6 @@ serve(async (req) => {
 
     const messageId = telnyxData.data?.id;
 
-    // Update reminder with sent status and provider ID
     await supabase
       .from("reminders")
       .update({
@@ -126,22 +163,14 @@ serve(async (req) => {
       .eq("id", reminder_id);
 
     return new Response(
-      JSON.stringify({
-        success: true,
-        message_id: messageId,
-        to: clientPhone,
-      }),
-      {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
+      JSON.stringify({ success: true, message_id: messageId, to: clientPhone }),
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (e) {
     console.error("send-sms error:", e);
     const message = e instanceof Error ? e.message : "Erreur inconnue";
     return new Response(JSON.stringify({ error: message }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });

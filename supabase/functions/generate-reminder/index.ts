@@ -7,25 +7,46 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const SYSTEM_PROMPT = `Tu es Lyss, l'adjointe administrative IA, un service de suivi de facturation pour des PME au Québec. Tu génères des messages de suivi de courtoisie pour des factures en attente de paiement.
+function buildSystemPrompt(settings: any): string {
+  const name = settings.assistant_name || "Lyss";
+  const role = settings.assistant_role || "adjointe";
+  const company = settings.company_name || "l'entreprise";
+  const tone = settings.tone === "vous" ? "Vouvoie le client." : "Tutoie le client.";
+  const personality = settings.vapi_personality || "chaleureuse";
+  const greeting = settings.greeting_style === "formel" ? "Utilise le nom de famille du client." : "Utilise le prénom du client.";
+  const closing = settings.follow_up_closing || "Bonne journée !";
+  const smsSig = settings.sms_signature ? `\n- Termine le SMS par : "${settings.sms_signature}"` : "";
+  const emailSig = settings.email_signature ? `\n- Termine le courriel par :\n${settings.email_signature}` : "";
+  const negotiate = settings.ai_negotiate
+    ? `\n- Tu peux proposer un rabais jusqu'à ${settings.ai_max_discount_percent || 0}% si le client hésite.`
+    : "\n- Ne propose AUCUN rabais.";
+  const paymentPlan = settings.ai_propose_payment_plan
+    ? "\n- Propose une solution flexible (paiement en 2-3 fois, Interac)."
+    : "\n- Ne propose PAS de plan de paiement.";
+
+  return `Tu es ${name}, ${role} IA pour ${company}. Tu génères des messages de suivi de courtoisie pour des factures en attente de paiement.
+
+PERSONNALITÉ : ${personality}
+${tone}
+${greeting}
 
 RÈGLES ABSOLUES :
-- Ton québécois professionnel : naturel, humain, jamais robotique. Tutoie le client.
-- Toujours poli et empathique. JAMAIS menaçant, agressif ou condescendant.
-- Propose toujours une solution flexible (paiement en 2-3 fois, Interac).
-- Respecte la Loi sur le recouvrement de certaines créances (RLRQ, c. R-2.2) : pas de harcèlement, pas de fausses menaces légales.
+- Ton québécois professionnel : naturel, humain, jamais robotique.
+- Toujours poli et empathique. JAMAIS menaçant, agressif ou condescendant.${paymentPlan}${negotiate}
+- Respecte la Loi sur le recouvrement de certaines créances (RLRQ, c. R-2.2).
 - Message court : max 4-5 phrases pour SMS, max 6-8 phrases pour courriel.
 - N'inclus AUCUN lien de paiement dans le message.
 - Ne mentionne JAMAIS d'intérêts de retard, de frais, ou de conséquences légales.
 - Utilise le terme "suivi de courtoisie" et non "relance" ou "recouvrement".
-- Ne mentionne JAMAIS d'intérêts de retard, de frais, ou de conséquences légales.
+- Termine chaque message par : "${closing}"${smsSig}${emailSig}
 
-Tu dois retourner exactement un JSON avec cette structure (pas de markdown, pas de texte autour) :
+Tu dois retourner exactement un JSON (pas de markdown, pas de texte autour) :
 {
   "sms": "le message SMS",
   "email_subject": "l'objet du courriel",
   "email_body": "le corps du courriel"
 }`;
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -42,7 +63,6 @@ serve(async (req) => {
       throw new Error("Missing Supabase credentials");
     }
 
-    // Auth check
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
       return new Response(JSON.stringify({ error: "Non autorisé" }), {
@@ -53,7 +73,6 @@ serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // Verify user
     const anonClient = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_PUBLISHABLE_KEY")!);
     const { data: { user }, error: authError } = await anonClient.auth.getUser(
       authHeader.replace("Bearer ", "")
@@ -73,28 +92,38 @@ serve(async (req) => {
       });
     }
 
-    // Fetch invoice + client
-    const { data: invoice, error: invError } = await supabase
-      .from("invoices")
-      .select("*, clients(*)")
-      .eq("id", invoice_id)
-      .eq("user_id", user.id)
-      .single();
+    // Fetch invoice + client AND user settings in parallel
+    const [invoiceRes, settingsRes] = await Promise.all([
+      supabase
+        .from("invoices")
+        .select("*, clients(*)")
+        .eq("id", invoice_id)
+        .eq("user_id", user.id)
+        .single(),
+      supabase
+        .from("payment_settings")
+        .select("*")
+        .eq("user_id", user.id)
+        .single(),
+    ]);
 
-    if (invError || !invoice) {
+    const invoice = invoiceRes.data;
+    if (invoiceRes.error || !invoice) {
       return new Response(JSON.stringify({ error: "Facture introuvable" }), {
         status: 404,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Skip disputed invoices
     if (invoice.status === 'disputed') {
       return new Response(JSON.stringify({ error: "Facture contestée — relances suspendues" }), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    const settings = settingsRes.data || {};
+    const activeChannels = (settings.active_channels as string[]) || ["sms", "email", "phone"];
 
     const client = invoice.clients;
     const dueDateStr = invoice.due_date
@@ -108,9 +137,10 @@ serve(async (req) => {
 - Date d'échéance : ${dueDateStr}
 - ID facture (pour le lien) : ${invoice.id}
 
-C'est le premier suivi de courtoisie (ton chaleureux).`;
+C'est le premier suivi de courtoisie.`;
 
-    // Call Lovable AI
+    const systemPrompt = buildSystemPrompt(settings);
+
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -120,7 +150,7 @@ C'est le premier suivi de courtoisie (ton chaleureux).`;
       body: JSON.stringify({
         model: "google/gemini-3-flash-preview",
         messages: [
-          { role: "system", content: SYSTEM_PROMPT },
+          { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
       }),
@@ -130,17 +160,14 @@ C'est le premier suivi de courtoisie (ton chaleureux).`;
       const status = aiResponse.status;
       const body = await aiResponse.text();
       console.error("AI gateway error:", status, body);
-
       if (status === 429) {
         return new Response(JSON.stringify({ error: "Trop de requêtes. Réessaie dans un moment." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       if (status === 402) {
         return new Response(JSON.stringify({ error: "Crédits IA épuisés." }), {
-          status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       throw new Error(`AI gateway error [${status}]`);
@@ -149,7 +176,6 @@ C'est le premier suivi de courtoisie (ton chaleureux).`;
     const aiData = await aiResponse.json();
     const rawContent = aiData.choices?.[0]?.message?.content || "";
 
-    // Parse JSON from response (handle markdown code blocks)
     let messages;
     try {
       const cleaned = rawContent.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
@@ -159,10 +185,10 @@ C'est le premier suivi de courtoisie (ton chaleureux).`;
       throw new Error("L'IA n'a pas retourné un format valide.");
     }
 
-    // Save reminders to DB
+    // Only create reminders for active channels
     const remindersToInsert = [];
 
-    if (messages.sms && client.phone) {
+    if (messages.sms && client.phone && activeChannels.includes("sms")) {
       remindersToInsert.push({
         invoice_id: invoice.id,
         user_id: user.id,
@@ -172,7 +198,7 @@ C'est le premier suivi de courtoisie (ton chaleureux).`;
       });
     }
 
-    if (messages.email_body && client.email) {
+    if (messages.email_body && client.email && activeChannels.includes("email")) {
       remindersToInsert.push({
         invoice_id: invoice.id,
         user_id: user.id,
@@ -186,35 +212,23 @@ C'est le premier suivi de courtoisie (ton chaleureux).`;
       const { error: insertError } = await supabase
         .from("reminders")
         .insert(remindersToInsert);
-
-      if (insertError) {
-        console.error("Error inserting reminders:", insertError);
-      }
+      if (insertError) console.error("Error inserting reminders:", insertError);
     }
 
-    // Update invoice status
     await supabase
       .from("invoices")
       .update({ status: "in_progress" })
       .eq("id", invoice.id);
 
     return new Response(
-      JSON.stringify({
-        success: true,
-        messages,
-        reminders_created: remindersToInsert.length,
-      }),
-      {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
+      JSON.stringify({ success: true, messages, reminders_created: remindersToInsert.length }),
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (e) {
     console.error("generate-reminder error:", e);
     const message = e instanceof Error ? e.message : "Erreur inconnue";
     return new Response(JSON.stringify({ error: message }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });

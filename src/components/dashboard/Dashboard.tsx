@@ -38,7 +38,7 @@ const SectionLoader = () => (
 
 interface DashboardProps {
   onBack: () => void;
-  onNewInvoice: () => void;
+  onNewInvoice?: () => void;
   onLogout?: () => void;
 }
 

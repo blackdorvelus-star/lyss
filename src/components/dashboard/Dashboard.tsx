@@ -297,6 +297,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                 {activeSection === "clients" && "Relations clients"}
                 {activeSection === "billing" && "Centre de commandement"}
                 {activeSection === "disputes" && "Centre de litiges"}
+                {activeSection === "reports" && "Rapports mensuels"}
                 {activeSection === "calendar" && "Gestion d'agenda"}
                 {activeSection === "settings" && "Réglages"}
               </h1>

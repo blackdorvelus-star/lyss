@@ -161,8 +161,6 @@ const SettingsWizard = () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setSaving(false); return; }
 
-    const selectedVoice = voices.find(v => v.id === voiceId);
-
     const { error } = await supabase
       .from("payment_settings")
       .upsert({
@@ -180,8 +178,9 @@ const SettingsWizard = () => {
         working_days: workDays,
         vapi_public_key: null,
         vapi_voice_id: null,
-        vapi_voice_id: voiceId,
+        vapi_voice_provider: null,
         vapi_custom_instructions: customInstructions || null,
+        vapi_first_message_template: firstMessageTemplate || null,
         vapi_first_message_template: firstMessageTemplate || null,
         ai_propose_payment_plan: aiProposePlan,
         ai_negotiate: aiNegotiate,

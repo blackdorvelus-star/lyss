@@ -268,11 +268,11 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
       <AppSidebar activeSection={activeSection} onSectionChange={setActiveSection} onLogout={onLogout} />
 
       <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
-        <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border px-6 py-3">
+        <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border px-4 sm:px-6 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-primary" />
-              <h1 className="font-display font-bold text-base">
+              <h1 className="font-display font-bold text-sm sm:text-base truncate">
                 {activeSection === "clients" && "Relations clients"}
                 {activeSection === "billing" && "Centre de commandement"}
                 {activeSection === "disputes" && "Centre de litiges"}
@@ -280,16 +280,18 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                 {activeSection === "settings" && "Réglages"}
               </h1>
             </div>
-            <div className="flex items-center gap-4">
-              <IntegrationStatus />
+            <div className="flex items-center gap-2 sm:gap-4">
+              <div className="hidden sm:block">
+                <IntegrationStatus />
+              </div>
               <NotificationBell />
             </div>
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto px-6 py-6">
+        <main className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-6 pb-20 md:pb-6">
           {activeSection === "billing" ? (
-            <div className="max-w-6xl space-y-6">
+            <div className="max-w-6xl space-y-4 sm:space-y-6">
               {/* Performance KPI Cards */}
               <PerformanceCards
                 hoursSaved={hoursSaved}

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Users, FileText, Calendar, Settings, LogOut, ChevronLeft, ChevronRight, Shield, ShieldAlert } from "lucide-react";
+import { Users, FileText, Calendar, Settings, LogOut, ChevronLeft, ChevronRight, Shield, ShieldAlert, Menu, X } from "lucide-react";
 import { useAdmin } from "@/hooks/useAdmin";
 import { cn } from "@/lib/utils";
 
@@ -13,93 +13,131 @@ interface AppSidebarProps {
 }
 
 const navItems: { id: Section; label: string; icon: typeof Users }[] = [
-  { id: "clients", label: "Relations clients", icon: Users },
-  { id: "billing", label: "Suivi de facturation", icon: FileText },
-  { id: "disputes", label: "Centre de litiges", icon: ShieldAlert },
-  { id: "calendar", label: "Gestion d'agenda", icon: Calendar },
+  { id: "billing", label: "Facturation", icon: FileText },
+  { id: "clients", label: "Clients", icon: Users },
+  { id: "disputes", label: "Litiges", icon: ShieldAlert },
+  { id: "calendar", label: "Agenda", icon: Calendar },
   { id: "settings", label: "Réglages", icon: Settings },
 ];
 
 const AppSidebar = ({ activeSection, onSectionChange, onLogout }: AppSidebarProps) => {
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const { isAdmin } = useAdmin();
   const navigate = useNavigate();
 
-  return (
-    <aside
-      className={cn(
-        "h-screen sticky top-0 bg-sidebar border-r border-sidebar-border flex flex-col transition-all duration-200",
-        collapsed ? "w-16" : "w-56"
-      )}
-    >
-      {/* Brand */}
-      <div className="flex items-center px-2 py-3 border-b border-sidebar-border">
-        <img src="/logo-lyss.png" alt="Lyss" className={cn("flex-shrink-0 object-contain", collapsed ? "h-8" : "h-10")} />
-      </div>
+  const handleNav = (section: Section) => {
+    onSectionChange(section);
+    setMobileOpen(false);
+  };
 
-      {/* Nav */}
-      <nav className="flex-1 py-3 px-2 space-y-1">
+  return (
+    <>
+      {/* Mobile bottom nav */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-sidebar border-t border-sidebar-border flex items-center justify-around px-1 py-1.5 safe-bottom">
         {navItems.map((item) => {
           const isActive = activeSection === item.id;
           return (
             <button
               key={item.id}
-              onClick={() => onSectionChange(item.id)}
+              onClick={() => handleNav(item.id)}
               className={cn(
-                "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
-                isActive
-                  ? "bg-sidebar-accent text-primary"
-                  : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-foreground"
+                "flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg transition-colors min-w-0 flex-1",
+                isActive ? "text-primary" : "text-sidebar-foreground"
               )}
-              title={collapsed ? item.label : undefined}
             >
-              <item.icon className="w-4.5 h-4.5 flex-shrink-0" />
-              {!collapsed && <span className="truncate">{item.label}</span>}
+              <item.icon className="w-5 h-5 flex-shrink-0" />
+              <span className="text-[10px] font-medium truncate">{item.label}</span>
             </button>
           );
         })}
-        {isAdmin && (
+        {onLogout && (
           <button
-            onClick={() => navigate("/admin")}
-            className={cn(
-              "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
-              "text-primary hover:bg-sidebar-accent/50"
-            )}
-            title={collapsed ? "Administration" : undefined}
+            onClick={onLogout}
+            className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg text-sidebar-foreground min-w-0"
           >
-            <Shield className="w-4.5 h-4.5 flex-shrink-0" />
-            {!collapsed && <span className="truncate">Administration</span>}
+            <LogOut className="w-5 h-5 flex-shrink-0" />
+            <span className="text-[10px] font-medium">Sortir</span>
           </button>
         )}
       </nav>
 
-      {/* Bottom */}
-      <div className="border-t border-sidebar-border px-2 py-3 space-y-1">
-        {onLogout && (
-          <button
-            onClick={onLogout}
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-foreground transition-colors"
-            title={collapsed ? "Déconnexion" : undefined}
-          >
-            <LogOut className="w-4 h-4 flex-shrink-0" />
-            {!collapsed && <span>Déconnexion</span>}
-          </button>
+      {/* Desktop sidebar */}
+      <aside
+        className={cn(
+          "h-screen sticky top-0 bg-sidebar border-r border-sidebar-border flex-col transition-all duration-200 hidden md:flex",
+          collapsed ? "w-16" : "w-56"
         )}
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors"
-        >
-          {collapsed ? (
-            <ChevronRight className="w-4 h-4 flex-shrink-0" />
-          ) : (
-            <>
-              <ChevronLeft className="w-4 h-4 flex-shrink-0" />
-              <span>Réduire</span>
-            </>
+      >
+        {/* Brand */}
+        <div className="flex items-center px-2 py-3 border-b border-sidebar-border">
+          <img src="/logo-lyss.png" alt="Lyss" className={cn("flex-shrink-0 object-contain", collapsed ? "h-8" : "h-10")} />
+        </div>
+
+        {/* Nav */}
+        <nav className="flex-1 py-3 px-2 space-y-1">
+          {navItems.map((item) => {
+            const isActive = activeSection === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => onSectionChange(item.id)}
+                className={cn(
+                  "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                  isActive
+                    ? "bg-sidebar-accent text-primary"
+                    : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-foreground"
+                )}
+                title={collapsed ? item.label : undefined}
+              >
+                <item.icon className="w-4.5 h-4.5 flex-shrink-0" />
+                {!collapsed && <span className="truncate">{item.label}</span>}
+              </button>
+            );
+          })}
+          {isAdmin && (
+            <button
+              onClick={() => navigate("/admin")}
+              className={cn(
+                "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                "text-primary hover:bg-sidebar-accent/50"
+              )}
+              title={collapsed ? "Administration" : undefined}
+            >
+              <Shield className="w-4.5 h-4.5 flex-shrink-0" />
+              {!collapsed && <span className="truncate">Administration</span>}
+            </button>
           )}
-        </button>
-      </div>
-    </aside>
+        </nav>
+
+        {/* Bottom */}
+        <div className="border-t border-sidebar-border px-2 py-3 space-y-1">
+          {onLogout && (
+            <button
+              onClick={onLogout}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-foreground transition-colors"
+              title={collapsed ? "Déconnexion" : undefined}
+            >
+              <LogOut className="w-4 h-4 flex-shrink-0" />
+              {!collapsed && <span>Déconnexion</span>}
+            </button>
+          )}
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors"
+          >
+            {collapsed ? (
+              <ChevronRight className="w-4 h-4 flex-shrink-0" />
+            ) : (
+              <>
+                <ChevronLeft className="w-4 h-4 flex-shrink-0" />
+                <span>Réduire</span>
+              </>
+            )}
+          </button>
+        </div>
+      </aside>
+    </>
   );
 };
 

@@ -345,7 +345,74 @@ const SettingsWizard = () => {
         </div>
       </SettingsSection>
 
-      {/* ── 3. AI Behavior ── */}
+      {/* ── 2b. Scripts personnalisés ── */}
+      <SettingsSection
+        id="scripts"
+        icon={PenLine}
+        title="Scripts de Lyss"
+        description={useCustomTemplates ? "Templates personnalisés actifs" : "Messages générés par l'IA"}
+        open={openSection === "scripts"}
+        onToggle={() => toggle("scripts")}
+      >
+        <div className="space-y-4">
+          <ToggleRow
+            icon={PenLine}
+            title="Utiliser mes propres messages"
+            description="Désactive la génération IA — Lyss envoie exactement ce que tu écris"
+            checked={useCustomTemplates}
+            onChange={setUseCustomTemplates}
+          />
+
+          {useCustomTemplates ? (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              className="space-y-4"
+            >
+              <div className="bg-accent/10 border border-accent/20 rounded-xl p-3 text-xs text-muted-foreground space-y-1">
+                <p className="font-semibold text-foreground text-sm">Variables disponibles :</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {["{prénom}", "{nom}", "{montant}", "{facture}", "{date_échéance}", "{nom_assistant}", "{rôle}", "{entreprise}"].map(v => (
+                    <code key={v} className="bg-secondary px-1.5 py-0.5 rounded text-[11px] font-mono">{v}</code>
+                  ))}
+                </div>
+              </div>
+
+              <Field icon={MessageSquare} label="Template SMS" hint="Le message SMS exact envoyé au client.">
+                <Textarea
+                  value={smsTemplate}
+                  onChange={e => setSmsTemplate(e.target.value)}
+                  placeholder={`Bonjour {prénom}, c'est {nom_assistant}, {rôle} chez {entreprise}. Petit suivi de courtoisie pour ta facture {facture} de {montant} $. N'hésite pas à me revenir si tu as des questions ! ${followUpClosing}`}
+                  className="bg-secondary min-h-[100px] text-sm"
+                />
+              </Field>
+
+              <Field icon={Mail} label="Objet du courriel">
+                <Input
+                  value={emailSubjectTemplate}
+                  onChange={e => setEmailSubjectTemplate(e.target.value)}
+                  placeholder="Suivi de courtoisie — Facture {facture}"
+                  className="bg-secondary"
+                />
+              </Field>
+
+              <Field icon={Mail} label="Corps du courriel" hint="Le contenu complet du courriel envoyé au client.">
+                <Textarea
+                  value={emailBodyTemplate}
+                  onChange={e => setEmailBodyTemplate(e.target.value)}
+                  placeholder={`Bonjour {prénom},\n\nC'est {nom_assistant}, {rôle} chez {entreprise}.\n\nJe fais un petit suivi de courtoisie concernant ta facture {facture} d'un montant de {montant} $, qui était due le {date_échéance}.\n\nSi c'est déjà réglé, ignore ce message ! Sinon, n'hésite pas à me revenir.\n\n${followUpClosing}`}
+                  className="bg-secondary min-h-[150px] text-sm"
+                />
+              </Field>
+            </motion.div>
+          ) : (
+            <div className="bg-secondary/50 rounded-xl p-3 text-xs text-muted-foreground">
+              <p>🤖 L'IA génère les messages automatiquement en fonction de la personnalité, du ton et des paramètres que tu as configurés ci-dessus.</p>
+            </div>
+          )}
+        </div>
+      </SettingsSection>
+
       <SettingsSection
         id="ai"
         icon={Brain}

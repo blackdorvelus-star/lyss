@@ -29,13 +29,7 @@ const roles = [
   { value: "agente", label: "Agente de facturation" },
 ];
 
-const voices = [
-  { id: "21m00Tcm4TlvDq8ikWAM", label: "Rachel — Chaleureuse (femme)", provider: "elevenlabs" },
-  { id: "EXAVITQu4vr4xnSDxMaL", label: "Bella — Douce (femme)", provider: "elevenlabs" },
-  { id: "ErXwobaYiN019PkySvjV", label: "Antoni — Professionnel (homme)", provider: "elevenlabs" },
-  { id: "VR6AewLTigWG4xSOukaG", label: "Arnold — Autoritaire (homme)", provider: "elevenlabs" },
-  { id: "pNInz6obpgDQGcFmaJgB", label: "Adam — Neutre (homme)", provider: "elevenlabs" },
-];
+// Voices removed — calls now via Telnyx
 
 const personalities = [
   { value: "chaleureuse", label: "🤗 Chaleureuse", description: "Empathique, amicale, tutoiement naturel" },

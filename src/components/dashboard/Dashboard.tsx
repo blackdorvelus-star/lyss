@@ -20,6 +20,7 @@ import PersonalitySelector, { type Personality } from "./PersonalitySelector";
 import VapiCallButton from "./VapiCallButton";
 import CallHistory, { type CallLog } from "./CallHistory";
 import ClientManagement from "./ClientManagement";
+import DisputeCenter from "./DisputeCenter";
 
 interface DashboardProps {
   onBack: () => void;

@@ -523,7 +523,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16">
                       <Sparkles className="w-12 h-12 text-muted-foreground mx-auto mb-3 opacity-40" />
                       <p className="text-muted-foreground mb-4">Aucun dossier confié à l'adjointe.</p>
-                      <Button onClick={onNewInvoice} className="bg-primary text-primary-foreground font-display">
+                      <Button onClick={() => setActiveSection("import")} className="bg-primary text-primary-foreground font-display">
                         <Plus className="w-4 h-4 mr-1" />
                         Confier un premier dossier
                       </Button>

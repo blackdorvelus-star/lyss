@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback, lazy, Suspense, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Plus, Clock, CheckCircle2, XCircle, MessageSquare, ChevronDown, ChevronUp,
@@ -12,16 +12,25 @@ import NotificationBell from "@/components/notifications/NotificationBell";
 import AppSidebar, { type Section } from "./AppSidebar";
 import PerformanceCards from "./PerformanceCards";
 import LiveActivityFeed, { type FeedItem } from "./LiveActivityFeed";
-import IntegrationStatus from "./IntegrationStatus";
 import ActiveDossierIndicator from "./ActiveDossierIndicator";
-import SettingsWizard from "./SettingsWizard";
-import FinancialHealth from "./FinancialHealth";
-import PersonalitySelector, { type Personality } from "./PersonalitySelector";
-import TelnyxCallButton from "./TelnyxCallButton";
-import CallHistory, { type CallLog } from "./CallHistory";
-import ClientManagement from "./ClientManagement";
-import DisputeCenter from "./DisputeCenter";
-import MonthlyReports from "./MonthlyReports";
+import type { CallLog } from "./CallHistory";
+
+// Lazy-loaded heavy sections
+const SettingsWizard = lazy(() => import("./SettingsWizard"));
+const ClientManagement = lazy(() => import("./ClientManagement"));
+const DisputeCenter = lazy(() => import("./DisputeCenter"));
+const MonthlyReports = lazy(() => import("./MonthlyReports"));
+const IntegrationStatus = lazy(() => import("./IntegrationStatus"));
+const FinancialHealth = lazy(() => import("./FinancialHealth"));
+const PersonalitySelector = lazy(() => import("./PersonalitySelector"));
+const TelnyxCallButton = lazy(() => import("./TelnyxCallButton"));
+const CallHistory = lazy(() => import("./CallHistory"));
+
+const SectionLoader = () => (
+  <div className="flex items-center justify-center py-16">
+    <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+  </div>
+);
 
 interface DashboardProps {
   onBack: () => void;
@@ -61,22 +70,195 @@ const statusConfig: Record<string, { label: string; icon: typeof Clock; color: s
   cancelled: { label: "Annulé", icon: XCircle, color: "text-muted-foreground" },
 };
 
+const formatMoney = (n: number) =>
+  new Intl.NumberFormat("fr-CA", { style: "currency", currency: "CAD", maximumFractionDigits: 0 }).format(n);
+const formatDate = (d: string) =>
+  new Date(d).toLocaleDateString("fr-CA", { day: "numeric", month: "short" });
+
+// ── Memoized sub-components ─────────────────────────────────────────────
+
+const InvoiceCard = memo(({
+  inv, reminders, isExpanded, onToggle, onMarkRecovery, recoveryId, recoveryAmount,
+  setRecoveryAmount, setRecoveryId, saving, onSendSms, sendingSmsId, fetchData,
+}: {
+  inv: InvoiceWithClient;
+  reminders: Reminder[];
+  isExpanded: boolean;
+  onToggle: () => void;
+  onMarkRecovery: (id: string, amount: number, max: number) => void;
+  recoveryId: string | null;
+  recoveryAmount: string;
+  setRecoveryAmount: (v: string) => void;
+  setRecoveryId: (v: string | null) => void;
+  saving: boolean;
+  onSendSms: (id: string) => void;
+  sendingSmsId: string | null;
+  fetchData: () => void;
+}) => {
+  const config = statusConfig[inv.status] || statusConfig.pending;
+  const StatusIcon = config.icon;
+
+  return (
+    <div>
+      <button
+        onClick={onToggle}
+        className="w-full text-left bg-card border border-border rounded-xl p-3 sm:p-4 hover:border-primary/20 transition-colors"
+      >
+        <div className="flex items-start justify-between mb-2">
+          <div className="flex-1 min-w-0">
+            <p className="font-medium truncate">{inv.clients.name}</p>
+            <p className="text-xs text-muted-foreground">
+              {inv.invoice_number ? `#${inv.invoice_number} · ` : ""}
+              {formatDate(inv.created_at)}
+            </p>
+          </div>
+          <p className="font-display font-bold text-base sm:text-lg ml-3">{formatMoney(inv.amount)}</p>
+        </div>
+        <div className="flex items-center justify-between">
+          <div className={`flex items-center gap-1.5 text-xs font-medium ${config.color}`}>
+            <StatusIcon className="w-3.5 h-3.5" />
+            {config.label}
+          </div>
+          <div className="flex items-center gap-2">
+            {reminders.length > 0 && (
+              <span className="text-xs text-muted-foreground">
+                {reminders.length} suivi{reminders.length > 1 ? "s" : ""}
+              </span>
+            )}
+            {isExpanded ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+          </div>
+        </div>
+        {(inv.amount_recovered || 0) > 0 && (
+          <div className="mt-2 bg-primary/10 rounded-lg px-3 py-1.5">
+            <p className="text-xs text-primary font-medium">
+              Reçu : {formatMoney(inv.amount_recovered || 0)} / {formatMoney(inv.amount)}
+            </p>
+            <div className="mt-1 h-1.5 bg-primary/20 rounded-full overflow-hidden">
+              <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${Math.min(100, ((inv.amount_recovered || 0) / inv.amount) * 100)}%` }} />
+            </div>
+          </div>
+        )}
+      </button>
+
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden">
+            <div className="pt-2 pb-1 space-y-2">
+              <div className="bg-secondary rounded-lg p-3 text-xs text-muted-foreground space-y-1">
+                <p><span className="font-medium text-foreground">Client :</span> {inv.clients.name}</p>
+                {inv.clients.email && <p><span className="font-medium text-foreground">Courriel :</span> {inv.clients.email}</p>}
+                {inv.clients.phone && <p><span className="font-medium text-foreground">Tél :</span> {inv.clients.phone}</p>}
+                {inv.due_date && <p><span className="font-medium text-foreground">Échéance :</span> {formatDate(inv.due_date)}</p>}
+              </div>
+
+              {inv.status !== "recovered" && inv.clients.phone && (
+                <div className="pt-1">
+                  <Suspense fallback={<SectionLoader />}>
+                    <TelnyxCallButton
+                      invoiceId={inv.id}
+                      clientName={inv.clients.name}
+                      clientPhone={inv.clients.phone}
+                      amount={inv.amount}
+                      invoiceNumber={inv.invoice_number}
+                      onCallEnd={fetchData}
+                    />
+                  </Suspense>
+                </div>
+              )}
+
+              {inv.status !== "recovered" && (
+                <div className="bg-primary/5 border border-primary/15 rounded-lg p-3">
+                  {recoveryId === inv.id ? (
+                    <div className="space-y-2">
+                      <p className="text-xs font-medium text-foreground">Montant reçu ($)</p>
+                      <div className="flex gap-2">
+                        <Input type="number" placeholder={`Max ${inv.amount}`} value={recoveryAmount} onChange={(e) => setRecoveryAmount(e.target.value)} className="bg-card h-9 text-sm" max={inv.amount} min={1} autoFocus />
+                        <Button size="sm" disabled={saving || !recoveryAmount} onClick={(e) => { e.stopPropagation(); onMarkRecovery(inv.id, parseFloat(recoveryAmount), inv.amount); }} className="bg-primary text-primary-foreground h-9 px-4 font-display whitespace-nowrap">
+                          {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : "Confirmer"}
+                        </Button>
+                      </div>
+                      <button onClick={(e) => { e.stopPropagation(); setRecoveryId(null); setRecoveryAmount(""); }} className="text-xs text-muted-foreground hover:text-foreground">Annuler</button>
+                    </div>
+                  ) : (
+                    <button onClick={(e) => { e.stopPropagation(); setRecoveryId(inv.id); setRecoveryAmount(String(inv.amount)); }} className="flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors w-full">
+                      <Banknote className="w-4 h-4" />
+                      Marquer comme réglé
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {reminders.length === 0 ? (
+                <p className="text-xs text-muted-foreground text-center py-3">L'adjointe n'a pas encore envoyé de message pour ce dossier.</p>
+              ) : (
+                reminders.map((rem) => (
+                  <div key={rem.id} className="bg-secondary rounded-lg p-3">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${rem.channel === "sms" ? "bg-accent/20 text-accent" : "bg-primary/15 text-primary"}`}>
+                        {rem.channel === "sms" ? "SMS" : "Courriel"}
+                      </span>
+                      <span className="text-xs text-muted-foreground">{rem.sent_at ? formatDate(rem.sent_at) : "Planifié"}</span>
+                      <span className={`text-xs ml-auto ${rem.status === "sent" || rem.status === "delivered" ? "text-primary" : rem.status === "failed" ? "text-destructive" : "text-muted-foreground"}`}>
+                        {rem.status === "scheduled" && "⏳ Planifié"}
+                        {rem.status === "sent" && `✓ Envoyé${rem.delivery_status === "delivered" ? " · Livré ✓✓" : rem.delivery_status === "failed" ? " · Échec livraison" : ""}`}
+                        {rem.status === "delivered" && "✓✓ Livré"}
+                        {rem.status === "replied" && "💬 Répondu"}
+                        {rem.status === "failed" && "✕ Échoué"}
+                      </span>
+                    </div>
+                    <p className="text-xs text-secondary-foreground leading-relaxed whitespace-pre-wrap">{rem.message_content}</p>
+                    {rem.sms_response && (
+                      <div className="mt-2 bg-primary/10 rounded-md p-2 border border-primary/20">
+                        <p className="text-[10px] font-medium text-primary mb-0.5">Réponse du client :</p>
+                        <p className="text-xs text-foreground">{rem.sms_response}</p>
+                        {rem.sms_response_at && (
+                          <p className="text-[10px] text-muted-foreground mt-1">{formatDate(rem.sms_response_at)}</p>
+                        )}
+                      </div>
+                    )}
+                    {rem.channel === "sms" && rem.status === "scheduled" && (
+                      <Button
+                        size="sm"
+                        onClick={(e) => { e.stopPropagation(); onSendSms(rem.id); }}
+                        disabled={sendingSmsId === rem.id}
+                        className="mt-2 bg-accent text-accent-foreground font-display text-xs h-8"
+                      >
+                        {sendingSmsId === rem.id ? (
+                          <Loader2 className="w-3 h-3 animate-spin mr-1" />
+                        ) : (
+                          <Send className="w-3 h-3 mr-1" />
+                        )}
+                        Envoyer le SMS maintenant
+                      </Button>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+});
+InvoiceCard.displayName = "InvoiceCard";
+
+// ── Main Dashboard ──────────────────────────────────────────────────────
+
 const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
   const [invoices, setInvoices] = useState<InvoiceWithClient[]>([]);
   const [reminders, setReminders] = useState<Record<string, Reminder[]>>({});
   const [callLogs, setCallLogs] = useState<CallLog[]>([]);
-  // Vapi removed - calls now via Telnyx
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [recoveryId, setRecoveryId] = useState<string | null>(null);
   const [recoveryAmount, setRecoveryAmount] = useState("");
   const [saving, setSaving] = useState(false);
   const [activeSection, setActiveSection] = useState<Section>("billing");
-  const [personality, setPersonality] = useState<Personality>("chaleureuse");
+  const [personality, setPersonality] = useState<import("./PersonalitySelector").Personality>("chaleureuse");
   const [sendingSmsId, setSendingSmsId] = useState<string | null>(null);
-  useEffect(() => { fetchData(); }, []);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     const { data: inv } = await supabase
       .from("invoices")
@@ -109,12 +291,12 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
       .order("created_at", { ascending: false });
     if (calls) setCallLogs(calls as any as CallLog[]);
 
-    // Settings loaded via individual components as needed
-
     setLoading(false);
-  };
+  }, []);
 
-  const markRecovered = async (invoiceId: string, amount: number, maxAmount: number) => {
+  useEffect(() => { fetchData(); }, [fetchData]);
+
+  const markRecovered = useCallback(async (invoiceId: string, amount: number, maxAmount: number) => {
     if (amount <= 0 || amount > maxAmount) {
       toast.error(`Le montant doit être entre 1 $ et ${maxAmount} $.`);
       return;
@@ -137,9 +319,9 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
       fetchData();
     }
     setSaving(false);
-  };
+  }, [fetchData]);
 
-  const sendSms = async (reminderId: string) => {
+  const sendSms = useCallback(async (reminderId: string) => {
     setSendingSmsId(reminderId);
     try {
       const { data, error } = await supabase.functions.invoke("send-sms", {
@@ -154,24 +336,30 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
     } finally {
       setSendingSmsId(null);
     }
-  };
+  }, [fetchData]);
 
-  const totalRecovered = invoices.reduce((s, i) => s + (i.amount_recovered || 0), 0);
-  const settledCount = invoices.filter((i) => i.status === "recovered").length;
-  const inProgressCount = invoices.filter((i) => i.status === "in_progress").length;
-  const pendingCount = invoices.filter((i) => i.status === "pending").length;
-
-  // Performance metrics
-  const hoursSaved = (invoices.length * 30) / 60;
-  const successRate = invoices.length > 0 ? Math.round((settledCount / invoices.length) * 100) : 0;
-  const paymentPromises = callLogs.filter(c => c.call_result === "payment_promised")
-    .reduce((sum, c) => {
-      const inv = invoices.find(i => i.id === c.invoice_id);
-      return sum + (inv?.amount || 0);
-    }, 0);
-  const predictedIncome = invoices
-    .filter(i => i.status === "in_progress" || i.status === "pending")
-    .reduce((sum, i) => sum + i.amount - (i.amount_recovered || 0), 0) * 0.6;
+  // Memoized computed values
+  const { totalRecovered, settledCount, inProgressCount, pendingCount, hoursSaved, successRate, paymentPromises, predictedIncome } = useMemo(() => {
+    const settled = invoices.filter((i) => i.status === "recovered").length;
+    const inProgress = invoices.filter((i) => i.status === "in_progress").length;
+    const pending = invoices.filter((i) => i.status === "pending").length;
+    return {
+      totalRecovered: invoices.reduce((s, i) => s + (i.amount_recovered || 0), 0),
+      settledCount: settled,
+      inProgressCount: inProgress,
+      pendingCount: pending,
+      hoursSaved: (invoices.length * 30) / 60,
+      successRate: invoices.length > 0 ? Math.round((settled / invoices.length) * 100) : 0,
+      paymentPromises: callLogs.filter(c => c.call_result === "payment_promised")
+        .reduce((sum, c) => {
+          const inv = invoices.find(i => i.id === c.invoice_id);
+          return sum + (inv?.amount || 0);
+        }, 0),
+      predictedIncome: invoices
+        .filter(i => i.status === "in_progress" || i.status === "pending")
+        .reduce((sum, i) => sum + i.amount - (i.amount_recovered || 0), 0) * 0.6,
+    };
+  }, [invoices, callLogs]);
 
   // Build live activity feed
   const feedItems: FeedItem[] = useMemo(() => {
@@ -225,7 +413,6 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
       };
     });
 
-    // Alert events for negative sentiment
     const alertEvents = callLogs
       .filter(c => c.client_sentiment === "negative")
       .slice(0, 3)
@@ -246,10 +433,10 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
       .slice(0, 15);
   }, [reminders, invoices, callLogs]);
 
-  const formatMoney = (n: number) =>
-    new Intl.NumberFormat("fr-CA", { style: "currency", currency: "CAD", maximumFractionDigits: 0 }).format(n);
-  const formatDate = (d: string) =>
-    new Date(d).toLocaleDateString("fr-CA", { day: "numeric", month: "short" });
+  const getClientName = useCallback((invoiceId: string) => {
+    const inv = invoices.find((i) => i.id === invoiceId);
+    return inv?.clients?.name || "Client";
+  }, [invoices]);
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -271,7 +458,9 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
             </div>
             <div className="flex items-center gap-2 sm:gap-4">
               <div className="hidden sm:block">
-                <IntegrationStatus />
+                <Suspense fallback={null}>
+                  <IntegrationStatus />
+                </Suspense>
               </div>
               <NotificationBell />
             </div>
@@ -281,7 +470,6 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
         <main className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-6 pb-20 md:pb-6">
           {activeSection === "billing" ? (
             <div className="max-w-6xl space-y-4 sm:space-y-6">
-              {/* Performance KPI Cards */}
               <PerformanceCards
                 hoursSaved={hoursSaved}
                 successRate={successRate}
@@ -289,27 +477,22 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                 predictedIncome={predictedIncome}
               />
 
-              {/* Active dossier indicator */}
               <ActiveDossierIndicator activeDossiers={inProgressCount} />
 
-              {/* Main content: Left (Health + Dossiers) | Right (Live Feed) */}
               <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
                 <div className="lg:col-span-2 space-y-4 sm:space-y-6">
-                  <FinancialHealth invoices={invoices} />
+                  <Suspense fallback={<SectionLoader />}>
+                    <FinancialHealth invoices={invoices} />
+                  </Suspense>
 
-                  {/* Call History */}
-                  <CallHistory
-                    calls={callLogs}
-                    getClientName={(invoiceId) => {
-                      const inv = invoices.find((i) => i.id === invoiceId);
-                      return inv?.clients?.name || "Client";
-                    }}
-                  />
+                  <Suspense fallback={<SectionLoader />}>
+                    <CallHistory calls={callLogs} getClientName={getClientName} />
+                  </Suspense>
 
-                  {/* Personality selector */}
-                  <PersonalitySelector value={personality} onChange={setPersonality} />
+                  <Suspense fallback={<SectionLoader />}>
+                    <PersonalitySelector value={personality} onChange={setPersonality} />
+                  </Suspense>
 
-                  {/* Dossiers clients */}
                   <div className="flex items-center justify-between gap-2">
                     <div className="min-w-0">
                       <h2 className="font-display text-base sm:text-lg font-bold">Dossiers clients</h2>
@@ -324,9 +507,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                   </div>
 
                   {loading ? (
-                    <div className="flex items-center justify-center py-16">
-                      <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-                    </div>
+                    <SectionLoader />
                   ) : invoices.length === 0 ? (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16">
                       <Sparkles className="w-12 h-12 text-muted-foreground mx-auto mb-3 opacity-40" />
@@ -338,163 +519,28 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                     </motion.div>
                   ) : (
                     <div className="space-y-3">
-                      {invoices.map((inv, i) => {
-                        const config = statusConfig[inv.status] || statusConfig.pending;
-                        const StatusIcon = config.icon;
-                        const invReminders = reminders[inv.id] || [];
-                        const isExpanded = expandedId === inv.id;
-
-                        return (
-                          <motion.div
-                            key={inv.id}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: i * 0.04 }}
-                          >
-                            <button
-                              onClick={() => setExpandedId(isExpanded ? null : inv.id)}
-                              className="w-full text-left bg-card border border-border rounded-xl p-3 sm:p-4 hover:border-primary/20 transition-colors"
-                            >
-                              <div className="flex items-start justify-between mb-2">
-                                <div className="flex-1 min-w-0">
-                                  <p className="font-medium truncate">{inv.clients.name}</p>
-                                  <p className="text-xs text-muted-foreground">
-                                    {inv.invoice_number ? `#${inv.invoice_number} · ` : ""}
-                                    {formatDate(inv.created_at)}
-                                  </p>
-                                </div>
-                                <p className="font-display font-bold text-base sm:text-lg ml-3">{formatMoney(inv.amount)}</p>
-                              </div>
-                              <div className="flex items-center justify-between">
-                                <div className={`flex items-center gap-1.5 text-xs font-medium ${config.color}`}>
-                                  <StatusIcon className="w-3.5 h-3.5" />
-                                  {config.label}
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  {invReminders.length > 0 && (
-                                    <span className="text-xs text-muted-foreground">
-                                      {invReminders.length} suivi{invReminders.length > 1 ? "s" : ""}
-                                    </span>
-                                  )}
-                                  {isExpanded ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
-                                </div>
-                              </div>
-                              {(inv.amount_recovered || 0) > 0 && (
-                                <div className="mt-2 bg-primary/10 rounded-lg px-3 py-1.5">
-                                  <p className="text-xs text-primary font-medium">
-                                    Reçu : {formatMoney(inv.amount_recovered || 0)} / {formatMoney(inv.amount)}
-                                  </p>
-                                  <div className="mt-1 h-1.5 bg-primary/20 rounded-full overflow-hidden">
-                                    <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${Math.min(100, ((inv.amount_recovered || 0) / inv.amount) * 100)}%` }} />
-                                  </div>
-                                </div>
-                              )}
-                            </button>
-
-                            <AnimatePresence>
-                              {isExpanded && (
-                                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden">
-                                  <div className="pt-2 pb-1 space-y-2">
-                                    <div className="bg-secondary rounded-lg p-3 text-xs text-muted-foreground space-y-1">
-                                      <p><span className="font-medium text-foreground">Client :</span> {inv.clients.name}</p>
-                                      {inv.clients.email && <p><span className="font-medium text-foreground">Courriel :</span> {inv.clients.email}</p>}
-                                      {inv.clients.phone && <p><span className="font-medium text-foreground">Tél :</span> {inv.clients.phone}</p>}
-                                      {inv.due_date && <p><span className="font-medium text-foreground">Échéance :</span> {formatDate(inv.due_date)}</p>}
-                                    </div>
-
-                                    {inv.status !== "recovered" && inv.clients.phone && (
-                                      <div className="pt-1">
-                                        <TelnyxCallButton
-                                          invoiceId={inv.id}
-                                          clientName={inv.clients.name}
-                                          clientPhone={inv.clients.phone}
-                                          amount={inv.amount}
-                                          invoiceNumber={inv.invoice_number}
-                                          onCallEnd={fetchData}
-                                        />
-                                      </div>
-                                    )}
-
-                                    {inv.status !== "recovered" && (
-                                      <div className="bg-primary/5 border border-primary/15 rounded-lg p-3">
-                                        {recoveryId === inv.id ? (
-                                          <div className="space-y-2">
-                                            <p className="text-xs font-medium text-foreground">Montant reçu ($)</p>
-                                            <div className="flex gap-2">
-                                              <Input type="number" placeholder={`Max ${inv.amount}`} value={recoveryAmount} onChange={(e) => setRecoveryAmount(e.target.value)} className="bg-card h-9 text-sm" max={inv.amount} min={1} autoFocus />
-                                              <Button size="sm" disabled={saving || !recoveryAmount} onClick={(e) => { e.stopPropagation(); markRecovered(inv.id, parseFloat(recoveryAmount), inv.amount); }} className="bg-primary text-primary-foreground h-9 px-4 font-display whitespace-nowrap">
-                                                {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : "Confirmer"}
-                                              </Button>
-                                            </div>
-                                            <button onClick={(e) => { e.stopPropagation(); setRecoveryId(null); setRecoveryAmount(""); }} className="text-xs text-muted-foreground hover:text-foreground">Annuler</button>
-                                          </div>
-                                        ) : (
-                                          <button onClick={(e) => { e.stopPropagation(); setRecoveryId(inv.id); setRecoveryAmount(String(inv.amount)); }} className="flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors w-full">
-                                            <Banknote className="w-4 h-4" />
-                                            Marquer comme réglé
-                                          </button>
-                                        )}
-                                      </div>
-                                    )}
-
-                                    {invReminders.length === 0 ? (
-                                      <p className="text-xs text-muted-foreground text-center py-3">L'adjointe n'a pas encore envoyé de message pour ce dossier.</p>
-                                    ) : (
-                                      invReminders.map((rem) => (
-                                        <div key={rem.id} className="bg-secondary rounded-lg p-3">
-                                          <div className="flex items-center gap-2 mb-2">
-                                            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${rem.channel === "sms" ? "bg-accent/20 text-accent" : "bg-primary/15 text-primary"}`}>
-                                              {rem.channel === "sms" ? "SMS" : "Courriel"}
-                                            </span>
-                                            <span className="text-xs text-muted-foreground">{rem.sent_at ? formatDate(rem.sent_at) : "Planifié"}</span>
-                                            <span className={`text-xs ml-auto ${rem.status === "sent" || rem.status === "delivered" ? "text-primary" : rem.status === "failed" ? "text-destructive" : "text-muted-foreground"}`}>
-                                              {rem.status === "scheduled" && "⏳ Planifié"}
-                                              {rem.status === "sent" && `✓ Envoyé${rem.delivery_status === "delivered" ? " · Livré ✓✓" : rem.delivery_status === "failed" ? " · Échec livraison" : ""}`}
-                                              {rem.status === "delivered" && "✓✓ Livré"}
-                                              {rem.status === "replied" && "💬 Répondu"}
-                                              {rem.status === "failed" && "✕ Échoué"}
-                                            </span>
-                                          </div>
-                                          <p className="text-xs text-secondary-foreground leading-relaxed whitespace-pre-wrap">{rem.message_content}</p>
-                                          {rem.sms_response && (
-                                            <div className="mt-2 bg-primary/10 rounded-md p-2 border border-primary/20">
-                                              <p className="text-[10px] font-medium text-primary mb-0.5">Réponse du client :</p>
-                                              <p className="text-xs text-foreground">{rem.sms_response}</p>
-                                              {rem.sms_response_at && (
-                                                <p className="text-[10px] text-muted-foreground mt-1">{formatDate(rem.sms_response_at)}</p>
-                                              )}
-                                            </div>
-                                          )}
-                                          {rem.channel === "sms" && rem.status === "scheduled" && (
-                                            <Button
-                                              size="sm"
-                                              onClick={(e) => { e.stopPropagation(); sendSms(rem.id); }}
-                                              disabled={sendingSmsId === rem.id}
-                                              className="mt-2 bg-accent text-accent-foreground font-display text-xs h-8"
-                                            >
-                                              {sendingSmsId === rem.id ? (
-                                                <Loader2 className="w-3 h-3 animate-spin mr-1" />
-                                              ) : (
-                                                <Send className="w-3 h-3 mr-1" />
-                                              )}
-                                              Envoyer le SMS maintenant
-                                            </Button>
-                                          )}
-                                        </div>
-                                      ))
-                                    )}
-                                  </div>
-                                </motion.div>
-                              )}
-                            </AnimatePresence>
-                          </motion.div>
-                        );
-                      })}
+                      {invoices.map((inv) => (
+                        <InvoiceCard
+                          key={inv.id}
+                          inv={inv}
+                          reminders={reminders[inv.id] || []}
+                          isExpanded={expandedId === inv.id}
+                          onToggle={() => setExpandedId(expandedId === inv.id ? null : inv.id)}
+                          onMarkRecovery={markRecovered}
+                          recoveryId={recoveryId}
+                          recoveryAmount={recoveryAmount}
+                          setRecoveryAmount={setRecoveryAmount}
+                          setRecoveryId={setRecoveryId}
+                          saving={saving}
+                          onSendSms={sendSms}
+                          sendingSmsId={sendingSmsId}
+                          fetchData={fetchData}
+                        />
+                      ))}
                     </div>
                   )}
                 </div>
 
-                {/* Right column: Live Activity Feed */}
                 <div className="lg:col-span-1">
                   <div className="sticky top-20">
                     <LiveActivityFeed items={feedItems} />
@@ -502,16 +548,20 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                 </div>
               </div>
             </div>
-          ) : activeSection === "clients" ? (
-            <ClientManagement />
-          ) : activeSection === "disputes" ? (
-            <DisputeCenter />
-          ) : activeSection === "reports" ? (
-            <MonthlyReports />
-          ) : activeSection === "settings" ? (
-            <SettingsWizard />
           ) : (
-            <PlaceholderSection title="Gestion d'agenda" desc="La prise de rendez-vous et les confirmations automatiques arrivent bientôt." />
+            <Suspense fallback={<SectionLoader />}>
+              {activeSection === "clients" ? (
+                <ClientManagement />
+              ) : activeSection === "disputes" ? (
+                <DisputeCenter />
+              ) : activeSection === "reports" ? (
+                <MonthlyReports />
+              ) : activeSection === "settings" ? (
+                <SettingsWizard />
+              ) : (
+                <PlaceholderSection title="Gestion d'agenda" desc="La prise de rendez-vous et les confirmations automatiques arrivent bientôt." />
+              )}
+            </Suspense>
           )}
         </main>
       </div>

@@ -26,7 +26,7 @@ const FinancialHealth = ({ invoices }: FinancialHealthProps) => {
   const barTotal = Math.max(total, 1);
 
   return (
-    <div className="bg-card border border-border rounded-xl p-5">
+    <div className="bg-card border border-border rounded-xl p-3.5 sm:p-5">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
           Santé financière

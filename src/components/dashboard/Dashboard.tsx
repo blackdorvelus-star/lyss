@@ -404,14 +404,12 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
 
                                     {inv.status !== "recovered" && inv.clients.phone && (
                                       <div className="pt-1">
-                                        <VapiCallButton
+                                        <TelnyxCallButton
                                           invoiceId={inv.id}
                                           clientName={inv.clients.name}
                                           clientPhone={inv.clients.phone}
                                           amount={inv.amount}
                                           invoiceNumber={inv.invoice_number}
-                                          vapiPublicKey={vapiPublicKey}
-                                          vapiConfig={vapiConfig}
                                           onCallEnd={fetchData}
                                         />
                                       </div>

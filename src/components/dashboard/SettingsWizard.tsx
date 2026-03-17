@@ -5,7 +5,7 @@ import {
   Banknote, CreditCard, ShieldAlert, CalendarClock,
   Loader2, Save, ChevronDown,
   MessageSquare, Phone, Mail, Bell, Brain, Clock, Globe,
-  HandCoins, Handshake,
+  HandCoins, Handshake, PenLine,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";

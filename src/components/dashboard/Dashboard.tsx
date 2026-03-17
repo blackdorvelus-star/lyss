@@ -582,6 +582,10 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                     Tu utilises un autre logiciel ? <a href="mailto:info@lyss.ca" className="text-primary hover:underline">Écris-nous</a> pour qu'on l'ajoute.
                   </p>
                 </div>
+              ) : activeSection === "widget" ? (
+                <Suspense fallback={<SectionLoader />}>
+                  <WidgetConfigurator />
+                </Suspense>
               ) : (
                 <PlaceholderSection title="Gestion d'agenda" desc="La prise de rendez-vous et les confirmations automatiques arrivent bientôt." />
               )}

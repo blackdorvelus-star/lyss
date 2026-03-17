@@ -17,7 +17,7 @@ import ActiveDossierIndicator from "./ActiveDossierIndicator";
 import SettingsWizard from "./SettingsWizard";
 import FinancialHealth from "./FinancialHealth";
 import PersonalitySelector, { type Personality } from "./PersonalitySelector";
-import VapiCallButton from "./VapiCallButton";
+import TelnyxCallButton from "./TelnyxCallButton";
 import CallHistory, { type CallLog } from "./CallHistory";
 import ClientManagement from "./ClientManagement";
 import DisputeCenter from "./DisputeCenter";

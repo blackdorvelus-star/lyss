@@ -454,30 +454,25 @@ const SettingsWizard = () => {
         </div>
       </SettingsSection>
 
-      {/* ── 5. Voice ── */}
+      {/* ── 5. Voice — now powered by Telnyx ── */}
       <SettingsSection
         id="voice"
         icon={Mic2}
-        title="Voix de l'agent"
-        description={voices.find(v => v.id === voiceId)?.label || "Non configuré"}
+        title="Appels vocaux (Telnyx)"
+        description="Appels de suivi lancés via Telnyx"
         open={openSection === "voice"}
         onToggle={() => toggle("voice")}
       >
         <div className="space-y-4">
-          <Field icon={Mic2} label="Voix ElevenLabs">
-            <Select value={voiceId} onValueChange={setVoiceId}>
-              <SelectTrigger className="bg-secondary"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {voices.map(v => <SelectItem key={v.id} value={v.id}>{v.label}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          </Field>
-          <Field icon={MessageSquare} label="Premier message de l'appel" hint="Variables : {prénom}, {montant}, {facture}, {nom_assistant}, {entreprise}">
+          <Field icon={MessageSquare} label="Premier message de l'appel (script)" hint="Variables : {prénom}, {montant}, {facture}, {nom_assistant}, {entreprise}">
             <Textarea value={firstMessageTemplate} onChange={e => setFirstMessageTemplate(e.target.value)} placeholder="Bonjour {prénom}, c'est {nom_assistant}…" className="bg-secondary min-h-[60px] text-sm" />
           </Field>
-          <Field icon={Key} label="Clé publique Vapi (optionnel)" hint="Dashboard Vapi → Settings → Public Key.">
-            <Input value={vapiPublicKey} onChange={e => setVapiPublicKey(e.target.value)} placeholder="xxxxxxxx-xxxx-…" className="bg-secondary font-mono text-xs" />
+          <Field icon={FileText} label="Instructions personnalisées (optionnel)" hint="Notes ajoutées au contexte de l'appel.">
+            <Textarea value={customInstructions} onChange={e => setCustomInstructions(e.target.value)} placeholder="Toujours mentionner que le paiement Interac est instantané…" className="bg-secondary min-h-[70px] text-sm" />
           </Field>
+          <div className="bg-secondary/50 rounded-xl p-3 text-xs text-muted-foreground">
+            <p>📞 Les appels sont lancés via <span className="font-semibold text-foreground">Telnyx</span> directement depuis le tableau de bord. La configuration du numéro et de l'API se fait dans votre compte Telnyx.</p>
+          </div>
         </div>
       </SettingsSection>
 

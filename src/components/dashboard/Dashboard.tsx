@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Plus, Clock, CheckCircle2, XCircle, MessageSquare, ChevronDown, ChevronUp,
-  Loader2, Banknote, Sparkles, Phone,
+  Loader2, Banknote, Sparkles, Phone, Send,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

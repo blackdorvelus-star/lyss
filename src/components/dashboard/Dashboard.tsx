@@ -460,6 +460,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                 {activeSection === "reports" && "Rapports mensuels"}
                 {activeSection === "calendar" && "Gestion d'agenda"}
                 {activeSection === "settings" && "Réglages"}
+                {activeSection === "integrations" && "Intégrations comptables"}
               </h1>
             </div>
             <div className="flex items-center gap-2 sm:gap-4">

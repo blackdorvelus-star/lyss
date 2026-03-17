@@ -100,10 +100,12 @@ export type Database = {
           amount_recovered: number | null
           client_id: string
           created_at: string
+          current_sequence_step: number | null
           due_date: string | null
           file_url: string | null
           id: string
           invoice_number: string | null
+          last_sequence_action_at: string | null
           status: string
           updated_at: string
           user_id: string
@@ -113,10 +115,12 @@ export type Database = {
           amount_recovered?: number | null
           client_id: string
           created_at?: string
+          current_sequence_step?: number | null
           due_date?: string | null
           file_url?: string | null
           id?: string
           invoice_number?: string | null
+          last_sequence_action_at?: string | null
           status?: string
           updated_at?: string
           user_id: string
@@ -126,10 +130,12 @@ export type Database = {
           amount_recovered?: number | null
           client_id?: string
           created_at?: string
+          current_sequence_step?: number | null
           due_date?: string | null
           file_url?: string | null
           id?: string
           invoice_number?: string | null
+          last_sequence_action_at?: string | null
           status?: string
           updated_at?: string
           user_id?: string
@@ -320,6 +326,36 @@ export type Database = {
           realm_id?: string
           refresh_token?: string
           token_expires_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      reminder_sequences: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          id: string
+          max_attempts_per_channel: Json
+          steps: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          max_attempts_per_channel?: Json
+          steps?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          max_attempts_per_channel?: Json
+          steps?: Json
           updated_at?: string
           user_id?: string
         }

@@ -4,7 +4,7 @@ import {
   UserCircle, Building2, BadgeCheck, Mic2, Sparkles, Key, FileText,
   Banknote, CreditCard, ShieldAlert, Link2,
   ChevronRight, ChevronLeft, Check, Loader2, Save,
-  MessageSquare, Phone,
+  MessageSquare, Phone, CalendarClock,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -16,6 +16,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import SequenceConfig from "./SequenceConfig";
 
 // ── Data ────────────────────────────────────────────────────────────────────
 
@@ -42,6 +43,7 @@ const personalities = [
 const STEPS = [
   { id: "identity", label: "Identité", icon: UserCircle },
   { id: "voice", label: "Voix & ton", icon: Mic2 },
+  { id: "sequences", label: "Séquences", icon: CalendarClock },
   { id: "payment", label: "Paiement", icon: Banknote },
   { id: "preview", label: "Aperçu", icon: Sparkles },
 ] as const;
@@ -280,6 +282,15 @@ const SettingsWizard = () => {
                   <Textarea value={firstMessageTemplate} onChange={e => setFirstMessageTemplate(e.target.value)} placeholder="Bonjour {prénom}, c'est {nom_assistant}…" className="bg-secondary min-h-[60px] text-sm" />
                 </Field>
               </div>
+            </StepCard>
+          )}
+
+          {step === "sequences" && (
+            <StepCard
+              title="Séquence de relance automatique"
+              subtitle="Configure les étapes et délais de relance après l'échéance d'une facture."
+            >
+              <SequenceConfig />
             </StepCard>
           )}
 

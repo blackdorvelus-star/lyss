@@ -17,11 +17,8 @@ import ActiveDossierIndicator from "./ActiveDossierIndicator";
 import SettingsWizard from "./SettingsWizard";
 import FinancialHealth from "./FinancialHealth";
 import PersonalitySelector, { type Personality } from "./PersonalitySelector";
-import AssistantIdentity from "./AssistantIdentity";
-import PaymentSettings from "./PaymentSettings";
 import VapiCallButton from "./VapiCallButton";
 import CallHistory, { type CallLog } from "./CallHistory";
-import VapiAssistantConfig from "./VapiAssistantConfig";
 import ClientManagement from "./ClientManagement";
 
 interface DashboardProps {

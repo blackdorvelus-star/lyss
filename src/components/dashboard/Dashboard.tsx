@@ -171,6 +171,23 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
     setSaving(false);
   };
 
+  const sendSms = async (reminderId: string) => {
+    setSendingSmsId(reminderId);
+    try {
+      const { data, error } = await supabase.functions.invoke("send-sms", {
+        body: { reminder_id: reminderId },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast.success(`SMS envoyé à ${data.to} ✓`);
+      fetchData();
+    } catch (e: any) {
+      toast.error(e.message || "Erreur lors de l'envoi du SMS");
+    } finally {
+      setSendingSmsId(null);
+    }
+  };
+
   const totalRecovered = invoices.reduce((s, i) => s + (i.amount_recovered || 0), 0);
   const settledCount = invoices.filter((i) => i.status === "recovered").length;
   const inProgressCount = invoices.filter((i) => i.status === "in_progress").length;

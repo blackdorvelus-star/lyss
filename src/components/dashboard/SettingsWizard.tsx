@@ -84,8 +84,7 @@ const SettingsWizard = () => {
   const [workDays, setWorkDays] = useState<string[]>(["lun", "mar", "mer", "jeu", "ven"]);
 
   // Voice
-  const [vapiPublicKey, setVapiPublicKey] = useState("");
-  const [voiceId, setVoiceId] = useState("21m00Tcm4TlvDq8ikWAM");
+  // Vapi key removed - calls via Telnyx
   const [customInstructions, setCustomInstructions] = useState("");
   const [firstMessageTemplate, setFirstMessageTemplate] = useState("");
 

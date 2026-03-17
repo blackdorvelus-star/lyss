@@ -31,13 +31,16 @@ const SageConnect = () => {
 
   const loadConnection = async () => {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
     const { data } = await (supabase
       .from("sage_connections" as any)
       .select("id, resource_owner_id, business_name, updated_at")
       .eq("user_id", user.id)
-      .single() as any);
+      .maybeSingle() as any);
 
     setConnection(data as SageConnection | null);
     setLoading(false);

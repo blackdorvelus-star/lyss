@@ -1,68 +1,72 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+const getRequiredEnv = (name: string) => {
+  const value = Deno.env.get(name)?.trim();
+  if (!value) throw new Error(`${name} not configured`);
+  return value;
+};
+
+const getAppUrl = () => Deno.env.get("APP_URL")?.trim() || "https://lyss.lovable.app";
+
+const redirectWithStatus = (status: string) =>
+  new Response(null, {
+    status: 302,
+    headers: { Location: `${getAppUrl()}/?${status}` },
+  });
+
 serve(async (req) => {
   try {
     const url = new URL(req.url);
     const code = url.searchParams.get("code");
     const stateParam = url.searchParams.get("state");
     const realmId = url.searchParams.get("realmId");
-    const error = url.searchParams.get("error");
+    const authError = url.searchParams.get("error");
 
-    // Handle user denial
-    if (error) {
-      const appUrl = Deno.env.get("APP_URL") || "https://lyss.lovable.app";
-      return new Response(null, {
-        status: 302,
-        headers: { Location: `${appUrl}/?qb_error=${encodeURIComponent(error)}` },
-      });
+    if (authError) {
+      return redirectWithStatus(`qb_error=${encodeURIComponent(authError)}`);
     }
 
     if (!code || !stateParam || !realmId) {
-      return new Response("Paramètres manquants", { status: 400 });
+      return redirectWithStatus("qb_error=missing_params");
     }
 
     const state = JSON.parse(atob(stateParam));
     const userId = state.user_id;
+    if (!userId) {
+      return redirectWithStatus("qb_error=invalid_state");
+    }
 
-    const clientId = Deno.env.get("QUICKBOOKS_CLIENT_ID")!;
-    const clientSecret = Deno.env.get("QUICKBOOKS_CLIENT_SECRET")!;
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const clientId = getRequiredEnv("QUICKBOOKS_CLIENT_ID");
+    const clientSecret = getRequiredEnv("QUICKBOOKS_CLIENT_SECRET");
+    const supabaseUrl = getRequiredEnv("SUPABASE_URL");
+    const serviceRoleKey = getRequiredEnv("SUPABASE_SERVICE_ROLE_KEY");
     const redirectUri = `${supabaseUrl}/functions/v1/quickbooks-callback`;
 
-    // Exchange code for tokens
     const basicAuth = btoa(`${clientId}:${clientSecret}`);
-    const tokenRes = await fetch(
-      "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Basic ${basicAuth}`,
-          "Content-Type": "application/x-www-form-urlencoded",
-          Accept: "application/json",
-        },
-        body: new URLSearchParams({
-          grant_type: "authorization_code",
-          code,
-          redirect_uri: redirectUri,
-        }),
-      }
-    );
+    const tokenRes = await fetch("https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer", {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${basicAuth}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+        Accept: "application/json",
+      },
+      body: new URLSearchParams({
+        grant_type: "authorization_code",
+        code,
+        redirect_uri: redirectUri,
+      }),
+    });
 
     if (!tokenRes.ok) {
       const errBody = await tokenRes.text();
-      console.error("Token exchange failed:", errBody);
-      const appUrl = Deno.env.get("APP_URL") || "https://lyss.lovable.app";
-      return new Response(null, {
-        status: 302,
-        headers: { Location: `${appUrl}/?qb_error=token_exchange_failed` },
-      });
+      console.error("QuickBooks token exchange failed:", errBody);
+      return redirectWithStatus("qb_error=token_exchange_failed");
     }
 
     const tokens = await tokenRes.json();
-
-    // Get company info
     let companyName: string | null = null;
+
     try {
       const companyRes = await fetch(
         `https://quickbooks.api.intuit.com/v3/company/${realmId}/companyinfo/${realmId}?minorversion=65`,
@@ -73,59 +77,41 @@ serve(async (req) => {
           },
         }
       );
+
       if (companyRes.ok) {
         const companyData = await companyRes.json();
         companyName = companyData.CompanyInfo?.CompanyName || null;
       }
-    } catch (e) {
-      console.warn("Could not fetch company name:", e);
+    } catch (error) {
+      console.warn("QuickBooks company info fetch warning:", error);
     }
 
-    // Store tokens using service role
-    const supabase = createClient(
-      supabaseUrl,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    const supabase = createClient(supabaseUrl, serviceRoleKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+
+    const expiresAt = new Date(Date.now() + (tokens.expires_in ?? 3600) * 1000).toISOString();
+    const { error: upsertError } = await supabase.from("quickbooks_connections").upsert(
+      {
+        user_id: userId,
+        realm_id: realmId,
+        access_token: tokens.access_token,
+        refresh_token: tokens.refresh_token,
+        token_expires_at: expiresAt,
+        company_name: companyName,
+      },
+      { onConflict: "user_id" }
     );
 
-    const expiresAt = new Date(
-      Date.now() + tokens.expires_in * 1000
-    ).toISOString();
-
-    const { error: upsertError } = await supabase
-      .from("quickbooks_connections")
-      .upsert(
-        {
-          user_id: userId,
-          realm_id: realmId,
-          access_token: tokens.access_token,
-          refresh_token: tokens.refresh_token,
-          token_expires_at: expiresAt,
-          company_name: companyName,
-        },
-        { onConflict: "user_id" }
-      );
-
     if (upsertError) {
-      console.error("DB upsert error:", upsertError);
-      const appUrl = Deno.env.get("APP_URL") || "https://lyss.lovable.app";
-      return new Response(null, {
-        status: 302,
-        headers: { Location: `${appUrl}/?qb_error=db_error` },
-      });
+      console.error("QuickBooks DB upsert error:", upsertError);
+      return redirectWithStatus("qb_error=db_error");
     }
 
-    // Redirect back to dashboard with success
-    const appUrl = Deno.env.get("APP_URL") || "https://lyss.lovable.app";
-    return new Response(null, {
-      status: 302,
-      headers: { Location: `${appUrl}/?qb_connected=true` },
-    });
+    return redirectWithStatus("qb_connected=true");
   } catch (error) {
-    console.error("QuickBooks callback error:", error);
-    const appUrl = Deno.env.get("APP_URL") || "https://lyss.lovable.app";
-    return new Response(null, {
-      status: 302,
-      headers: { Location: `${appUrl}/?qb_error=unknown` },
-    });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("QuickBooks callback error:", errorMessage);
+    return redirectWithStatus("qb_error=unknown");
   }
 });

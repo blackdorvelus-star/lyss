@@ -28,6 +28,7 @@ const CallHistory = lazy(() => import("./CallHistory"));
 const QuickBooksConnect = lazy(() => import("./QuickBooksConnect"));
 const SageConnect = lazy(() => import("./SageConnect"));
 const WidgetConfigurator = lazy(() => import("./WidgetConfigurator"));
+const ImportHub = lazy(() => import("./ImportHub"));
 
 const SectionLoader = () => (
   <div className="flex items-center justify-center py-16">

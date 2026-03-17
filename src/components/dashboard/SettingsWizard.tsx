@@ -135,7 +135,6 @@ const SettingsWizard = () => {
       setWorkStart(d.working_hours_start || "08:00");
       setWorkEnd(d.working_hours_end || "18:00");
       setWorkDays(d.working_days || ["lun", "mar", "mer", "jeu", "ven"]);
-      // Vapi key no longer loaded
       setCustomInstructions(d.vapi_custom_instructions || "");
       setFirstMessageTemplate(d.vapi_first_message_template || "");
       setUseCustomTemplates(d.use_custom_templates ?? false);

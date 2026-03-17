@@ -135,7 +135,6 @@ const SettingsWizard = () => {
       setWorkStart(d.working_hours_start || "08:00");
       setWorkEnd(d.working_hours_end || "18:00");
       setWorkDays(d.working_days || ["lun", "mar", "mer", "jeu", "ven"]);
-      // Vapi key no longer loaded
       setCustomInstructions(d.vapi_custom_instructions || "");
       setFirstMessageTemplate(d.vapi_first_message_template || "");
       setUseCustomTemplates(d.use_custom_templates ?? false);
@@ -180,9 +179,6 @@ const SettingsWizard = () => {
         working_hours_start: workStart,
         working_hours_end: workEnd,
         working_days: workDays,
-        vapi_public_key: null,
-        vapi_voice_id: null,
-        vapi_voice_provider: null,
         vapi_custom_instructions: customInstructions || null,
         vapi_first_message_template: firstMessageTemplate || null,
         use_custom_templates: useCustomTemplates,

@@ -304,8 +304,8 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
               <ActiveDossierIndicator activeDossiers={inProgressCount} />
 
               {/* Main content: Left (Health + Dossiers) | Right (Live Feed) */}
-              <div className="grid lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 space-y-6">
+              <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
+                <div className="lg:col-span-2 space-y-4 sm:space-y-6">
                   <FinancialHealth invoices={invoices} />
 
                   {/* Call History */}

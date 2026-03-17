@@ -221,7 +221,7 @@ const DisputeCenter = () => {
       </div>
 
       {/* Stats bar */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-3 gap-2 sm:gap-3">
         <div className="bg-accent/10 border border-accent/20 rounded-xl p-3 text-center">
           <p className="font-display text-xl font-bold text-accent">{invoices.length}</p>
           <p className="text-[10px] text-muted-foreground">Litiges actifs</p>

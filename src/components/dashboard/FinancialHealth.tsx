@@ -61,7 +61,7 @@ const FinancialHealth = ({ invoices }: FinancialHealthProps) => {
       </div>
 
       {/* Stats row */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-2 sm:gap-3">
         <div className="bg-secondary/50 rounded-lg p-3 text-center">
           <p className="font-display text-2xl font-bold text-primary">{recoveryRate}%</p>
           <p className="text-xs text-muted-foreground">Taux de règlement</p>

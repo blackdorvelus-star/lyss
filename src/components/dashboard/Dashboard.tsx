@@ -268,11 +268,11 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
       <AppSidebar activeSection={activeSection} onSectionChange={setActiveSection} onLogout={onLogout} />
 
       <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
-        <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border px-6 py-3">
+        <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border px-4 sm:px-6 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-primary" />
-              <h1 className="font-display font-bold text-base">
+              <h1 className="font-display font-bold text-sm sm:text-base truncate">
                 {activeSection === "clients" && "Relations clients"}
                 {activeSection === "billing" && "Centre de commandement"}
                 {activeSection === "disputes" && "Centre de litiges"}
@@ -280,16 +280,18 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                 {activeSection === "settings" && "Réglages"}
               </h1>
             </div>
-            <div className="flex items-center gap-4">
-              <IntegrationStatus />
+            <div className="flex items-center gap-2 sm:gap-4">
+              <div className="hidden sm:block">
+                <IntegrationStatus />
+              </div>
               <NotificationBell />
             </div>
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto px-6 py-6">
+        <main className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-6 pb-20 md:pb-6">
           {activeSection === "billing" ? (
-            <div className="max-w-6xl space-y-6">
+            <div className="max-w-6xl space-y-4 sm:space-y-6">
               {/* Performance KPI Cards */}
               <PerformanceCards
                 hoursSaved={hoursSaved}
@@ -302,8 +304,8 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
               <ActiveDossierIndicator activeDossiers={inProgressCount} />
 
               {/* Main content: Left (Health + Dossiers) | Right (Live Feed) */}
-              <div className="grid lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 space-y-6">
+              <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
+                <div className="lg:col-span-2 space-y-4 sm:space-y-6">
                   <FinancialHealth invoices={invoices} />
 
                   {/* Call History */}
@@ -319,16 +321,16 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                   <PersonalitySelector value={personality} onChange={setPersonality} />
 
                   {/* Dossiers clients */}
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h2 className="font-display text-lg font-bold">Dossiers clients</h2>
-                      <p className="text-xs text-muted-foreground">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <h2 className="font-display text-base sm:text-lg font-bold">Dossiers clients</h2>
+                      <p className="text-[10px] sm:text-xs text-muted-foreground">
                         {inProgressCount} suivi{inProgressCount !== 1 ? "s" : ""} actif{inProgressCount !== 1 ? "s" : ""} · {pendingCount} en attente
                       </p>
                     </div>
-                    <Button size="sm" onClick={onNewInvoice} className="bg-primary text-primary-foreground font-display">
-                      <Plus className="w-4 h-4 mr-1" />
-                      Confier un dossier
+                    <Button size="sm" onClick={onNewInvoice} className="bg-primary text-primary-foreground font-display text-xs sm:text-sm flex-shrink-0">
+                      <Plus className="w-4 h-4 sm:mr-1" />
+                      <span className="hidden sm:inline">Confier un dossier</span>
                     </Button>
                   </div>
 

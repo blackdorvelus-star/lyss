@@ -8,7 +8,7 @@ import PricingSection from "@/components/landing/PricingSection";
 import FAQSection from "@/components/landing/FAQSection";
 import IntegrationSection from "@/components/landing/IntegrationSection";
 import Footer from "@/components/landing/Footer";
-import InvoiceUpload from "@/components/dashboard/InvoiceUpload";
+
 import Dashboard from "@/components/dashboard/Dashboard";
 import AuthPage from "@/components/auth/AuthPage";
 import OnboardingWizard from "@/components/onboarding/OnboardingWizard";

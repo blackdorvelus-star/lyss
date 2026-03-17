@@ -14,6 +14,7 @@ import PerformanceCards from "./PerformanceCards";
 import LiveActivityFeed, { type FeedItem } from "./LiveActivityFeed";
 import IntegrationStatus from "./IntegrationStatus";
 import ActiveDossierIndicator from "./ActiveDossierIndicator";
+import SettingsWizard from "./SettingsWizard";
 import FinancialHealth from "./FinancialHealth";
 import PersonalitySelector, { type Personality } from "./PersonalitySelector";
 import AssistantIdentity from "./AssistantIdentity";

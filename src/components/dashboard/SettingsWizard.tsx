@@ -82,6 +82,12 @@ const SettingsWizard = () => {
   const [customInstructions, setCustomInstructions] = useState("");
   const [firstMessageTemplate, setFirstMessageTemplate] = useState("");
 
+  // Custom templates
+  const [useCustomTemplates, setUseCustomTemplates] = useState(false);
+  const [smsTemplate, setSmsTemplate] = useState("");
+  const [emailSubjectTemplate, setEmailSubjectTemplate] = useState("");
+  const [emailBodyTemplate, setEmailBodyTemplate] = useState("");
+
   // AI behavior
   const [aiProposePlan, setAiProposePlan] = useState(true);
   const [aiNegotiate, setAiNegotiate] = useState(false);

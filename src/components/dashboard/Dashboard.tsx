@@ -65,8 +65,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
   const [invoices, setInvoices] = useState<InvoiceWithClient[]>([]);
   const [reminders, setReminders] = useState<Record<string, Reminder[]>>({});
   const [callLogs, setCallLogs] = useState<CallLog[]>([]);
-  const [vapiPublicKey, setVapiPublicKey] = useState<string | null>(null);
-  const [vapiConfig, setVapiConfig] = useState<any>(null);
+  // Vapi removed - calls now via Telnyx
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [recoveryId, setRecoveryId] = useState<string | null>(null);

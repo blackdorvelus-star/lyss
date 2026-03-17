@@ -285,6 +285,15 @@ const SettingsWizard = () => {
             </StepCard>
           )}
 
+          {step === "sequences" && (
+            <StepCard
+              title="Séquence de relance automatique"
+              subtitle="Configure les étapes et délais de relance après l'échéance d'une facture."
+            >
+              <SequenceConfig />
+            </StepCard>
+          )}
+
           {step === "payment" && (
             <StepCard
               title="Comment tes clients paient ?"

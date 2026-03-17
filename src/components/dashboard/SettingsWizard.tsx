@@ -239,21 +239,21 @@ const SettingsWizard = () => {
                 {/* Personality — big visual cards */}
                 <div>
                   <p className="text-sm font-medium mb-2">Personnalité</p>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
                     {personalities.map(p => (
                       <button
                         key={p.value}
                         onClick={() => setPersonality(p.value)}
                         className={cn(
-                          "flex flex-col items-center text-center p-4 rounded-xl border transition-all",
+                          "flex flex-col items-center text-center p-2.5 sm:p-4 rounded-xl border transition-all",
                           personality === p.value
                             ? "border-primary bg-primary/5 ring-1 ring-primary/20"
                             : "border-border bg-card hover:border-primary/30"
                         )}
                       >
-                        <span className="text-2xl mb-1">{p.label.split(" ")[0]}</span>
-                        <span className="text-xs font-semibold">{p.label.split(" ").slice(1).join(" ")}</span>
-                        <span className="text-[10px] text-muted-foreground mt-1">{p.description}</span>
+                        <span className="text-xl sm:text-2xl mb-0.5 sm:mb-1">{p.label.split(" ")[0]}</span>
+                        <span className="text-[10px] sm:text-xs font-semibold leading-tight">{p.label.split(" ").slice(1).join(" ")}</span>
+                        <span className="text-[9px] sm:text-[10px] text-muted-foreground mt-0.5 sm:mt-1 leading-tight hidden sm:block">{p.description}</span>
                       </button>
                     ))}
                   </div>

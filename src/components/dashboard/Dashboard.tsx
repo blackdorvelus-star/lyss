@@ -321,16 +321,16 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                   <PersonalitySelector value={personality} onChange={setPersonality} />
 
                   {/* Dossiers clients */}
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h2 className="font-display text-lg font-bold">Dossiers clients</h2>
-                      <p className="text-xs text-muted-foreground">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <h2 className="font-display text-base sm:text-lg font-bold">Dossiers clients</h2>
+                      <p className="text-[10px] sm:text-xs text-muted-foreground">
                         {inProgressCount} suivi{inProgressCount !== 1 ? "s" : ""} actif{inProgressCount !== 1 ? "s" : ""} · {pendingCount} en attente
                       </p>
                     </div>
-                    <Button size="sm" onClick={onNewInvoice} className="bg-primary text-primary-foreground font-display">
-                      <Plus className="w-4 h-4 mr-1" />
-                      Confier un dossier
+                    <Button size="sm" onClick={onNewInvoice} className="bg-primary text-primary-foreground font-display text-xs sm:text-sm flex-shrink-0">
+                      <Plus className="w-4 h-4 sm:mr-1" />
+                      <span className="hidden sm:inline">Confier un dossier</span>
                     </Button>
                   </div>
 

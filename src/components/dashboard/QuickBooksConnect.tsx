@@ -21,12 +21,16 @@ const QuickBooksConnect = () => {
 
   useEffect(() => {
     loadConnection();
-    // Check URL params for success redirect
     const params = new URLSearchParams(window.location.search);
     if (params.get('qb_connected') === 'true') {
       toast.success("QuickBooks connecté avec succès !");
       window.history.replaceState({}, '', window.location.pathname);
       loadConnection();
+    }
+    if (params.get('qb_error')) {
+      const err = params.get('qb_error');
+      toast.error(`Erreur QuickBooks : ${err === 'token_exchange_failed' ? "Échange de jeton échoué" : err === 'db_error' ? "Erreur de sauvegarde" : err}`);
+      window.history.replaceState({}, '', window.location.pathname);
     }
   }, []);
 

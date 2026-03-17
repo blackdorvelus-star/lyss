@@ -511,7 +511,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                         {inProgressCount} suivi{inProgressCount !== 1 ? "s" : ""} actif{inProgressCount !== 1 ? "s" : ""} · {pendingCount} en attente
                       </p>
                     </div>
-                    <Button size="sm" onClick={onNewInvoice} className="bg-primary text-primary-foreground font-display text-xs sm:text-sm flex-shrink-0">
+                    <Button size="sm" onClick={() => setActiveSection("import")} className="bg-primary text-primary-foreground font-display text-xs sm:text-sm flex-shrink-0">
                       <Plus className="w-4 h-4 sm:mr-1" />
                       <span className="hidden sm:inline">Confier un dossier</span>
                     </Button>
@@ -523,7 +523,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16">
                       <Sparkles className="w-12 h-12 text-muted-foreground mx-auto mb-3 opacity-40" />
                       <p className="text-muted-foreground mb-4">Aucun dossier confié à l'adjointe.</p>
-                      <Button onClick={onNewInvoice} className="bg-primary text-primary-foreground font-display">
+                      <Button onClick={() => setActiveSection("import")} className="bg-primary text-primary-foreground font-display">
                         <Plus className="w-4 h-4 mr-1" />
                         Confier un premier dossier
                       </Button>

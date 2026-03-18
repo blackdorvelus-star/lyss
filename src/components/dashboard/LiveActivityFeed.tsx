@@ -26,9 +26,13 @@ const iconMap = {
 const LiveActivityFeed = ({ items }: LiveActivityFeedProps) => {
   return (
     <div className="bg-card border border-border rounded-xl p-3.5 sm:p-5 h-full flex flex-col">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
-          Journal d'activité
+       <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <LyssAvatar size="xs" />
+          <h3 className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
+            Journal de Lyss
+          </h3>
+        </div>
         </h3>
         <div className="flex items-center gap-1.5">
           <span className="relative flex h-2 w-2">

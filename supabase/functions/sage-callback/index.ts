@@ -7,7 +7,7 @@ const getRequiredEnv = (name: string) => {
   return value;
 };
 
-const getAppUrl = () => Deno.env.get("APP_URL")?.trim() || "https://lyss.lovable.app";
+const getAppUrl = () => Deno.env.get("APP_URL")?.trim() || "https://lyss.ca";
 
 const redirectWithStatus = (status: string) =>
   new Response(null, {

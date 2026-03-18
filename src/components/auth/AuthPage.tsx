@@ -4,7 +4,7 @@ import { Mail, Lock, ArrowRight, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { supabase } from "@/lib/supabase-safe";
+import { safeSupabase as supabase } from "@/lib/supabase-safe";
 
 interface AuthPageProps {
   onAuth: () => void;

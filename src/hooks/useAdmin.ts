@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase-safe";
+import { safeSupabase as supabase } from "@/lib/supabase-safe";
 
 export const useAdmin = () => {
   const [isAdmin, setIsAdmin] = useState(false);

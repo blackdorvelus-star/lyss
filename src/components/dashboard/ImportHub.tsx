@@ -4,7 +4,7 @@ import { Upload, FileText, X, Send, Plus, FileSpreadsheet, Pencil, Code, Copy, C
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { supabase } from "@/lib/supabase-safe";
+import { safeSupabase as supabase } from "@/lib/supabase-safe";
 import CsvImport from "./CsvImport";
 
 type ImportMethod = "manual" | "csv";

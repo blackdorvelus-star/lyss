@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { RefreshCw, Unplug, Loader2, CheckCircle2, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/lib/supabase-safe";
+import { safeSupabase as supabase } from "@/lib/supabase-safe";
 import { toast } from "sonner";
 
 interface SageConnection {

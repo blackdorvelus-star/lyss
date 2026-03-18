@@ -8,7 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { supabase } from "@/lib/supabase-safe";
+import { safeSupabase as supabase } from "@/lib/supabase-safe";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import LyssAvatar from "@/components/LyssAvatar";

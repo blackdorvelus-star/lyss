@@ -600,6 +600,9 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
         <main className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-6 pb-20 md:pb-6">
           {activeSection === "billing" ? (
             <div className="max-w-6xl space-y-4 sm:space-y-6">
+              {/* 0. Journal de Lyss — première chose visible */}
+              <LiveActivityFeed items={feedItems} onToneAdjust={() => setActiveSection("settings")} />
+
               {/* 1. KPI — réponse en 5 sec */}
               <PerformanceCards
                 hoursSaved={hoursSaved}
@@ -609,11 +612,6 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
               />
 
               <ActiveDossierIndicator activeDossiers={inProgressCount} />
-
-              {/* Journal de Lyss — visible en haut sur mobile */}
-              {isMobile && (
-                <LiveActivityFeed items={feedItems} onToneAdjust={() => setActiveSection("settings")} />
-              )}
 
               <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
                 {/* ── Colonne principale (2/3) ── */}

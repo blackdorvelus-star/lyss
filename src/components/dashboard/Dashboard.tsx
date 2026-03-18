@@ -671,6 +671,10 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                 <Suspense fallback={<SectionLoader />}>
                   <ImportHub onComplete={() => { setActiveSection("billing"); fetchData(); }} />
                 </Suspense>
+              ) : activeSection === "quotes" ? (
+                <Suspense fallback={<SectionLoader />}>
+                  <QuoteManagement />
+                </Suspense>
               ) : (
                 <PlaceholderSection title="Gestion d'agenda" desc="La prise de rendez-vous et les confirmations automatiques arrivent bientôt." />
               )}

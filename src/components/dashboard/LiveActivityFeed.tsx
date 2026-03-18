@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Phone, Mail, MessageSquare, CheckCircle, AlertTriangle, Sparkles, Clock } from "lucide-react";
+import LyssAvatar from "@/components/LyssAvatar";
 
 export interface FeedItem {
   id: string;

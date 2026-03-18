@@ -376,6 +376,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout, demo = false }: DashboardPr
   }, [fetchData]);
 
   const sendSms = useCallback(async (reminderId: string) => {
+    if (demo) { toast.info("Mode démo — action désactivée"); return; }
     setSendingSmsId(reminderId);
     try {
       const { data, error } = await supabase.functions.invoke("send-sms", {

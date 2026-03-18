@@ -215,6 +215,13 @@ const SettingsWizard = () => {
         notify_on_payment: notifyPayment,
         notify_on_dispute: notifyDispute,
         notify_on_negative_sentiment: notifyNegative,
+        script_promise: scriptPromise || null,
+        script_dispute: scriptDispute || null,
+        script_no_response: scriptNoResponse || null,
+        script_partial_payment: scriptPartialPayment || null,
+        script_call_full: scriptCallFull || null,
+        script_sms_followup: scriptSmsFollowup || null,
+        script_email_followup: scriptEmailFollowup || null,
       } as any, { onConflict: "user_id" });
 
     if (error) {

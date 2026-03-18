@@ -2,7 +2,6 @@ import { motion } from "framer-motion";
 import { ArrowRight, Sparkles, MessageSquare, Phone, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import LyssAvatar from "@/components/LyssAvatar";
-import screenshotDashboard from "@/assets/screenshot-dashboard.jpg";
 
 interface HeroSectionProps {
   onStart: () => void;

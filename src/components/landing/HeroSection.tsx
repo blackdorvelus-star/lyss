@@ -2,7 +2,6 @@ import { motion } from "framer-motion";
 import { ArrowRight, Sparkles, MessageSquare, Phone, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import LyssAvatar from "@/components/LyssAvatar";
-import screenshotDashboard from "@/assets/screenshot-dashboard.jpg";
 
 interface HeroSectionProps {
   onStart: () => void;
@@ -23,7 +22,7 @@ const HeroSection = ({ onStart, onDemo }: HeroSectionProps) => {
 
       <div className="relative z-10 max-w-5xl mx-auto">
         {/* Top: Text + CTA */}
-        <div className="text-center max-w-xl mx-auto mb-8">
+        <div className="text-center max-w-xl mx-auto">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -97,22 +96,6 @@ const HeroSection = ({ onStart, onDemo }: HeroSectionProps) => {
           </motion.div>
         </div>
 
-        {/* Dashboard preview */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.5 }}
-          className="max-w-3xl mx-auto"
-        >
-          <div className="rounded-xl border border-border bg-card overflow-hidden shadow-xl shadow-primary/5">
-            <img
-              src={screenshotDashboard}
-              alt="Dashboard Lyss"
-              className="w-full object-cover"
-              loading="lazy"
-            />
-          </div>
-        </motion.div>
       </div>
     </section>
   );

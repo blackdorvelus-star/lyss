@@ -629,6 +629,12 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout, demo = false }: DashboardPr
               {/* 0. Journal de Lyss — première chose visible */}
               <LiveActivityFeed items={feedItems} onToneAdjust={() => setActiveSection("settings")} />
 
+              {/* 0b. Radar de priorité — juste après */}
+              <PriorityRadar
+                items={priorityItems}
+                onNavigate={(id) => setExpandedId(expandedId === id ? null : id)}
+              />
+
               {/* 1. KPI — réponse en 5 sec */}
               <PerformanceCards
                 hoursSaved={hoursSaved}
@@ -639,9 +645,8 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout, demo = false }: DashboardPr
 
               <ActiveDossierIndicator activeDossiers={inProgressCount} />
 
-              <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
-                {/* ── Colonne principale (2/3) ── */}
-                <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+              <div>
+                <div className="space-y-4 sm:space-y-6">
                   {/* 2. ROI — preuve de valeur */}
                   <SavingsWidget
                     tasksHandled={invoices.length}
@@ -732,15 +737,6 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout, demo = false }: DashboardPr
                   )}
                 </div>
 
-                {/* ── Colonne latérale (1/3) — sticky ── */}
-                <div className="lg:col-span-1 space-y-4 sm:space-y-6">
-                  <div className="sticky top-20 space-y-4 sm:space-y-6">
-                    <PriorityRadar
-                      items={priorityItems}
-                      onNavigate={(id) => setExpandedId(expandedId === id ? null : id)}
-                    />
-                  </div>
-                </div>
               </div>
 
               {/* Floating mobile CTA */}

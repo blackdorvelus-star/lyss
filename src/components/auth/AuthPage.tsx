@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { safeSupabase as supabase } from "@/lib/supabase-safe";
 import { lovable } from "@/integrations/lovable/index";
+import ForgotPasswordForm from "@/components/auth/ForgotPasswordForm";
 
 interface AuthPageProps {
   onAuth: () => void;

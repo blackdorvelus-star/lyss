@@ -610,8 +610,12 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                   )}
                 </div>
 
-                <div className="lg:col-span-1">
-                  <div className="sticky top-20">
+                <div className="lg:col-span-1 space-y-4 sm:space-y-6">
+                  <div className="sticky top-20 space-y-4 sm:space-y-6">
+                    <PriorityRadar
+                      items={priorityItems}
+                      onNavigate={(id) => setExpandedId(expandedId === id ? null : id)}
+                    />
                     <LiveActivityFeed items={feedItems} />
                   </div>
                 </div>

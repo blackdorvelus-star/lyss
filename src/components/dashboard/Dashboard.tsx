@@ -442,6 +442,63 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
       .slice(0, 15);
   }, [reminders, invoices, callLogs]);
 
+  // Build priority radar items
+  const priorityItems: PriorityItem[] = useMemo(() => {
+    const items: PriorityItem[] = [];
+
+    // Payment promises from call logs
+    callLogs
+      .filter((c) => c.call_result === "payment_promised")
+      .forEach((c) => {
+        const inv = invoices.find((i) => i.id === c.invoice_id);
+        if (inv) {
+          items.push({
+            id: inv.id,
+            type: "promise",
+            clientName: inv.clients?.name || "Client",
+            detail: `A promis de payer ${formatMoney(inv.amount)}`,
+            date: new Date(c.created_at).toLocaleDateString("fr-CA", { day: "numeric", month: "short" }),
+          });
+        }
+      });
+
+    // Negative sentiment — needs intervention
+    callLogs
+      .filter((c) => c.client_sentiment === "negative")
+      .forEach((c) => {
+        const inv = invoices.find((i) => i.id === c.invoice_id);
+        if (inv) {
+          items.push({
+            id: inv.id,
+            type: "negative",
+            clientName: inv.clients?.name || "Client",
+            detail: "Réponse négative — intervention suggérée",
+            date: new Date(c.created_at).toLocaleDateString("fr-CA", { day: "numeric", month: "short" }),
+          });
+        }
+      });
+
+    // New SMS responses from reminders
+    Object.entries(reminders).forEach(([invoiceId, rems]) => {
+      rems
+        .filter((r) => r.sms_response && r.sms_response_at)
+        .forEach((r) => {
+          const inv = invoices.find((i) => i.id === invoiceId);
+          if (inv) {
+            items.push({
+              id: inv.id,
+              type: "response",
+              clientName: inv.clients?.name || "Client",
+              detail: `« ${r.sms_response!.slice(0, 60)}${r.sms_response!.length > 60 ? "…" : ""} »`,
+              date: new Date(r.sms_response_at!).toLocaleDateString("fr-CA", { day: "numeric", month: "short" }),
+            });
+          }
+        });
+    });
+
+    return items;
+  }, [invoices, callLogs, reminders]);
+
   const getClientName = useCallback((invoiceId: string) => {
     const inv = invoices.find((i) => i.id === invoiceId);
     return inv?.clients?.name || "Client";

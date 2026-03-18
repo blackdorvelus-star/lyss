@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ShieldAlert, AlertTriangle, Clock, CheckCircle2, MessageSquare,
   Phone, Mail, ChevronDown, ChevronUp, Loader2, Send, UserCheck,
-  XCircle, Pause, Play, FileText,
+  XCircle, Pause, Play, FileText, Sparkles, Copy, Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,6 +11,8 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import LyssAvatar from "@/components/LyssAvatar";
+import ReactMarkdown from "react-markdown";
 
 interface DisputedInvoice {
   id: string;

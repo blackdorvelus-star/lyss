@@ -631,6 +631,8 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout, demo = false }: DashboardPr
                 {activeSection === "batch" && "Relance en lot"}
                 {activeSection === "audit" && "Journal d'audit"}
               </h1>
+                <p className="text-[10px] text-muted-foreground leading-none hidden sm:block">{assistantName} · Adjointe IA</p>
+              </div>
             </div>
             <div className="flex items-center gap-2 sm:gap-4">
               <div className="hidden sm:block">

@@ -645,9 +645,8 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout, demo = false }: DashboardPr
 
               <ActiveDossierIndicator activeDossiers={inProgressCount} />
 
-              <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
-                {/* ── Colonne principale (2/3) ── */}
-                <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+              <div>
+                <div className="space-y-4 sm:space-y-6">
                   {/* 2. ROI — preuve de valeur */}
                   <SavingsWidget
                     tasksHandled={invoices.length}

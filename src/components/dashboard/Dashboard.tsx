@@ -12,6 +12,7 @@ import NotificationBell from "@/components/notifications/NotificationBell";
 import AppSidebar, { type Section } from "./AppSidebar";
 import PerformanceCards from "./PerformanceCards";
 import LiveActivityFeed, { type FeedItem } from "./LiveActivityFeed";
+import PriorityRadar, { type PriorityItem } from "./PriorityRadar";
 import ActiveDossierIndicator from "./ActiveDossierIndicator";
 import type { CallLog } from "./CallHistory";
 

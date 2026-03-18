@@ -4,7 +4,7 @@ import { Banknote, CreditCard, Building2, Save, Loader2, Link2, ShieldAlert } fr
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { supabase } from "@/integrations/supabase/client";
+import { safeSupabase as supabase } from "@/lib/supabase-safe";
 import { toast } from "sonner";
 
 const PaymentSettings = () => {

@@ -14,7 +14,7 @@ import { Switch } from "@/components/ui/switch";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { supabase } from "@/integrations/supabase/client";
+import { safeSupabase as supabase } from "@/lib/supabase-safe";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import SequenceConfig from "./SequenceConfig";

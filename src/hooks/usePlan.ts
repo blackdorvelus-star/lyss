@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { safeSupabase as supabase } from "@/lib/supabase-safe";
 
 export type Plan = "free" | "solo" | "pro" | "enterprise";
 

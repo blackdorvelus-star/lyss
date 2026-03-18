@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Building2, User, Sparkles, Send, ArrowRight, ArrowLeft, Check, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
+import { safeSupabase as supabase } from "@/lib/supabase-safe";
 import { toast } from "sonner";
 
 interface OnboardingWizardProps {

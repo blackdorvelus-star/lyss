@@ -275,6 +275,8 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
   });
   const [personality, setPersonality] = useState<import("./PersonalitySelector").Personality>("chaleureuse");
   const [sendingSmsId, setSendingSmsId] = useState<string | null>(null);
+  const [quotes, setQuotes] = useState<any[]>([]);
+  const [showTour, setShowTour] = useState(() => !localStorage.getItem("lyss_tour_done"));
 
   const fetchData = useCallback(async () => {
     setLoading(true);

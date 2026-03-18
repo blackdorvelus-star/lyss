@@ -1,61 +1,47 @@
 import { motion } from "framer-motion";
-import { Upload, MessageSquare, CheckCircle } from "lucide-react";
+import { Upload, Bot, Banknote } from "lucide-react";
 
 const steps = [
   {
     icon: Upload,
-    title: "Dépose ta tâche",
-    desc: "Facture impayée, rappel de rendez-vous ou suivi client. 30 secondes max.",
-    accent: false,
+    num: "01",
+    title: "Dépose ta facture",
+    desc: "Manuel, CSV ou QuickBooks. 30 secondes.",
   },
   {
-    icon: MessageSquare,
-    title: "L'adjointe s'en occupe",
-    desc: "Messages professionnels en ton québécois. SMS, courriels et appels inclus.",
-    accent: false,
+    icon: Bot,
+    num: "02",
+    title: "Lyss s'en occupe",
+    desc: "SMS, courriels et appels — ton québécois pro.",
   },
   {
-    icon: CheckCircle,
-    title: "Résultat livré",
-    desc: "Paiement reçu, rendez-vous confirmé, client satisfait. Tu restes informé(e).",
-    accent: true,
+    icon: Banknote,
+    num: "03",
+    title: "Tu es payé",
+    desc: "73 % de taux de réponse moyen.",
   },
 ];
 
 const HowItWorks = () => {
   return (
-    <section className="px-5 py-16">
-      <div className="max-w-xl mx-auto">
-        <h2 className="font-display text-2xl font-bold text-center mb-10">
-          Comment ça marche
-        </h2>
-
-        <div className="space-y-6">
+    <section className="px-5 py-10">
+      <div className="max-w-3xl mx-auto">
+        <div className="grid grid-cols-3 gap-3 sm:gap-6">
           {steps.map((step, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.15 }}
-              className={`flex items-start gap-4 p-5 rounded-xl border ${
-                step.accent
-                  ? "border-primary/30 bg-primary/5"
-                  : "border-border bg-card"
-              }`}
+              transition={{ delay: i * 0.1 }}
+              className="text-center p-3 sm:p-5 rounded-xl border border-border bg-card"
             >
-              <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
-                step.accent ? "bg-primary/20 text-primary" : "bg-secondary text-muted-foreground"
-              }`}>
-                <step.icon className="w-5 h-5" />
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-2.5">
+                <step.icon className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
               </div>
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-xs font-mono text-muted-foreground">0{i + 1}</span>
-                  <h3 className="font-display font-semibold">{step.title}</h3>
-                </div>
-                <p className="text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
-              </div>
+              <span className="text-[10px] font-mono text-muted-foreground">{step.num}</span>
+              <h3 className="font-display font-bold text-xs sm:text-sm mt-0.5 mb-1">{step.title}</h3>
+              <p className="text-[10px] sm:text-xs text-muted-foreground leading-snug">{step.desc}</p>
             </motion.div>
           ))}
         </div>

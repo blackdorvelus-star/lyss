@@ -575,6 +575,11 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
 
               <ActiveDossierIndicator activeDossiers={inProgressCount} />
 
+              {/* Journal de Lyss — visible en haut sur mobile */}
+              {isMobile && (
+                <LiveActivityFeed items={feedItems} onToneAdjust={() => setActiveSection("settings")} />
+              )}
+
               <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
                 {/* ── Colonne principale (2/3) ── */}
                 <div className="lg:col-span-2 space-y-4 sm:space-y-6">
@@ -671,11 +676,11 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                 {/* ── Colonne latérale (1/3) — sticky ── */}
                 <div className="lg:col-span-1 space-y-4 sm:space-y-6">
                   <div className="sticky top-20 space-y-4 sm:space-y-6">
+                    <LiveActivityFeed items={feedItems} onToneAdjust={() => setActiveSection("settings")} />
                     <PriorityRadar
                       items={priorityItems}
                       onNavigate={(id) => setExpandedId(expandedId === id ? null : id)}
                     />
-                    <LiveActivityFeed items={feedItems} onToneAdjust={() => setActiveSection("settings")} />
                   </div>
                 </div>
               </div>

@@ -653,7 +653,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout, demo = false }: DashboardPr
                 <div className="min-w-0">
                   <h3 className="font-display text-sm sm:text-base font-bold text-foreground flex items-center gap-2">
                     <Plus className="w-4 h-4 text-primary" />
-                    Confier un dossier à {assistantName}
+                    Confier un dossier à Lyss
                   </h3>
                   <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">Import manuel, CSV/Excel ou sync comptable</p>
                 </div>

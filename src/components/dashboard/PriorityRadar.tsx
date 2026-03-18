@@ -113,6 +113,11 @@ const PriorityRadar = ({ items, onNavigate }: PriorityRadarProps) => {
             {responses.length} réponse{responses.length > 1 ? "s" : ""}
           </span>
         )}
+        {quotes.length > 0 && (
+          <span className="text-[10px] font-medium px-2 py-1 rounded-full bg-amber-500/10 text-amber-500 ring-1 ring-amber-500/20">
+            {quotes.length} soumission{quotes.length > 1 ? "s" : ""}
+          </span>
+        )}
       </div>
 
       {/* Items */}

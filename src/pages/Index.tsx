@@ -7,6 +7,8 @@ import FAQSection from "@/components/landing/FAQSection";
 import IntegrationSection from "@/components/landing/IntegrationSection";
 import Footer from "@/components/landing/Footer";
 import Dashboard from "@/components/dashboard/Dashboard";
+import ExitIntentSurvey from "@/components/feedback/ExitIntentSurvey";
+import FeedbackWidget from "@/components/dashboard/FeedbackWidget";
 
 type View = "landing" | "dashboard";
 

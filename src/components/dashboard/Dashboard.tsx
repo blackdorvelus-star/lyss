@@ -491,6 +491,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout, demo = false }: DashboardPr
 
   // Build priority radar items
   const priorityItems: PriorityItem[] = useMemo(() => {
+    if (demo) return demoPriorityItems;
     const items: PriorityItem[] = [];
 
     // Payment promises from call logs

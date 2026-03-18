@@ -529,8 +529,22 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
         });
     });
 
+    // Unanswered quotes (sent > 3 days ago)
+    quotes.forEach((q: any) => {
+      const daysSinceSent = q.sent_at ? (Date.now() - new Date(q.sent_at).getTime()) / 86400000 : 999;
+      if (daysSinceSent > 3) {
+        items.push({
+          id: q.id,
+          type: "quote",
+          clientName: q.clients?.name || "Client",
+          detail: `Soumission ${q.quote_number || ""} (${formatMoney(q.amount)}) sans réponse depuis ${Math.floor(daysSinceSent)}j`,
+          date: new Date(q.sent_at || q.created_at).toLocaleDateString("fr-CA", { day: "numeric", month: "short" }),
+        });
+      }
+    });
+
     return items;
-  }, [invoices, callLogs, reminders]);
+  }, [invoices, callLogs, reminders, quotes]);
 
   const getClientName = useCallback((invoiceId: string) => {
     const inv = invoices.find((i) => i.id === invoiceId);

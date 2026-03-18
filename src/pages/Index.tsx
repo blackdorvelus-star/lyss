@@ -14,6 +14,7 @@ import FeedbackWidget from "@/components/dashboard/FeedbackWidget";
 type View = "landing" | "dashboard" | "demo";
 
 const Index = () => {
+  const navigate = useNavigate();
   const [view, setView] = useState<View>("landing");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 

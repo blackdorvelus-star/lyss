@@ -96,22 +96,6 @@ const HeroSection = ({ onStart, onDemo }: HeroSectionProps) => {
           </motion.div>
         </div>
 
-        {/* Dashboard preview */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.5 }}
-          className="max-w-3xl mx-auto"
-        >
-          <div className="rounded-xl border border-border bg-card overflow-hidden shadow-xl shadow-primary/5">
-            <img
-              src={screenshotDashboard}
-              alt="Dashboard Lyss"
-              className="w-full object-cover"
-              loading="lazy"
-            />
-          </div>
-        </motion.div>
       </div>
     </section>
   );

@@ -311,6 +311,14 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
       .order("created_at", { ascending: false });
     if (calls) setCallLogs(calls as any as CallLog[]);
 
+    // Fetch quotes for radar
+    const { data: quotesData } = await supabase
+      .from("quotes")
+      .select("*, clients(*)")
+      .in("status", ["sent", "viewed"])
+      .order("created_at", { ascending: false });
+    if (quotesData) setQuotes(quotesData);
+
     setLoading(false);
   }, []);
 

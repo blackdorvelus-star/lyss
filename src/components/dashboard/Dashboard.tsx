@@ -675,7 +675,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                       items={priorityItems}
                       onNavigate={(id) => setExpandedId(expandedId === id ? null : id)}
                     />
-                    <LiveActivityFeed items={feedItems} />
+                    <LiveActivityFeed items={feedItems} onToneAdjust={() => setActiveSection("settings")} />
                   </div>
                 </div>
               </div>

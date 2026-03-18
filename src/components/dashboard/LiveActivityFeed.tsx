@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Phone, Mail, MessageSquare, CheckCircle, AlertTriangle, Sparkles, Clock } from "lucide-react";
+import { Phone, Mail, MessageSquare, CheckCircle, AlertTriangle, Sparkles, Clock, SlidersHorizontal } from "lucide-react";
 import LyssAvatar from "@/components/LyssAvatar";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 export interface FeedItem {
   id: string;
@@ -12,6 +15,7 @@ export interface FeedItem {
 
 interface LiveActivityFeedProps {
   items: FeedItem[];
+  onToneAdjust?: () => void;
 }
 
 const iconMap = {
@@ -23,7 +27,21 @@ const iconMap = {
   ai: { icon: Sparkles, color: "text-primary", bg: "bg-primary/10", ring: "ring-primary/20" },
 };
 
-const LiveActivityFeed = ({ items }: LiveActivityFeedProps) => {
+const toneOptions = [
+  { label: "Plus doux", value: "douce", emoji: "🕊️" },
+  { label: "Plus direct", value: "directe", emoji: "🎯" },
+  { label: "Plus formel", value: "formelle", emoji: "👔" },
+];
+
+const LiveActivityFeed = ({ items, onToneAdjust }: LiveActivityFeedProps) => {
+  const [toneMenuId, setToneMenuId] = useState<string | null>(null);
+
+  const handleToneClick = (itemId: string, tone: string) => {
+    toast.success(`Ton ajusté → ${tone}. Les prochains messages seront adaptés.`);
+    setToneMenuId(null);
+    onToneAdjust?.();
+  };
+
   return (
     <div className="bg-card border border-border rounded-xl p-3.5 sm:p-5 h-full flex flex-col">
        <div className="flex items-center justify-between mb-4">
@@ -56,33 +74,74 @@ const LiveActivityFeed = ({ items }: LiveActivityFeedProps) => {
             {items.map((item, i) => {
               const config = iconMap[item.icon];
               const Icon = config.icon;
+              const isMessage = item.icon === "sms" || item.icon === "email";
               return (
                 <motion.div
                   key={item.id}
                   initial={{ opacity: 0, x: -10, height: 0 }}
                   animate={{ opacity: 1, x: 0, height: "auto" }}
                   transition={{ delay: i * 0.03 }}
-                  className="flex items-start gap-2.5 py-2 relative"
+                  className="relative"
                 >
-                  {/* Timeline line */}
-                  {i < items.length - 1 && (
-                    <div className="absolute left-[13px] top-9 bottom-0 w-px bg-border" />
-                  )}
-                  <div className={`w-7 h-7 rounded-md ${config.bg} flex items-center justify-center flex-shrink-0 ring-1 ${config.ring}`}>
-                    <Icon className={`w-3.5 h-3.5 ${config.color}`} />
+                  <div className="flex items-start gap-2.5 py-2">
+                    {/* Timeline line */}
+                    {i < items.length - 1 && (
+                      <div className="absolute left-[13px] top-9 bottom-0 w-px bg-border" />
+                    )}
+                    <div className={`w-7 h-7 rounded-md ${config.bg} flex items-center justify-center flex-shrink-0 ring-1 ${config.ring}`}>
+                      <Icon className={`w-3.5 h-3.5 ${config.color}`} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-foreground leading-snug">{item.text}</p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <p className="text-[10px] text-muted-foreground flex items-center gap-1">
+                          <Clock className="w-2.5 h-2.5" />
+                          {item.time}
+                        </p>
+                        {isMessage && (
+                          <button
+                            onClick={() => setToneMenuId(toneMenuId === item.id ? null : item.id)}
+                            className="text-[10px] text-muted-foreground hover:text-primary flex items-center gap-0.5 transition-colors"
+                            title="Ajuster le ton"
+                          >
+                            <SlidersHorizontal className="w-2.5 h-2.5" />
+                            <span className="hidden sm:inline">Ajuster</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    {item.isNew && (
+                      <span className="text-[9px] font-semibold text-primary bg-primary/10 rounded-full px-1.5 py-0.5 flex-shrink-0">
+                        NEW
+                      </span>
+                    )}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs text-foreground leading-snug">{item.text}</p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5 flex items-center gap-1">
-                      <Clock className="w-2.5 h-2.5" />
-                      {item.time}
-                    </p>
-                  </div>
-                  {item.isNew && (
-                    <span className="text-[9px] font-semibold text-primary bg-primary/10 rounded-full px-1.5 py-0.5 flex-shrink-0">
-                      NEW
-                    </span>
-                  )}
+
+                  {/* Inline tone adjustment menu */}
+                  <AnimatePresence>
+                    {toneMenuId === item.id && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="overflow-hidden ml-9 mb-1"
+                      >
+                        <div className="flex gap-1.5 py-1.5">
+                          {toneOptions.map((opt) => (
+                            <Button
+                              key={opt.value}
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleToneClick(item.id, opt.label.toLowerCase())}
+                              className="h-6 text-[10px] px-2 gap-1"
+                            >
+                              {opt.emoji} {opt.label}
+                            </Button>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </motion.div>
               );
             })}

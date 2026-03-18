@@ -106,15 +106,48 @@ serve(async (req) => {
         .from("invoices")
         .select("*, clients(*)")
         .eq("user_id", seq.user_id)
-        .in("status", ["pending", "in_progress"])
+        .in("status", ["pending", "in_progress"]) // exclut "recovered" et "disputed"
         .not("due_date", "is", null);
 
       if (!invoices || invoices.length === 0) continue;
+
+      // ── Vérifier les appels avec sentiment négatif pour escalade humaine ──
+      const { data: negativeCalls } = await supabase
+        .from("call_logs")
+        .select("invoice_id")
+        .eq("user_id", seq.user_id)
+        .eq("client_sentiment", "negative");
+
+      const negativeInvoiceIds = new Set((negativeCalls || []).map(c => c.invoice_id));
 
       for (const invoice of invoices) {
         const dueDate = new Date(invoice.due_date);
         const daysPastDue = Math.floor((now.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
         if (daysPastDue < 0) continue;
+
+        // ── Escalade humaine : suspendre les relances si sentiment négatif ──
+        if (negativeInvoiceIds.has(invoice.id)) {
+          console.log(`Skipping invoice ${invoice.id}: negative sentiment detected, human escalation required`);
+          // Créer une notification d'escalade (une seule fois)
+          const { count: existingEscalation } = await supabase
+            .from("notifications")
+            .select("*", { count: "exact", head: true })
+            .eq("invoice_id", invoice.id)
+            .eq("type", "warning")
+            .ilike("title", "%intervention%");
+
+          if (!existingEscalation || existingEscalation === 0) {
+            const assistantName = settings?.assistant_name || "Lyss";
+            await supabase.from("notifications").insert({
+              user_id: seq.user_id,
+              invoice_id: invoice.id,
+              title: "🚨 Intervention humaine requise",
+              message: `${assistantName} a suspendu les relances pour ${invoice.clients?.name} (${invoice.amount} $) suite à une réponse négative. Veuillez intervenir personnellement.`,
+              type: "warning",
+            });
+          }
+          continue;
+        }
 
         const currentStep = invoice.current_sequence_step || 0;
         if (currentStep >= steps.length) continue;

@@ -132,7 +132,7 @@ const AppSidebar = ({ activeSection, onSectionChange, onLogout }: AppSidebarProp
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 py-3 px-2 space-y-1">
+        <nav className="flex-1 py-3 px-2 space-y-1 overflow-y-auto">
           {navItems.map((item) => {
             const isActive = activeSection === item.id;
             return (

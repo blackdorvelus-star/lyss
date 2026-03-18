@@ -226,6 +226,8 @@ const AuthPage = ({ onAuth }: AuthPageProps) => {
               {mode === "login" ? "S'inscrire" : "Se connecter"}
             </button>
           </p>
+          </>
+          )}
         </motion.div>
       </div>
     </div>

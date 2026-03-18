@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import HeroSection from "@/components/landing/HeroSection";
 import HowItWorks from "@/components/landing/HowItWorks";
 import MessagePreview from "@/components/landing/MessagePreview";
+import DashboardShowcase from "@/components/landing/DashboardShowcase";
 import PricingSection from "@/components/landing/PricingSection";
 import FAQSection from "@/components/landing/FAQSection";
 import IntegrationSection from "@/components/landing/IntegrationSection";

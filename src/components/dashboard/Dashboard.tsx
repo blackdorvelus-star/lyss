@@ -49,6 +49,7 @@ interface DashboardProps {
   onBack: () => void;
   onNewInvoice?: () => void;
   onLogout?: () => void;
+  demo?: boolean;
 }
 
 interface InvoiceWithClient {

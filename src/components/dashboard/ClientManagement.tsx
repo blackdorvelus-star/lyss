@@ -244,8 +244,8 @@ const ClientManagement = () => {
                   <div className="flex-1 space-y-2">
                     <Input value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} className="bg-secondary h-8 text-sm" />
                     <div className="grid grid-cols-2 gap-2">
-                      <Input value={editForm.email} onChange={(e) => setEditForm({ ...editForm, email: e.target.value })} placeholder="Courriel" className="bg-secondary h-8 text-sm" />
-                      <Input value={editForm.phone} onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })} placeholder="Téléphone" className="bg-secondary h-8 text-sm" />
+                       <Input value={editForm.email} onChange={(e) => setEditForm({ ...editForm, email: e.target.value })} placeholder="ex: info@entreprise.ca" className="bg-secondary h-8 text-sm" />
+                      <Input value={editForm.phone} onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })} placeholder="ex: 514-555-1234" className="bg-secondary h-8 text-sm" />
                     </div>
                     <div className="flex gap-2">
                       <Button size="sm" variant="default" onClick={() => handleEdit(client.id)} disabled={saving} className="h-7 text-xs">

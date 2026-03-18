@@ -96,6 +96,14 @@ const HeroSection = ({ onStart, onDemo }: HeroSectionProps) => {
               Essayer gratuitement
               <ArrowRight className="w-4 h-4 ml-1" />
             </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              onClick={onDemo}
+              className="font-display font-semibold text-sm px-7 h-11 border-primary/30 text-primary hover:bg-primary/5"
+            >
+              Voir la démo
+            </Button>
             <span className="text-xs text-muted-foreground">
               3 crédits offerts · 49 $/mois · Sans engagement
             </span>

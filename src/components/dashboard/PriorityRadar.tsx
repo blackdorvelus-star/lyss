@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { AlertTriangle, Banknote, MessageSquare, ArrowRight, Clock } from "lucide-react";
+import { AlertTriangle, Banknote, MessageSquare, ArrowRight, Clock, FileSignature } from "lucide-react";
 
 interface PriorityItem {
   id: string;

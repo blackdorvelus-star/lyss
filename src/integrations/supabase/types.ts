@@ -391,6 +391,56 @@ export type Database = {
         }
         Relationships: []
       }
+      quotes: {
+        Row: {
+          amount: number
+          client_id: string
+          created_at: string
+          description: string | null
+          expires_at: string | null
+          id: string
+          quote_number: string | null
+          sent_at: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          client_id: string
+          created_at?: string
+          description?: string | null
+          expires_at?: string | null
+          id?: string
+          quote_number?: string | null
+          sent_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          client_id?: string
+          created_at?: string
+          description?: string | null
+          expires_at?: string | null
+          id?: string
+          quote_number?: string | null
+          sent_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotes_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reminder_sequences: {
         Row: {
           created_at: string

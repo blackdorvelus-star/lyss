@@ -305,6 +305,20 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
+  // ── Realtime subscriptions ────────────────────────────────────────────
+  useEffect(() => {
+    const channel = supabase
+      .channel("dashboard-realtime")
+      .on("postgres_changes", { event: "*", schema: "public", table: "reminders" }, () => fetchData())
+      .on("postgres_changes", { event: "*", schema: "public", table: "invoices" }, () => fetchData())
+      .on("postgres_changes", { event: "*", schema: "public", table: "call_logs" }, () => fetchData())
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [fetchData]);
+
   const markRecovered = useCallback(async (invoiceId: string, amount: number, maxAmount: number) => {
     if (amount <= 0 || amount > maxAmount) {
       toast.error(`Le montant doit être entre 1 $ et ${maxAmount} $.`);

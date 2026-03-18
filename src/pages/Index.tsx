@@ -51,11 +51,12 @@ const Index = () => {
   };
 
   const handleStart = async () => {
+    // Skip auth for testing — go directly to dashboard
     if (session) {
       const completed = await checkOnboarding();
       setView(completed ? "dashboard" : "onboarding");
     } else {
-      setView("auth");
+      setView("dashboard");
     }
   };
 

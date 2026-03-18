@@ -515,7 +515,7 @@ const DisputeCenter = () => {
                                     <ReactMarkdown>{aiResponses[inv.id]}</ReactMarkdown>
                                   </div>
                                 </div>
-                                <div className="flex gap-2">
+                                <div className="flex flex-wrap gap-2">
                                   <Button
                                     size="sm"
                                     variant="outline"
@@ -534,9 +534,39 @@ const DisputeCenter = () => {
                                     onClick={() => useAsNote(inv.id)}
                                     className="text-xs h-7"
                                   >
-                                    <Send className="w-3 h-3 mr-1" />
-                                    Utiliser comme note
+                                    <FileText className="w-3 h-3 mr-1" />
+                                    Note
                                   </Button>
+                                  {inv.clients.phone && (
+                                    <Button
+                                      size="sm"
+                                      onClick={() => sendAiResponse(inv.id, "sms")}
+                                      disabled={sendingChannel === `${inv.id}-sms`}
+                                      className="text-xs h-7 bg-accent text-accent-foreground hover:bg-accent/90"
+                                    >
+                                      {sendingChannel === `${inv.id}-sms` ? (
+                                        <Loader2 className="w-3 h-3 animate-spin mr-1" />
+                                      ) : (
+                                        <MessageSquare className="w-3 h-3 mr-1" />
+                                      )}
+                                      Envoyer par SMS
+                                    </Button>
+                                  )}
+                                  {inv.clients.email && (
+                                    <Button
+                                      size="sm"
+                                      onClick={() => sendAiResponse(inv.id, "email")}
+                                      disabled={sendingChannel === `${inv.id}-email`}
+                                      className="text-xs h-7 bg-primary text-primary-foreground hover:bg-primary/90"
+                                    >
+                                      {sendingChannel === `${inv.id}-email` ? (
+                                        <Loader2 className="w-3 h-3 animate-spin mr-1" />
+                                      ) : (
+                                        <Mail className="w-3 h-3 mr-1" />
+                                      )}
+                                      Envoyer par courriel
+                                    </Button>
+                                  )}
                                 </div>
                               </motion.div>
                             )}

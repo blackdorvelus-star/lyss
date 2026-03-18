@@ -7,7 +7,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase-safe";
 import { toast } from "sonner";
 import LyssAvatar from "@/components/LyssAvatar";
 

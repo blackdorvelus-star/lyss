@@ -39,10 +39,10 @@ const Index = () => {
     setView("landing");
   };
 
-  if (view === "dashboard") {
+  if (view === "dashboard" || view === "demo") {
     return (
       <>
-        <Dashboard onBack={handleBackToLanding} onLogout={handleLogout} />
+        <Dashboard onBack={handleBackToLanding} onLogout={handleLogout} demo={view === "demo"} />
         <FeedbackWidget />
       </>
     );

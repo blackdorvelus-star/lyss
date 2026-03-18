@@ -10,7 +10,7 @@ import Dashboard from "@/components/dashboard/Dashboard";
 import ExitIntentSurvey from "@/components/feedback/ExitIntentSurvey";
 import FeedbackWidget from "@/components/dashboard/FeedbackWidget";
 
-type View = "landing" | "dashboard";
+type View = "landing" | "dashboard" | "demo";
 
 const Index = () => {
   const [view, setView] = useState<View>("landing");

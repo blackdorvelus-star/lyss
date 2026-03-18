@@ -565,6 +565,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
         <main className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-6 pb-20 md:pb-6">
           {activeSection === "billing" ? (
             <div className="max-w-6xl space-y-4 sm:space-y-6">
+              {/* 1. KPI — réponse en 5 sec */}
               <PerformanceCards
                 hoursSaved={hoursSaved}
                 successRate={successRate}
@@ -575,11 +576,20 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
               <ActiveDossierIndicator activeDossiers={inProgressCount} />
 
               <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
+                {/* ── Colonne principale (2/3) ── */}
                 <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+                  {/* 2. ROI — preuve de valeur */}
+                  <SavingsWidget
+                    tasksHandled={invoices.length}
+                    totalRecovered={totalRecovered}
+                  />
+
+                  {/* 3. Santé financière */}
                   <Suspense fallback={<SectionLoader />}>
                     <FinancialHealth invoices={invoices} />
                   </Suspense>
 
+                  {/* 4. Prévisions */}
                   <Suspense fallback={<SectionLoader />}>
                     <CashflowForecast
                       invoices={invoices}
@@ -592,14 +602,24 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                     />
                   </Suspense>
 
+                  {/* 5. Productivité hebdo */}
+                  <WeeklyProductivity
+                    tasksCompleted={settledCount + inProgressCount}
+                    appointmentsConfirmed={callLogs.filter(c => c.call_result === "callback_requested").length}
+                    invoicesSettled={settledCount}
+                  />
+
+                  {/* 6. Historique appels */}
                   <Suspense fallback={<SectionLoader />}>
                     <CallHistory calls={callLogs} getClientName={getClientName} />
                   </Suspense>
 
+                  {/* 7. Personnalité */}
                   <Suspense fallback={<SectionLoader />}>
                     <PersonalitySelector value={personality} onChange={setPersonality} />
                   </Suspense>
 
+                  {/* 8. Dossiers clients */}
                   <div className="flex items-center justify-between gap-2">
                     <div className="min-w-0">
                       <h2 className="font-display text-base sm:text-lg font-bold">Dossiers clients</h2>
@@ -648,6 +668,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                   )}
                 </div>
 
+                {/* ── Colonne latérale (1/3) — sticky ── */}
                 <div className="lg:col-span-1 space-y-4 sm:space-y-6">
                   <div className="sticky top-20 space-y-4 sm:space-y-6">
                     <PriorityRadar
@@ -658,6 +679,22 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                   </div>
                 </div>
               </div>
+
+              {/* Floating mobile CTA */}
+              {isMobile && (
+                <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  className="fixed bottom-20 right-4 z-40"
+                >
+                  <Button
+                    onClick={() => setActiveSection("import")}
+                    className="bg-primary text-primary-foreground font-display shadow-lg rounded-full h-14 w-14 p-0"
+                  >
+                    <Plus className="w-6 h-6" />
+                  </Button>
+                </motion.div>
+              )}
             </div>
           ) : (
             <Suspense fallback={<SectionLoader />}>

@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Sparkles, MessageSquare, Phone, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 import LyssAvatar from "@/components/LyssAvatar";
 
 interface HeroSectionProps {

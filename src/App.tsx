@@ -43,6 +43,7 @@ const App = () => (
           <Route path="/confidentialite" element={<PrivacyPage />} />
           <Route path="/conditions-utilisation" element={<TermsPage />} />
           <Route path="/conditions" element={<TermsPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>

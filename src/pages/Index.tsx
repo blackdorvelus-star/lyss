@@ -27,8 +27,8 @@ const Index = () => {
   }, [view, mobileMenuOpen]);
 
   const handleStart = () => {
-    console.info("[Index] ouverture du dashboard sans connexion");
-    setView("dashboard");
+    console.info("[Index] ouverture du dashboard");
+    navigate("/dashboard");
   };
 
   const handleBackToLanding = () => {

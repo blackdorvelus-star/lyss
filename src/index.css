@@ -72,3 +72,10 @@
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 }
+
+/* Hide Lovable badge in production */
+a[href*="lovable.dev"],
+#lovable-badge,
+[data-lovable-badge] {
+  display: none !important;
+}

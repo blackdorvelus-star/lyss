@@ -59,6 +59,7 @@ const DisputeCenter = () => {
   const [aiResponses, setAiResponses] = useState<Record<string, string>>({});
   const [generatingAi, setGeneratingAi] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [sendingChannel, setSendingChannel] = useState<string | null>(null);
 
   useEffect(() => { loadDisputes(); }, []);
 

@@ -27,14 +27,14 @@ const HeroSection = ({ onStart }: HeroSectionProps) => {
           Adjointe administrative IA
         </motion.div>
 
-        <h1 className="font-display text-4xl sm:text-5xl font-bold leading-[1.1] tracking-tight mb-5">
-          Ton bureau virtuel{" "}
-          <span className="text-primary">qui travaille pour toi.</span>
+         <h1 className="font-display text-4xl sm:text-5xl font-bold leading-[1.1] tracking-tight mb-5">
+          Récupère tes milliers de{" "}
+          <span className="text-primary">dollars en attente.</span>
         </h1>
 
         <p className="text-muted-foreground text-lg leading-relaxed mb-8 max-w-md mx-auto">
-          Suivi de facturation, gestion des rendez-vous, relations clients — 
-          Lyss s'occupe de ton administratif pendant que tu te concentres sur ton métier.
+          Lyss relance tes clients avec un ton québécois professionnel — SMS, courriels et appels — 
+          pendant que tu te concentres sur ta job.
         </p>
 
         <motion.div

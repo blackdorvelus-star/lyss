@@ -645,6 +645,24 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout, demo = false }: DashboardPr
 
               <ActiveDossierIndicator activeDossiers={inProgressCount} />
 
+              {/* Confier un dossier — CTA rapide */}
+              <div
+                onClick={() => setActiveSection("import")}
+                className="group cursor-pointer rounded-2xl border border-dashed border-primary/30 bg-primary/5 hover:bg-primary/10 transition-all p-4 sm:p-5 flex items-center justify-between gap-4"
+              >
+                <div className="min-w-0">
+                  <h3 className="font-display text-sm sm:text-base font-bold text-foreground flex items-center gap-2">
+                    <Plus className="w-4 h-4 text-primary" />
+                    Confier un dossier à Lyss
+                  </h3>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">Import manuel, CSV/Excel ou sync comptable</p>
+                </div>
+                <Button size="sm" className="bg-primary text-primary-foreground font-display text-xs flex-shrink-0 group-hover:scale-105 transition-transform">
+                  <Plus className="w-4 h-4 sm:mr-1" />
+                  <span className="hidden sm:inline">Confier</span>
+                </Button>
+              </div>
+
               <div>
                 <div className="space-y-4 sm:space-y-6">
                   {/* 2. ROI — preuve de valeur */}

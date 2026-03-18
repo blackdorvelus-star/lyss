@@ -106,10 +106,19 @@ serve(async (req) => {
         .from("invoices")
         .select("*, clients(*)")
         .eq("user_id", seq.user_id)
-        .in("status", ["pending", "in_progress"])
+        .in("status", ["pending", "in_progress"]) // exclut "recovered" et "disputed"
         .not("due_date", "is", null);
 
       if (!invoices || invoices.length === 0) continue;
+
+      // ── Vérifier les appels avec sentiment négatif pour escalade humaine ──
+      const { data: negativeCalls } = await supabase
+        .from("call_logs")
+        .select("invoice_id")
+        .eq("user_id", seq.user_id)
+        .eq("client_sentiment", "negative");
+
+      const negativeInvoiceIds = new Set((negativeCalls || []).map(c => c.invoice_id));
 
       for (const invoice of invoices) {
         const dueDate = new Date(invoice.due_date);

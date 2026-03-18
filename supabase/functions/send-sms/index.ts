@@ -81,6 +81,19 @@ serve(async (req) => {
       });
     }
 
+    // ── Garde-fou : vérifier que la facture n'est pas déjà réglée ──
+    const invoiceStatus = reminder.invoices?.status;
+    if (invoiceStatus === "recovered") {
+      return new Response(JSON.stringify({ error: "Cette facture est déjà réglée. SMS annulé pour éviter un doublon." }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    if (invoiceStatus === "disputed") {
+      return new Response(JSON.stringify({ error: "Cette facture est en litige. Les relances sont suspendues." }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Check if SMS channel is active in user settings
     const settings = settingsRes.data;
     if (settings) {

@@ -125,6 +125,30 @@ serve(async (req) => {
         const daysPastDue = Math.floor((now.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
         if (daysPastDue < 0) continue;
 
+        // ── Escalade humaine : suspendre les relances si sentiment négatif ──
+        if (negativeInvoiceIds.has(invoice.id)) {
+          console.log(`Skipping invoice ${invoice.id}: negative sentiment detected, human escalation required`);
+          // Créer une notification d'escalade (une seule fois)
+          const { count: existingEscalation } = await supabase
+            .from("notifications")
+            .select("*", { count: "exact", head: true })
+            .eq("invoice_id", invoice.id)
+            .eq("type", "warning")
+            .ilike("title", "%intervention%");
+
+          if (!existingEscalation || existingEscalation === 0) {
+            const assistantName = settings?.assistant_name || "Lyss";
+            await supabase.from("notifications").insert({
+              user_id: seq.user_id,
+              invoice_id: invoice.id,
+              title: "🚨 Intervention humaine requise",
+              message: `${assistantName} a suspendu les relances pour ${invoice.clients?.name} (${invoice.amount} $) suite à une réponse négative. Veuillez intervenir personnellement.`,
+              type: "warning",
+            });
+          }
+          continue;
+        }
+
         const currentStep = invoice.current_sequence_step || 0;
         if (currentStep >= steps.length) continue;
 

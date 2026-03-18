@@ -50,6 +50,24 @@ serve(async (req) => {
       });
     }
 
+    // ── Garde-fou : vérifier que la facture n'est pas déjà réglée/contestée ──
+    const { data: invoiceCheck } = await supabase
+      .from("invoices")
+      .select("status")
+      .eq("id", invoice_id)
+      .single();
+
+    if (invoiceCheck?.status === "recovered") {
+      return new Response(JSON.stringify({ error: "Cette facture est déjà réglée. Appel annulé pour éviter un doublon." }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    if (invoiceCheck?.status === "disputed") {
+      return new Response(JSON.stringify({ error: "Cette facture est en litige. Les relances sont suspendues." }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Fetch user settings
     const { data: settings } = await supabase
       .from("payment_settings")

@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import NotificationBell from "@/components/notifications/NotificationBell";
+import LyssAvatar from "@/components/LyssAvatar";
 import AppSidebar, { type Section } from "./AppSidebar";
 import PerformanceCards from "./PerformanceCards";
 import LiveActivityFeed, { type FeedItem } from "./LiveActivityFeed";

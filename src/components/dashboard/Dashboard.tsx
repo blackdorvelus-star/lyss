@@ -260,7 +260,7 @@ InvoiceCard.displayName = "InvoiceCard";
 
 // ── Main Dashboard ──────────────────────────────────────────────────────
 
-const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
+const Dashboard = ({ onBack, onNewInvoice, onLogout, demo = false }: DashboardProps) => {
   const isMobile = useIsMobile();
   const [invoices, setInvoices] = useState<InvoiceWithClient[]>([]);
   const [reminders, setReminders] = useState<Record<string, Reminder[]>>({});

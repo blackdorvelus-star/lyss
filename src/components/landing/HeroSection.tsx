@@ -16,6 +16,7 @@ const channels = [
 ];
 
 const HeroSection = ({ onStart, onDemo }: HeroSectionProps) => {
+  const navigate = useNavigate();
 
   return (
     <section className="relative px-5 pt-12 sm:pt-16 pb-8 overflow-hidden">

@@ -1,6 +1,4 @@
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import type { Session } from "@supabase/supabase-js";
+import { useEffect, useState } from "react";
 import HeroSection from "@/components/landing/HeroSection";
 import HowItWorks from "@/components/landing/HowItWorks";
 import MessagePreview from "@/components/landing/MessagePreview";
@@ -8,86 +6,39 @@ import PricingSection from "@/components/landing/PricingSection";
 import FAQSection from "@/components/landing/FAQSection";
 import IntegrationSection from "@/components/landing/IntegrationSection";
 import Footer from "@/components/landing/Footer";
-
 import Dashboard from "@/components/dashboard/Dashboard";
-import AuthPage from "@/components/auth/AuthPage";
-import OnboardingWizard from "@/components/onboarding/OnboardingWizard";
 
-type View = "landing" | "auth" | "onboarding" | "dashboard";
+type View = "landing" | "dashboard";
 
 const Index = () => {
   const [view, setView] = useState<View>("landing");
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setSession(session);
-        setLoading(false);
-      }
-    );
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    console.info("[Index] mode test sans auth activé");
   }, []);
 
-  const checkOnboarding = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return false;
-
-    const { data } = await supabase
-      .from("payment_settings")
-      .select("onboarding_completed")
-      .eq("user_id", user.id)
-      .single();
-
-    return (data as any)?.onboarding_completed === true;
-  };
+  useEffect(() => {
+    console.info("[Index] état navigation", { view, mobileMenuOpen });
+  }, [view, mobileMenuOpen]);
 
   const handleStart = () => {
-    // Skip auth entirely for testing
+    console.info("[Index] ouverture du dashboard sans connexion");
     setView("dashboard");
   };
 
-  const handleAuth = async () => {
-    const completed = await checkOnboarding();
-    setView(completed ? "dashboard" : "onboarding");
-  };
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
+  const handleBackToLanding = () => {
+    console.info("[Index] retour à la landing");
     setView("landing");
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  if (view === "auth" && !session) {
-    return <AuthPage onAuth={handleAuth} />;
-  }
-
-  if (view === "onboarding") {
-    return <OnboardingWizard onComplete={() => setView("dashboard")} />;
-  }
+  const handleLogout = () => {
+    console.info("[Index] fermeture de session simulée en mode test");
+    setView("landing");
+  };
 
   if (view === "dashboard") {
-    return (
-      <Dashboard
-        onBack={() => setView("landing")}
-        onLogout={handleLogout}
-      />
-    );
+    return <Dashboard onBack={handleBackToLanding} onLogout={handleLogout} />;
   }
 
   return (
@@ -96,7 +47,6 @@ const Index = () => {
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <img src="/logo-lyss.png" alt="Lyss" className="h-9 object-contain" />
 
-          {/* Desktop nav */}
           <nav className="hidden sm:flex items-center gap-6">
             <a href="#how-it-works" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Comment ça marche
@@ -113,22 +63,13 @@ const Index = () => {
           </nav>
 
           <div className="flex items-center gap-3">
-            {session && (
-              <button
-                onClick={handleLogout}
-                className="hidden sm:inline text-xs text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Déconnexion
-              </button>
-            )}
             <button
               onClick={handleStart}
               className="text-sm font-medium bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors font-display"
             >
-              {session ? "Tableau de bord →" : "Connexion →"}
+              Tableau de bord →
             </button>
 
-            {/* Mobile hamburger */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="sm:hidden flex flex-col gap-1.5 p-1.5"
@@ -141,7 +82,6 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Mobile menu */}
         {mobileMenuOpen && (
           <nav className="sm:hidden mt-3 pb-2 border-t border-border pt-3 flex flex-col gap-3">
             <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
@@ -156,14 +96,15 @@ const Index = () => {
             <a href="#faq" onClick={() => setMobileMenuOpen(false)} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               FAQ
             </a>
-            {session && (
-              <button
-                onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors text-left"
-              >
-                Déconnexion
-              </button>
-            )}
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                handleStart();
+              }}
+              className="text-sm text-left text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Ouvrir le tableau de bord
+            </button>
           </nav>
         )}
       </header>

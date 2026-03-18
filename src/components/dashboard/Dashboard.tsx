@@ -32,6 +32,9 @@ const SageConnect = lazy(() => import("./SageConnect"));
 const WidgetConfigurator = lazy(() => import("./WidgetConfigurator"));
 const ImportHub = lazy(() => import("./ImportHub"));
 const QuoteManagement = lazy(() => import("./QuoteManagement"));
+const BatchReminder = lazy(() => import("./BatchReminder"));
+const AuditTrail = lazy(() => import("./AuditTrail"));
+const CashflowForecast = lazy(() => import("./CashflowForecast"));
 
 const SectionLoader = () => (
   <div className="flex items-center justify-center py-16">

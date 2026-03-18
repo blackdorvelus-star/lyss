@@ -1,24 +1,13 @@
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Sparkles, MessageSquare, Phone, Mail, Monitor, Radar, Globe, Smartphone } from "lucide-react";
+import { motion } from "framer-motion";
+import { ArrowRight, Sparkles, MessageSquare, Phone, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import LyssAvatar from "@/components/LyssAvatar";
 import screenshotDashboard from "@/assets/screenshot-dashboard.jpg";
-import screenshotRadar from "@/assets/screenshot-radar.jpg";
-import screenshotPortal from "@/assets/screenshot-portal.jpg";
-import screenshotMobile from "@/assets/screenshot-mobile.jpg";
 
 interface HeroSectionProps {
   onStart: () => void;
   onDemo?: () => void;
 }
-
-const screenshots = [
-  { id: "dashboard", label: "Dashboard", icon: Monitor, img: screenshotDashboard },
-  { id: "radar", label: "Radar", icon: Radar, img: screenshotRadar },
-  { id: "portal", label: "Portail client", icon: Globe, img: screenshotPortal },
-  { id: "mobile", label: "Mobile", icon: Smartphone, img: screenshotMobile },
-];
 
 const channels = [
   { icon: MessageSquare, label: "SMS" },
@@ -27,8 +16,6 @@ const channels = [
 ];
 
 const HeroSection = ({ onStart, onDemo }: HeroSectionProps) => {
-  const [activeScreen, setActiveScreen] = useState("dashboard");
-  const current = screenshots.find((s) => s.id === activeScreen)!;
 
   return (
     <section className="relative px-5 pt-12 sm:pt-16 pb-8 overflow-hidden">

@@ -1,16 +1,10 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Switch } from "@/components/ui/switch";
-import { Check, MessageSquare, Phone, Mail, CreditCard, Clock, HandshakeIcon } from "lucide-react";
+import { MessageSquare, Phone, Mail, CreditCard, Clock, HandshakeIcon, Check } from "lucide-react";
+import LyssAvatar from "@/components/LyssAvatar";
 
 type Formality = "tu" | "vous";
-
-interface AiAction {
-  id: string;
-  label: string;
-  icon: React.ReactNode;
-  enabled: boolean;
-}
 
 const smsVariants: Record<Formality, { greeting: string; body: string }> = {
   tu: {
@@ -19,135 +13,109 @@ const smsVariants: Record<Formality, { greeting: string; body: string }> = {
   },
   vous: {
     greeting: "Bonjour M. Tremblay, nous effectuons un suivi concernant la facture #1247 de Plomberie Lévis (850 $, échéance : 12 mars).",
-    body: "Nous comprenons que des imprévus peuvent survenir. Si vous le souhaitez, il est possible de diviser ce montant en 2 versements par Interac. Vous pouvez régler le tout en quelques minutes 👇",
+    body: "Nous comprenons que des imprévus peuvent survenir. Si vous le souhaitez, il est possible de diviser ce montant en 2 versements par Interac.",
   },
 };
 
+const actions = [
+  { id: "sms", label: "SMS", icon: MessageSquare },
+  { id: "email", label: "Courriel", icon: Mail },
+  { id: "call", label: "Appel IA", icon: Phone },
+  { id: "payment", label: "Plan paiement", icon: CreditCard },
+  { id: "schedule", label: "Rappel", icon: Clock },
+  { id: "negotiate", label: "Négociation", icon: HandshakeIcon },
+];
+
 const MessagePreview = () => {
   const [formality, setFormality] = useState<Formality>("tu");
-  const [actions, setActions] = useState<AiAction[]>([
-    { id: "sms", label: "SMS de courtoisie", icon: <MessageSquare className="w-3.5 h-3.5" />, enabled: true },
-    { id: "email", label: "Courriel de suivi", icon: <Mail className="w-3.5 h-3.5" />, enabled: true },
-    { id: "call", label: "Appel vocal IA", icon: <Phone className="w-3.5 h-3.5" />, enabled: false },
-    { id: "payment", label: "Plan de paiement", icon: <CreditCard className="w-3.5 h-3.5" />, enabled: true },
-    { id: "schedule", label: "Rappel planifié", icon: <Clock className="w-3.5 h-3.5" />, enabled: false },
-    { id: "negotiate", label: "Négociation souple", icon: <HandshakeIcon className="w-3.5 h-3.5" />, enabled: false },
-  ]);
-
-  const toggleAction = (id: string) => {
-    setActions((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, enabled: !a.enabled } : a))
-    );
-  };
-
-  const activeCount = actions.filter((a) => a.enabled).length;
+  const [enabled, setEnabled] = useState<Set<string>>(new Set(["sms", "email", "payment"]));
   const variant = smsVariants[formality];
 
+  const toggle = (id: string) => {
+    setEnabled((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
   return (
-    <section className="px-5 py-16">
-      <div className="max-w-lg mx-auto">
+    <section className="px-5 py-10">
+      <div className="max-w-3xl mx-auto grid md:grid-cols-2 gap-4">
+        {/* Left: actions */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, x: -15 }}
+          whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-8"
+          className="bg-card border border-border rounded-xl p-4"
         >
-          <h2 className="font-display text-2xl font-bold mb-2">
-            L'IA parle comme du monde
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Pas de robot froid. Un ton humain, québécois, professionnel.
-          </p>
-        </motion.div>
-
-        {/* Action selector */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="bg-card border border-border rounded-2xl p-5 mb-4"
-        >
-          <p className="text-xs text-muted-foreground font-medium mb-3 uppercase tracking-wider">
-            Que doit faire Lyss pour toi ?
-          </p>
-          <div className="grid grid-cols-2 gap-2">
-            {actions.map((action) => (
-              <button
-                key={action.id}
-                onClick={() => toggleAction(action.id)}
-                className={`flex items-center gap-2 rounded-lg px-3 py-2.5 text-xs font-medium transition-all border ${
-                  action.enabled
-                    ? "bg-primary/10 border-primary/30 text-primary"
-                    : "bg-secondary/50 border-border text-muted-foreground hover:border-primary/20"
-                }`}
-              >
-                {action.enabled ? (
-                  <Check className="w-3.5 h-3.5" />
-                ) : (
-                  action.icon
-                )}
-                {action.label}
-              </button>
-            ))}
+          <h3 className="font-display font-bold text-sm mb-1">Que doit faire Lyss ?</h3>
+          <p className="text-[10px] text-muted-foreground mb-3">Active ou désactive les canaux selon tes besoins.</p>
+          <div className="grid grid-cols-3 gap-1.5">
+            {actions.map((a) => {
+              const isOn = enabled.has(a.id);
+              return (
+                <button
+                  key={a.id}
+                  onClick={() => toggle(a.id)}
+                  className={`flex flex-col items-center gap-1 rounded-lg px-2 py-2 text-[10px] font-medium transition-all border ${
+                    isOn
+                      ? "bg-primary/10 border-primary/30 text-primary"
+                      : "bg-secondary/30 border-border text-muted-foreground hover:border-primary/20"
+                  }`}
+                >
+                  {isOn ? <Check className="w-3.5 h-3.5" /> : <a.icon className="w-3.5 h-3.5" />}
+                  {a.label}
+                </button>
+              );
+            })}
           </div>
-          <p className="text-xs text-muted-foreground mt-3 text-center">
-            <span className="text-primary font-semibold">{activeCount}</span> action{activeCount > 1 ? "s" : ""} activée{activeCount > 1 ? "s" : ""}
+          <p className="text-[10px] text-muted-foreground mt-2.5 text-center">
+            <span className="text-primary font-semibold">{enabled.size}</span> action{enabled.size > 1 ? "s" : ""} activée{enabled.size > 1 ? "s" : ""}
           </p>
         </motion.div>
 
-        {/* Tu/Vous toggle + SMS preview */}
+        {/* Right: SMS preview */}
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, x: 15 }}
+          whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
-          className="bg-card border border-border rounded-2xl p-5 space-y-3"
+          className="bg-card border border-border rounded-xl p-4"
         >
-          {/* Header row */}
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary text-xs font-bold">
-                IA
-              </div>
+              <LyssAvatar size="xs" />
               <div>
-                <p className="text-sm font-medium">Lyss</p>
-                <p className="text-xs text-muted-foreground">SMS automatisé</p>
+                <p className="text-xs font-medium">Lyss</p>
+                <p className="text-[10px] text-muted-foreground">SMS automatisé</p>
               </div>
             </div>
-            {/* Tu/Vous toggle */}
-            <div className="flex items-center gap-2">
-              <span className={`text-xs font-medium ${formality === "tu" ? "text-primary" : "text-muted-foreground"}`}>
-                Tu
-              </span>
+            <div className="flex items-center gap-1.5">
+              <span className={`text-[10px] font-medium ${formality === "tu" ? "text-primary" : "text-muted-foreground"}`}>Tu</span>
               <Switch
                 checked={formality === "vous"}
-                onCheckedChange={(checked) => setFormality(checked ? "vous" : "tu")}
-                className="scale-90"
+                onCheckedChange={(c) => setFormality(c ? "vous" : "tu")}
+                className="scale-75"
               />
-              <span className={`text-xs font-medium ${formality === "vous" ? "text-primary" : "text-muted-foreground"}`}>
-                Vous
-              </span>
+              <span className={`text-[10px] font-medium ${formality === "vous" ? "text-primary" : "text-muted-foreground"}`}>Vous</span>
             </div>
           </div>
 
-          {/* Message bubble */}
           <AnimatePresence mode="wait">
             <motion.div
               key={formality}
-              initial={{ opacity: 0, y: 5 }}
+              initial={{ opacity: 0, y: 4 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -5 }}
-              transition={{ duration: 0.2 }}
-              className="bg-secondary rounded-xl rounded-tl-sm p-4 text-sm leading-relaxed"
+              exit={{ opacity: 0, y: -4 }}
+              className="bg-secondary rounded-lg rounded-tl-sm p-3 text-xs leading-relaxed"
             >
               <p>{variant.greeting}</p>
-              <p className="mt-2">{variant.body}</p>
-              <p className="mt-2 text-primary font-medium">
-                → Lien de paiement sécurisé
-              </p>
+              <p className="mt-1.5">{variant.body}</p>
+              <p className="mt-1.5 text-primary font-medium">→ Lien de paiement sécurisé</p>
             </motion.div>
           </AnimatePresence>
 
-          <p className="text-xs text-muted-foreground text-center pt-2">
+          <p className="text-[10px] text-muted-foreground text-center mt-2.5">
             Taux de réponse moyen : <span className="text-accent font-semibold">73 %</span>
           </p>
         </motion.div>

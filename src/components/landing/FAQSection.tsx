@@ -7,78 +7,43 @@ import {
 } from "@/components/ui/accordion";
 
 const faqs = [
-  {
-    q: "C'est quoi exactement Lyss ?",
-    a: "Lyss est une adjointe administrative propulsée par l'intelligence artificielle. Elle s'occupe de tes suivis de facturation — messages de courtoisie par SMS, courriel et appels — pour que tu te concentres sur ton métier au lieu de courir après tes paiements.",
-  },
-  {
-    q: "Est-ce que c'est légal au Québec ?",
-    a: "Absolument. Lyss est un service de messagerie administrative, pas une agence de recouvrement. L'adjointe envoie des suivis de courtoisie professionnels. Nos messages respectent la Loi sur le recouvrement de certaines créances (RLRQ, c. R-2.2) : aucune menace, aucun harcèlement, jamais.",
-  },
-  {
-    q: "Comment l'adjointe contacte mes clients ?",
-    a: "Selon les coordonnées que tu fournis : SMS, courriel ou appel vocal IA. Chaque message est rédigé dans un ton québécois professionnel et inclut un lien de paiement sécurisé. Tu peux choisir la personnalité de l'adjointe (chaleureuse, professionnelle ou persévérante).",
-  },
-  {
-    q: "Mes clients vont-ils savoir que c'est une IA ?",
-    a: "L'adjointe se présente comme faisant partie de ton équipe administrative. Les messages sont naturels, personnalisés et rédigés dans un français québécois authentique. Le but est que ton client se sente contacté par une vraie personne de ton bureau.",
-  },
-  {
-    q: "Combien de tentatives par dossier ?",
-    a: "Chaque dossier inclut jusqu'à 5 SMS, 3 courriels et 2 appels vocaux IA, étalés sur une période raisonnable. Si le client répond ou paie, l'adjointe arrête automatiquement les suivis.",
-  },
-  {
-    q: "Et si mon client est mécontent d'être contacté ?",
-    a: "L'adjointe respecte toujours les demandes de cessation de contact. Si un client demande qu'on arrête, le dossier est mis en pause immédiatement et tu en es notifié. Le ton reste toujours respectueux et professionnel.",
-  },
-  {
-    q: "Puis-je annuler en tout temps ?",
-    a: "Oui, sans frais ni pénalité. Tu peux annuler ton abonnement à n'importe quel moment depuis ton tableau de bord. Les dossiers en cours seront complétés, mais aucun nouveau suivi ne sera lancé.",
-  },
-  {
-    q: "Est-ce que ça fonctionne pour les gros montants ?",
-    a: "Oui. L'adjointe est aussi efficace pour une facture de 200 $ que pour une de 25 000 $. Pour les montants importants, on recommande la personnalité « Professionnelle » qui adopte un ton plus formel et propose des plans de paiement structurés.",
-  },
+  { q: "C'est quoi Lyss ?", a: "Une adjointe administrative IA qui relance tes clients par SMS, courriel et appel vocal — avec un ton québécois professionnel." },
+  { q: "Est-ce légal au Québec ?", a: "Oui. Lyss envoie des suivis de courtoisie, pas du recouvrement agressif. Aucune menace, jamais." },
+  { q: "Mes clients sauront que c'est une IA ?", a: "Non. Lyss se présente comme faisant partie de ton équipe. Messages naturels et personnalisés." },
+  { q: "Combien de relances par dossier ?", a: "Jusqu'à 5 SMS, 3 courriels et 2 appels vocaux. Arrêt automatique dès le paiement reçu." },
+  { q: "Si un client est mécontent ?", a: "L'adjointe respecte toute demande de cessation. Le dossier est pausé et tu es notifié." },
+  { q: "Puis-je annuler ?", a: "Oui, en tout temps, sans frais ni pénalité depuis ton tableau de bord." },
 ];
 
 const FAQSection = () => {
   return (
-    <section className="px-5 py-16">
+    <section className="px-5 py-10">
       <div className="max-w-2xl mx-auto">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-10"
+          className="text-center mb-6"
         >
-          <h2 className="font-display text-2xl font-bold mb-2">Questions fréquentes</h2>
-          <p className="text-sm text-muted-foreground">
-            Tout ce que tu dois savoir avant de confier tes dossiers à l'adjointe.
-          </p>
+          <h2 className="font-display text-xl sm:text-2xl font-bold mb-1">Questions fréquentes</h2>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
-          <Accordion type="single" collapsible className="space-y-2">
-            {faqs.map((faq, i) => (
-              <AccordionItem
-                key={i}
-                value={`faq-${i}`}
-                className="border border-border rounded-xl px-5 bg-card data-[state=open]:border-primary/20"
-              >
-                <AccordionTrigger className="text-sm font-medium text-left py-4 hover:no-underline">
-                  {faq.q}
-                </AccordionTrigger>
-                <AccordionContent className="text-sm text-muted-foreground leading-relaxed pb-4">
-                  {faq.a}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </motion.div>
+        <Accordion type="single" collapsible className="space-y-1.5">
+          {faqs.map((faq, i) => (
+            <AccordionItem
+              key={i}
+              value={`faq-${i}`}
+              className="border border-border rounded-lg px-4 bg-card data-[state=open]:border-primary/20"
+            >
+              <AccordionTrigger className="text-xs sm:text-sm font-medium text-left py-3 hover:no-underline">
+                {faq.q}
+              </AccordionTrigger>
+              <AccordionContent className="text-xs text-muted-foreground leading-relaxed pb-3">
+                {faq.a}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
       </div>
     </section>
   );

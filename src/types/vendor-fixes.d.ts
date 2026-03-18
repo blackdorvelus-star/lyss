@@ -1,3 +1,5 @@
+import "@supabase/supabase-js";
+
 declare module "@supabase/supabase-js" {
   export type Session = any;
 
@@ -14,3 +16,5 @@ declare module "@supabase/supabase-js" {
 }
 
 declare module "@testing-library/jest-dom";
+
+export {};

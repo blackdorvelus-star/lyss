@@ -279,6 +279,22 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout, demo = false }: DashboardPr
   const [sendingSmsId, setSendingSmsId] = useState<string | null>(null);
   const [quotes, setQuotes] = useState<any[]>([]);
   const [showTour, setShowTour] = useState(() => !localStorage.getItem("lyss_tour_done"));
+  const [assistantName, setAssistantName] = useState("Lyss");
+
+  // Fetch assistant name from settings
+  useEffect(() => {
+    if (demo) return;
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await supabase
+        .from("payment_settings")
+        .select("assistant_name")
+        .eq("user_id", user.id)
+        .single();
+      if (data?.assistant_name) setAssistantName(data.assistant_name);
+    })();
+  }, [demo]);
 
   const fetchData = useCallback(async () => {
     if (demo) {
@@ -653,7 +669,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout, demo = false }: DashboardPr
                 <div className="min-w-0">
                   <h3 className="font-display text-sm sm:text-base font-bold text-foreground flex items-center gap-2">
                     <Plus className="w-4 h-4 text-primary" />
-                    Confier un dossier à Lyss
+                    Confier un dossier à {assistantName}
                   </h3>
                   <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">Import manuel, CSV/Excel ou sync comptable</p>
                 </div>

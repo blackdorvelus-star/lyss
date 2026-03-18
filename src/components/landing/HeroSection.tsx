@@ -26,7 +26,7 @@ const channels = [
   { icon: Phone, label: "Appel IA" },
 ];
 
-const HeroSection = ({ onStart }: HeroSectionProps) => {
+const HeroSection = ({ onStart, onDemo }: HeroSectionProps) => {
   const [activeScreen, setActiveScreen] = useState("dashboard");
   const current = screenshots.find((s) => s.id === activeScreen)!;
 

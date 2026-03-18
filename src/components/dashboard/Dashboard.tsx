@@ -612,8 +612,12 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout, demo = false }: DashboardPr
         <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border px-4 sm:px-6 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <LyssAvatar size="sm" pulse />
-              <h1 className="font-display font-bold text-sm sm:text-base truncate">
+              <div className="relative">
+                <LyssAvatar size="md" pulse />
+                <span className="absolute -bottom-0.5 -right-0.5 bg-primary text-primary-foreground text-[7px] font-bold px-1 py-px rounded-full ring-2 ring-background leading-none hidden sm:block">EN LIGNE</span>
+              </div>
+              <div className="min-w-0">
+                <h1 className="font-display font-bold text-sm sm:text-base truncate">
                 {activeSection === "clients" && "Relations clients"}
                 {activeSection === "billing" && "Centre de commandement"}
                 {activeSection === "disputes" && "Centre de litiges"}

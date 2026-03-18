@@ -58,9 +58,6 @@ const Index = () => {
             <a href="#how-it-works" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Comment ça marche
             </a>
-            <a href="#showcase" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-              Aperçu
-            </a>
             <a href="#integrations" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Intégrations
             </a>

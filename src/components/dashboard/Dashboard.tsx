@@ -552,6 +552,17 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
   }, [invoices]);
 
   return (
+    <>
+      {showTour && (
+        <GuidedTour
+          urgentCount={priorityItems.filter(i => i.type === "negative").length}
+          onComplete={() => {
+            setShowTour(false);
+            localStorage.setItem("lyss_tour_done", "1");
+          }}
+          onNavigate={(section) => setActiveSection(section as Section)}
+        />
+      )}
     <div className="min-h-screen bg-background flex">
       <AppSidebar activeSection={activeSection} onSectionChange={setActiveSection} onLogout={onLogout} />
 

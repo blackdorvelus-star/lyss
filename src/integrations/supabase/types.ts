@@ -247,6 +247,13 @@ export type Database = {
           notify_on_payment: boolean | null
           notify_on_response: boolean | null
           onboarding_completed: boolean
+          script_call_full: string | null
+          script_dispute: string | null
+          script_email_followup: string | null
+          script_no_response: string | null
+          script_partial_payment: string | null
+          script_promise: string | null
+          script_sms_followup: string | null
           sms_signature: string | null
           sms_template: string | null
           stripe_link: string | null
@@ -289,6 +296,13 @@ export type Database = {
           notify_on_payment?: boolean | null
           notify_on_response?: boolean | null
           onboarding_completed?: boolean
+          script_call_full?: string | null
+          script_dispute?: string | null
+          script_email_followup?: string | null
+          script_no_response?: string | null
+          script_partial_payment?: string | null
+          script_promise?: string | null
+          script_sms_followup?: string | null
           sms_signature?: string | null
           sms_template?: string | null
           stripe_link?: string | null
@@ -331,6 +345,13 @@ export type Database = {
           notify_on_payment?: boolean | null
           notify_on_response?: boolean | null
           onboarding_completed?: boolean
+          script_call_full?: string | null
+          script_dispute?: string | null
+          script_email_followup?: string | null
+          script_no_response?: string | null
+          script_partial_payment?: string | null
+          script_promise?: string | null
+          script_sms_followup?: string | null
           sms_signature?: string | null
           sms_template?: string | null
           stripe_link?: string | null

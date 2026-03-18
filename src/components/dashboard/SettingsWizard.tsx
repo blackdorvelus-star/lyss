@@ -88,6 +88,15 @@ const SettingsWizard = () => {
   const [emailSubjectTemplate, setEmailSubjectTemplate] = useState("");
   const [emailBodyTemplate, setEmailBodyTemplate] = useState("");
 
+  // Scenario scripts
+  const [scriptPromise, setScriptPromise] = useState("");
+  const [scriptDispute, setScriptDispute] = useState("");
+  const [scriptNoResponse, setScriptNoResponse] = useState("");
+  const [scriptPartialPayment, setScriptPartialPayment] = useState("");
+  const [scriptCallFull, setScriptCallFull] = useState("");
+  const [scriptSmsFollowup, setScriptSmsFollowup] = useState("");
+  const [scriptEmailFollowup, setScriptEmailFollowup] = useState("");
+
   // AI behavior
   const [aiProposePlan, setAiProposePlan] = useState(true);
   const [aiNegotiate, setAiNegotiate] = useState(false);
@@ -155,6 +164,13 @@ const SettingsWizard = () => {
       setNotifyPayment(d.notify_on_payment ?? true);
       setNotifyDispute(d.notify_on_dispute ?? true);
       setNotifyNegative(d.notify_on_negative_sentiment ?? true);
+      setScriptPromise(d.script_promise || "");
+      setScriptDispute(d.script_dispute || "");
+      setScriptNoResponse(d.script_no_response || "");
+      setScriptPartialPayment(d.script_partial_payment || "");
+      setScriptCallFull(d.script_call_full || "");
+      setScriptSmsFollowup(d.script_sms_followup || "");
+      setScriptEmailFollowup(d.script_email_followup || "");
     }
     setLoading(false);
   };
@@ -199,6 +215,13 @@ const SettingsWizard = () => {
         notify_on_payment: notifyPayment,
         notify_on_dispute: notifyDispute,
         notify_on_negative_sentiment: notifyNegative,
+        script_promise: scriptPromise || null,
+        script_dispute: scriptDispute || null,
+        script_no_response: scriptNoResponse || null,
+        script_partial_payment: scriptPartialPayment || null,
+        script_call_full: scriptCallFull || null,
+        script_sms_followup: scriptSmsFollowup || null,
+        script_email_followup: scriptEmailFollowup || null,
       } as any, { onConflict: "user_id" });
 
     if (error) {
@@ -363,7 +386,7 @@ const SettingsWizard = () => {
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
-              className="space-y-4"
+              className="space-y-5"
             >
               <div className="bg-accent/10 border border-accent/20 rounded-xl p-3 text-xs text-muted-foreground space-y-1">
                 <p className="font-semibold text-foreground text-sm">Variables disponibles :</p>
@@ -374,32 +397,126 @@ const SettingsWizard = () => {
                 </div>
               </div>
 
-              <Field icon={MessageSquare} label="Template SMS" hint="Le message SMS exact envoyé au client.">
-                <Textarea
-                  value={smsTemplate}
-                  onChange={e => setSmsTemplate(e.target.value)}
-                  placeholder={`Bonjour {prénom}, c'est {nom_assistant}, {rôle} chez {entreprise}. Petit suivi de courtoisie pour ta facture {facture} de {montant} $. N'hésite pas à me revenir si tu as des questions ! ${followUpClosing}`}
-                  className="bg-secondary min-h-[100px] text-sm"
-                />
-              </Field>
+              {/* ── Premier contact ── */}
+              <div className="space-y-3">
+                <p className="text-sm font-semibold text-foreground flex items-center gap-2">
+                  <MessageSquare className="w-4 h-4 text-primary" /> Premier contact
+                </p>
 
-              <Field icon={Mail} label="Objet du courriel">
-                <Input
-                  value={emailSubjectTemplate}
-                  onChange={e => setEmailSubjectTemplate(e.target.value)}
-                  placeholder="Suivi de courtoisie — Facture {facture}"
-                  className="bg-secondary"
-                />
-              </Field>
+                <Field icon={MessageSquare} label="SMS initial" hint="Premier SMS envoyé au client.">
+                  <Textarea
+                    value={smsTemplate}
+                    onChange={e => setSmsTemplate(e.target.value)}
+                    placeholder={`Bonjour {prénom}, c'est {nom_assistant}, {rôle} chez {entreprise}. Petit suivi pour ta facture {facture} de {montant} $. N'hésite pas à me revenir ! ${followUpClosing}`}
+                    className="bg-secondary min-h-[90px] text-sm"
+                  />
+                </Field>
 
-              <Field icon={Mail} label="Corps du courriel" hint="Le contenu complet du courriel envoyé au client.">
-                <Textarea
-                  value={emailBodyTemplate}
-                  onChange={e => setEmailBodyTemplate(e.target.value)}
-                  placeholder={`Bonjour {prénom},\n\nC'est {nom_assistant}, {rôle} chez {entreprise}.\n\nJe fais un petit suivi de courtoisie concernant ta facture {facture} d'un montant de {montant} $, qui était due le {date_échéance}.\n\nSi c'est déjà réglé, ignore ce message ! Sinon, n'hésite pas à me revenir.\n\n${followUpClosing}`}
-                  className="bg-secondary min-h-[150px] text-sm"
-                />
-              </Field>
+                <Field icon={Mail} label="Objet du courriel">
+                  <Input
+                    value={emailSubjectTemplate}
+                    onChange={e => setEmailSubjectTemplate(e.target.value)}
+                    placeholder="Suivi de courtoisie — Facture {facture}"
+                    className="bg-secondary"
+                  />
+                </Field>
+
+                <Field icon={Mail} label="Corps du courriel" hint="Contenu complet du premier courriel.">
+                  <Textarea
+                    value={emailBodyTemplate}
+                    onChange={e => setEmailBodyTemplate(e.target.value)}
+                    placeholder={`Bonjour {prénom},\n\nC'est {nom_assistant}, {rôle} chez {entreprise}.\n\nJe fais un suivi pour ta facture {facture} de {montant} $, due le {date_échéance}.\n\nSi c'est déjà réglé, ignore ce message !\n\n${followUpClosing}`}
+                    className="bg-secondary min-h-[120px] text-sm"
+                  />
+                </Field>
+              </div>
+
+              {/* ── Relances suivantes ── */}
+              <div className="space-y-3">
+                <p className="text-sm font-semibold text-foreground flex items-center gap-2">
+                  <CalendarClock className="w-4 h-4 text-accent" /> Relances suivantes
+                </p>
+
+                <Field icon={MessageSquare} label="SMS de suivi (2e, 3e relance…)" hint="Envoyé si le client n'a pas répondu au premier SMS.">
+                  <Textarea
+                    value={scriptSmsFollowup}
+                    onChange={e => setScriptSmsFollowup(e.target.value)}
+                    placeholder={`Bonjour {prénom}, c'est encore {nom_assistant} de {entreprise}. Je fais un petit suivi pour ta facture {facture} de {montant} $. Est-ce que tout est correct de ton côté ? ${followUpClosing}`}
+                    className="bg-secondary min-h-[90px] text-sm"
+                  />
+                </Field>
+
+                <Field icon={Mail} label="Courriel de suivi (2e, 3e relance…)" hint="Envoyé si le client n'a pas répondu au premier courriel.">
+                  <Textarea
+                    value={scriptEmailFollowup}
+                    onChange={e => setScriptEmailFollowup(e.target.value)}
+                    placeholder={`Bonjour {prénom},\n\nJe me permets de revenir au sujet de ta facture {facture} de {montant} $. Je veux juste m'assurer que tout est en ordre.\n\nSi tu as des questions ou un souci, je suis là pour t'aider.\n\n${followUpClosing}`}
+                    className="bg-secondary min-h-[120px] text-sm"
+                  />
+                </Field>
+              </div>
+
+              {/* ── Script d'appel ── */}
+              <div className="space-y-3">
+                <p className="text-sm font-semibold text-foreground flex items-center gap-2">
+                  <Phone className="w-4 h-4 text-accent" /> Script d'appel complet
+                </p>
+
+                <Field icon={Phone} label="Script complet de l'appel" hint="Ce que Lyss dit lors d'un appel vocal, du début à la fin.">
+                  <Textarea
+                    value={scriptCallFull}
+                    onChange={e => setScriptCallFull(e.target.value)}
+                    placeholder={`Bonjour {prénom}, c'est {nom_assistant} de {entreprise}. Je t'appelle au sujet de ta facture {facture} de {montant} $.\n\nEst-ce que c'est un bon moment pour en discuter ?\n\n[Si oui] Parfait ! Je voulais juste m'assurer que tu avais bien reçu notre facture…\n[Si occupé] Pas de souci, je peux te rappeler. Quel moment te conviendrait ?`}
+                    className="bg-secondary min-h-[150px] text-sm"
+                  />
+                </Field>
+              </div>
+
+              {/* ── Scénarios de réponse ── */}
+              <div className="space-y-3">
+                <p className="text-sm font-semibold text-foreground flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-primary" /> Scénarios de réponse
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Définis ce que Lyss répond dans chaque situation. Laisse vide pour que l'IA décide.
+                </p>
+
+                <Field icon={HandCoins} label="Le client promet de payer" hint="Réponse quand le client dit « je vais payer bientôt ».">
+                  <Textarea
+                    value={scriptPromise}
+                    onChange={e => setScriptPromise(e.target.value)}
+                    placeholder={`Parfait {prénom}, merci ! Je prends note. Si jamais tu as besoin d'aide pour le paiement, n'hésite pas à me revenir. ${followUpClosing}`}
+                    className="bg-secondary min-h-[80px] text-sm"
+                  />
+                </Field>
+
+                <Field icon={Banknote} label="Paiement partiel reçu" hint="Réponse quand le client a payé une partie seulement.">
+                  <Textarea
+                    value={scriptPartialPayment}
+                    onChange={e => setScriptPartialPayment(e.target.value)}
+                    placeholder={`Merci {prénom}, j'ai bien noté ton paiement partiel ! Il reste un solde de {montant} $ sur ta facture {facture}. On peut s'entendre sur un arrangement si tu veux. ${followUpClosing}`}
+                    className="bg-secondary min-h-[80px] text-sm"
+                  />
+                </Field>
+
+                <Field icon={ShieldAlert} label="Le client conteste la facture" hint="Réponse quand le client est en désaccord avec le montant ou le service.">
+                  <Textarea
+                    value={scriptDispute}
+                    onChange={e => setScriptDispute(e.target.value)}
+                    placeholder={`Je comprends {prénom}, et je prends ça au sérieux. Je vais transmettre ton message à {entreprise} pour qu'on regarde ça ensemble. Quelqu'un va te revenir rapidement. ${followUpClosing}`}
+                    className="bg-secondary min-h-[80px] text-sm"
+                  />
+                </Field>
+
+                <Field icon={Clock} label="Aucune réponse du client" hint="Message envoyé après plusieurs tentatives sans réponse.">
+                  <Textarea
+                    value={scriptNoResponse}
+                    onChange={e => setScriptNoResponse(e.target.value)}
+                    placeholder={`Bonjour {prénom}, je n'ai pas eu de nouvelles suite à mes messages précédents. Je voulais juste m'assurer que tout va bien. Ta facture {facture} de {montant} $ est toujours en attente. N'hésite pas à me contacter si tu as des questions. ${followUpClosing}`}
+                    className="bg-secondary min-h-[80px] text-sm"
+                  />
+                </Field>
+              </div>
             </motion.div>
           ) : (
             <div className="bg-secondary/50 rounded-xl p-3 text-xs text-muted-foreground">

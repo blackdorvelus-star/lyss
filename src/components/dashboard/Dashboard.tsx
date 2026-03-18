@@ -692,6 +692,14 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                 <Suspense fallback={<SectionLoader />}>
                   <QuoteManagement />
                 </Suspense>
+              ) : activeSection === "batch" ? (
+                <Suspense fallback={<SectionLoader />}>
+                  <BatchReminder />
+                </Suspense>
+              ) : activeSection === "audit" ? (
+                <Suspense fallback={<SectionLoader />}>
+                  <AuditTrail />
+                </Suspense>
               ) : (
                 <PlaceholderSection title="Gestion d'agenda" desc="La prise de rendez-vous et les confirmations automatiques arrivent bientôt." />
               )}

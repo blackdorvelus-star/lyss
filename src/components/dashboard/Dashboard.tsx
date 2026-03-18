@@ -629,6 +629,12 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout, demo = false }: DashboardPr
               {/* 0. Journal de Lyss — première chose visible */}
               <LiveActivityFeed items={feedItems} onToneAdjust={() => setActiveSection("settings")} />
 
+              {/* 0b. Radar de priorité — juste après */}
+              <PriorityRadar
+                items={priorityItems}
+                onNavigate={(id) => setExpandedId(expandedId === id ? null : id)}
+              />
+
               {/* 1. KPI — réponse en 5 sec */}
               <PerformanceCards
                 hoursSaved={hoursSaved}

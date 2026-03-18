@@ -124,6 +124,7 @@ const Index = () => {
       <div id="pricing"><PricingSection /></div>
       <div id="faq"><FAQSection /></div>
       <Footer />
+      <ExitIntentSurvey />
     </div>
   );
 };

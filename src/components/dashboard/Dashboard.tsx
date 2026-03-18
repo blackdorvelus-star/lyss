@@ -32,6 +32,9 @@ const SageConnect = lazy(() => import("./SageConnect"));
 const WidgetConfigurator = lazy(() => import("./WidgetConfigurator"));
 const ImportHub = lazy(() => import("./ImportHub"));
 const QuoteManagement = lazy(() => import("./QuoteManagement"));
+const BatchReminder = lazy(() => import("./BatchReminder"));
+const AuditTrail = lazy(() => import("./AuditTrail"));
+const CashflowForecast = lazy(() => import("./CashflowForecast"));
 
 const SectionLoader = () => (
   <div className="flex items-center justify-center py-16">
@@ -263,7 +266,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
   const [saving, setSaving] = useState(false);
   const [activeSection, setActiveSection] = useState<Section>(() => {
     const hash = window.location.hash.replace("#", "");
-    const validSections: Section[] = ["clients", "billing", "disputes", "reports", "calendar", "settings", "integrations", "widget", "import", "quotes"];
+    const validSections: Section[] = ["clients", "billing", "disputes", "reports", "calendar", "settings", "integrations", "widget", "import", "quotes", "batch", "audit"];
     return validSections.includes(hash as Section) ? (hash as Section) : "billing";
   });
   const [personality, setPersonality] = useState<import("./PersonalitySelector").Personality>("chaleureuse");
@@ -540,6 +543,8 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                 {activeSection === "widget" && "Widget embarqué"}
                 {activeSection === "import" && "Confier un dossier"}
                 {activeSection === "quotes" && "Soumissions"}
+                {activeSection === "batch" && "Relance en lot"}
+                {activeSection === "audit" && "Journal d'audit"}
               </h1>
             </div>
             <div className="flex items-center gap-2 sm:gap-4">
@@ -569,6 +574,18 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                 <div className="lg:col-span-2 space-y-4 sm:space-y-6">
                   <Suspense fallback={<SectionLoader />}>
                     <FinancialHealth invoices={invoices} />
+                  </Suspense>
+
+                  <Suspense fallback={<SectionLoader />}>
+                    <CashflowForecast
+                      invoices={invoices}
+                      paymentPromises={callLogs
+                        .filter(c => c.call_result === "payment_promised")
+                        .map(c => {
+                          const inv = invoices.find(i => i.id === c.invoice_id);
+                          return { amount: inv?.amount || 0, date: c.created_at };
+                        })}
+                    />
                   </Suspense>
 
                   <Suspense fallback={<SectionLoader />}>
@@ -674,6 +691,14 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
               ) : activeSection === "quotes" ? (
                 <Suspense fallback={<SectionLoader />}>
                   <QuoteManagement />
+                </Suspense>
+              ) : activeSection === "batch" ? (
+                <Suspense fallback={<SectionLoader />}>
+                  <BatchReminder />
+                </Suspense>
+              ) : activeSection === "audit" ? (
+                <Suspense fallback={<SectionLoader />}>
+                  <AuditTrail />
                 </Suspense>
               ) : (
                 <PlaceholderSection title="Gestion d'agenda" desc="La prise de rendez-vous et les confirmations automatiques arrivent bientôt." />

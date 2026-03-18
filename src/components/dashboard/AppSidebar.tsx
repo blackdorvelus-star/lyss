@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Users, FileText, Calendar, Settings, LogOut, ChevronLeft, ChevronRight, Shield, ShieldAlert, Menu, X, FileBarChart, Link2, Globe, PlusCircle, FileSignature } from "lucide-react";
+import { Users, FileText, Calendar, Settings, LogOut, ChevronLeft, ChevronRight, Shield, ShieldAlert, Menu, X, FileBarChart, Link2, Globe, PlusCircle, FileSignature, Zap, ScrollText } from "lucide-react";
 import { useAdmin } from "@/hooks/useAdmin";
 import { cn } from "@/lib/utils";
 
-export type Section = "clients" | "billing" | "disputes" | "reports" | "calendar" | "settings" | "integrations" | "widget" | "import" | "quotes";
+export type Section = "clients" | "billing" | "disputes" | "reports" | "calendar" | "settings" | "integrations" | "widget" | "import" | "quotes" | "batch" | "audit";
 
 interface AppSidebarProps {
   activeSection: Section;
@@ -18,9 +18,11 @@ const navItems: { id: Section; label: string; icon: typeof Users }[] = [
   { id: "import", label: "Confier", icon: PlusCircle },
   { id: "clients", label: "Clients", icon: Users },
   { id: "widget", label: "Widget", icon: Globe },
+  { id: "batch", label: "Lot", icon: Zap },
   { id: "integrations", label: "Intégrations", icon: Link2 },
   { id: "disputes", label: "Litiges", icon: ShieldAlert },
   { id: "reports", label: "Rapports", icon: FileBarChart },
+  { id: "audit", label: "Audit", icon: ScrollText },
   { id: "calendar", label: "Agenda", icon: Calendar },
   { id: "settings", label: "Réglages", icon: Settings },
 ];

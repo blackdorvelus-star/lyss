@@ -31,6 +31,8 @@ const App = () => (
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/demo" element={<DemoPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/payer/:token" element={<PayerPortal />} />
           <Route path="/widget/:userId" element={<ClientWidget />} />
           <Route path="/admin" element={<AdminPage />} />

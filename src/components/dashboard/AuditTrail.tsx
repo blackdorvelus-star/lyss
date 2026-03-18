@@ -135,19 +135,19 @@ const AuditTrail = () => {
   return (
     <div className="max-w-3xl space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="font-display text-lg font-bold flex items-center gap-2">
-            <ScrollText className="w-5 h-5 text-primary" />
+      <div className="flex items-start sm:items-center justify-between gap-2">
+        <div className="min-w-0">
+          <h2 className="font-display text-base sm:text-lg font-bold flex items-center gap-2">
+            <ScrollText className="w-5 h-5 text-primary flex-shrink-0" />
             Journal d'audit
           </h2>
-          <p className="text-xs text-muted-foreground">
-            Historique complet et horodaté de toutes les actions pour conformité juridique.
+          <p className="text-[10px] sm:text-xs text-muted-foreground">
+            Historique horodaté pour conformité juridique.
           </p>
         </div>
-        <Button onClick={exportCSV} size="sm" variant="outline" disabled={logs.length === 0}>
-          <Download className="w-4 h-4 mr-1" />
-          Exporter CSV
+        <Button onClick={exportCSV} size="sm" variant="outline" disabled={logs.length === 0} className="flex-shrink-0 text-xs">
+          <Download className="w-3.5 h-3.5 sm:mr-1" />
+          <span className="hidden sm:inline">Exporter CSV</span>
         </Button>
       </div>
 

@@ -193,10 +193,10 @@ const ClientManagement = () => {
             className="overflow-hidden"
           >
             <div className="bg-card border border-border rounded-xl p-4 space-y-3">
-              <Input placeholder="Nom du client *" value={newClient.name} onChange={(e) => setNewClient({ ...newClient, name: e.target.value })} className="bg-secondary" />
+               <Input placeholder="ex: Construction Roy inc." value={newClient.name} onChange={(e) => setNewClient({ ...newClient, name: e.target.value })} className="bg-secondary" />
               <div className="grid grid-cols-2 gap-3">
-                <Input placeholder="Courriel" value={newClient.email} onChange={(e) => setNewClient({ ...newClient, email: e.target.value })} className="bg-secondary" />
-                <Input placeholder="Téléphone" value={newClient.phone} onChange={(e) => setNewClient({ ...newClient, phone: e.target.value })} className="bg-secondary" />
+                <Input placeholder="ex: info@constructionroy.ca" value={newClient.email} onChange={(e) => setNewClient({ ...newClient, email: e.target.value })} className="bg-secondary" />
+                <Input placeholder="ex: 418-555-3210" value={newClient.phone} onChange={(e) => setNewClient({ ...newClient, phone: e.target.value })} className="bg-secondary" />
               </div>
               <Button onClick={handleAdd} disabled={!newClient.name.trim() || saving} className="w-full" size="sm">
                 {saving ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Plus className="w-4 h-4 mr-1" />}

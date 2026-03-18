@@ -155,6 +155,16 @@ const AuthPage = ({ onAuth }: AuthPageProps) => {
                 </>
               )}
             </Button>
+
+            {mode === "login" && (
+              <button
+                type="button"
+                onClick={() => setMode("forgot")}
+                className="text-xs text-muted-foreground hover:text-primary transition-colors w-full text-right mt-1"
+              >
+                Mot de passe oublié ?
+              </button>
+            )}
           </form>
 
           <div className="relative my-6">

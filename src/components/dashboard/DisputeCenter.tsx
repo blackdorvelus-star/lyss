@@ -145,6 +145,37 @@ const DisputeCenter = () => {
     }
   };
 
+  const generateAiResponse = async (invoiceId: string) => {
+    setGeneratingAi(invoiceId);
+    try {
+      const { data, error } = await supabase.functions.invoke("dispute-ai-response", {
+        body: { invoice_id: invoiceId },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setAiResponses(prev => ({ ...prev, [invoiceId]: data.response }));
+      toast.success("Réponse IA générée !");
+    } catch (e: any) {
+      toast.error(e.message || "Erreur lors de la génération");
+    } finally {
+      setGeneratingAi(null);
+    }
+  };
+
+  const copyToClipboard = async (text: string, invoiceId: string) => {
+    await navigator.clipboard.writeText(text);
+    setCopiedId(invoiceId);
+    toast.success("Copié dans le presse-papiers !");
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const useAsNote = (invoiceId: string) => {
+    const text = aiResponses[invoiceId];
+    if (!text) return;
+    setActionNote(text);
+    toast.info("Réponse copiée dans le champ de note.");
+  };
+
   const formatMoney = (n: number) =>
     new Intl.NumberFormat("fr-CA", { style: "currency", currency: "CAD", maximumFractionDigits: 0 }).format(n);
   const formatDate = (d: string) =>

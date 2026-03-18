@@ -54,21 +54,21 @@ export const demoReminders: Record<string, any[]> = {
 
 export const demoCallLogs: CallLog[] = [
   {
-    id: "c1", invoice_id: "demo-2", user_id: "demo", status: "completed",
+    id: "c1", invoice_id: "demo-2", status: "completed",
     call_result: "payment_promised", client_sentiment: "positive",
     duration_seconds: 142, summary: "Le client s'est engagé à payer d'ici vendredi via Interac.",
     created_at: new Date(now - 1 * day).toISOString(), ended_at: new Date(now - 1 * day + 142000).toISOString(),
     vapi_call_id: null,
   },
   {
-    id: "c2", invoice_id: "demo-5", user_id: "demo", status: "completed",
+    id: "c2", invoice_id: "demo-5", status: "completed",
     call_result: "refused", client_sentiment: "negative",
     duration_seconds: 87, summary: "Le client conteste la qualité du service rendu.",
     created_at: new Date(now - 3 * day).toISOString(), ended_at: new Date(now - 3 * day + 87000).toISOString(),
     vapi_call_id: null,
   },
   {
-    id: "c3", invoice_id: "demo-3", user_id: "demo", status: "completed",
+    id: "c3", invoice_id: "demo-3", status: "completed",
     call_result: "callback_requested", client_sentiment: "neutral",
     duration_seconds: 63, summary: "Demande de rappel la semaine prochaine.",
     created_at: new Date(now - 2 * day).toISOString(), ended_at: new Date(now - 2 * day + 63000).toISOString(),
@@ -77,14 +77,14 @@ export const demoCallLogs: CallLog[] = [
 ];
 
 export const demoFeedItems: FeedItem[] = [
-  { id: "f1", icon: "sms", text: "SMS de suivi envoyé à Construction Tremblay", time: "Aujourd'hui 10:32", date: new Date(now - 2 * 3600000).toISOString(), isNew: true },
-  { id: "f2", icon: "phone", text: "Appel à Plomberie Lévis — Paiement promis ✓", time: "Hier 14:15", date: new Date(now - 1 * day).toISOString(), isNew: false },
-  { id: "f3", icon: "payment", text: "Paiement de 3 200 $ confirmé — Transport Beauce Inc.", time: "17 mars", date: new Date(now - 2 * day).toISOString(), isNew: false },
-  { id: "f4", icon: "email", text: "Courriel de suivi envoyé à Construction Tremblay", time: "16 mars", date: new Date(now - 2 * day).toISOString(), isNew: false },
-  { id: "f5", icon: "alert", text: "⚠️ Garage Pelletier a répondu négativement — intervention suggérée", time: "15 mars", date: new Date(now - 3 * day).toISOString(), isNew: true },
-  { id: "f6", icon: "sms", text: "SMS de suivi envoyé à Plomberie Lévis", time: "15 mars", date: new Date(now - 3 * day).toISOString(), isNew: false },
-  { id: "f7", icon: "phone", text: "Appel à Construction Tremblay — Rappel demandé", time: "14 mars", date: new Date(now - 4 * day).toISOString(), isNew: false },
-  { id: "f8", icon: "sms", text: "SMS de suivi envoyé à Transport Beauce Inc.", time: "13 mars", date: new Date(now - 5 * day).toISOString(), isNew: false },
+  { id: "f1", icon: "sms", text: "SMS de suivi envoyé à Construction Tremblay", time: "Aujourd'hui 10:32", isNew: true },
+  { id: "f2", icon: "phone", text: "Appel à Plomberie Lévis — Paiement promis ✓", time: "Hier 14:15", isNew: false },
+  { id: "f3", icon: "payment", text: "Paiement de 3 200 $ confirmé — Transport Beauce Inc.", time: "17 mars", isNew: false },
+  { id: "f4", icon: "email", text: "Courriel de suivi envoyé à Construction Tremblay", time: "16 mars", isNew: false },
+  { id: "f5", icon: "alert", text: "⚠️ Garage Pelletier a répondu négativement — intervention suggérée", time: "15 mars", isNew: true },
+  { id: "f6", icon: "sms", text: "SMS de suivi envoyé à Plomberie Lévis", time: "15 mars", isNew: false },
+  { id: "f7", icon: "phone", text: "Appel à Construction Tremblay — Rappel demandé", time: "14 mars", isNew: false },
+  { id: "f8", icon: "sms", text: "SMS de suivi envoyé à Transport Beauce Inc.", time: "13 mars", isNew: false },
 ];
 
 export const demoPriorityItems: PriorityItem[] = [

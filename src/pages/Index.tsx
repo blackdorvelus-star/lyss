@@ -121,7 +121,6 @@ const Index = () => {
 
       <HeroSection onStart={handleStart} />
       <div id="how-it-works"><HowItWorks /></div>
-      <div id="showcase"><DashboardShowcase /></div>
       <MessagePreview />
       <div id="integrations"><IntegrationSection /></div>
       <div id="pricing"><PricingSection /></div>

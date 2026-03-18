@@ -40,7 +40,13 @@ const Index = () => {
   };
 
   if (view === "dashboard") {
-    return <Dashboard onBack={handleBackToLanding} onLogout={handleLogout} />;
+    return (
+      <>
+        <Dashboard onBack={handleBackToLanding} onLogout={handleLogout} />
+        <FeedbackWidget />
+      </>
+    );
+  }
   }
 
   return (

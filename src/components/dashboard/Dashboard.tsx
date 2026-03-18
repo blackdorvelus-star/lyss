@@ -577,6 +577,18 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                   </Suspense>
 
                   <Suspense fallback={<SectionLoader />}>
+                    <CashflowForecast
+                      invoices={invoices}
+                      paymentPromises={callLogs
+                        .filter(c => c.call_result === "payment_promised")
+                        .map(c => {
+                          const inv = invoices.find(i => i.id === c.invoice_id);
+                          return { amount: inv?.amount || 0, date: c.created_at };
+                        })}
+                    />
+                  </Suspense>
+
+                  <Suspense fallback={<SectionLoader />}>
                     <CallHistory calls={callLogs} getClientName={getClientName} />
                   </Suspense>
 

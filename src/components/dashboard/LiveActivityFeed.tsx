@@ -33,7 +33,6 @@ const LiveActivityFeed = ({ items }: LiveActivityFeedProps) => {
             Journal de Lyss
           </h3>
         </div>
-        </h3>
         <div className="flex items-center gap-1.5">
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />

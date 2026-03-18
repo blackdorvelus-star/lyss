@@ -18,9 +18,11 @@ const navItems: { id: Section; label: string; icon: typeof Users }[] = [
   { id: "import", label: "Confier", icon: PlusCircle },
   { id: "clients", label: "Clients", icon: Users },
   { id: "widget", label: "Widget", icon: Globe },
+  { id: "batch", label: "Lot", icon: Zap },
   { id: "integrations", label: "Intégrations", icon: Link2 },
   { id: "disputes", label: "Litiges", icon: ShieldAlert },
   { id: "reports", label: "Rapports", icon: FileBarChart },
+  { id: "audit", label: "Audit", icon: ScrollText },
   { id: "calendar", label: "Agenda", icon: Calendar },
   { id: "settings", label: "Réglages", icon: Settings },
 ];

@@ -539,6 +539,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
                 {activeSection === "integrations" && "Intégrations comptables"}
                 {activeSection === "widget" && "Widget embarqué"}
                 {activeSection === "import" && "Confier un dossier"}
+                {activeSection === "quotes" && "Soumissions"}
               </h1>
             </div>
             <div className="flex items-center gap-2 sm:gap-4">

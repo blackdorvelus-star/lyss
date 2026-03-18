@@ -281,6 +281,14 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout, demo = false }: DashboardPr
   const [showTour, setShowTour] = useState(() => !localStorage.getItem("lyss_tour_done"));
 
   const fetchData = useCallback(async () => {
+    if (demo) {
+      setInvoices(demoInvoices as unknown as InvoiceWithClient[]);
+      setReminders(demoReminders);
+      setCallLogs(demoCallLogs);
+      setQuotes(demoQuotes);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     const { data: inv } = await supabase
       .from("invoices")
@@ -322,7 +330,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout, demo = false }: DashboardPr
     if (quotesData) setQuotes(quotesData);
 
     setLoading(false);
-  }, []);
+  }, [demo]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 

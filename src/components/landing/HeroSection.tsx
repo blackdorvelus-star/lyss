@@ -87,7 +87,7 @@ const HeroSection = ({ onStart, onDemo }: HeroSectionProps) => {
             <Button
               size="lg"
               variant="outline"
-              onClick={onDemo}
+              onClick={() => navigate("/demo")}
               className="font-display font-semibold text-sm px-7 h-11 border-primary/30 text-primary hover:bg-primary/5"
             >
               Voir la démo

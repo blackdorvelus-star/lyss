@@ -116,7 +116,7 @@ const Index = () => {
         )}
       </header>
 
-      <HeroSection onStart={handleStart} onDemo={() => setView("demo")} />
+      <HeroSection onStart={handleStart} />
       <div id="how-it-works"><HowItWorks /></div>
       <MessagePreview />
       <div id="integrations"><IntegrationSection /></div>

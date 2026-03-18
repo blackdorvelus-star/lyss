@@ -401,6 +401,81 @@ const DisputeCenter = () => {
                           )}
                         </div>
 
+                        {/* AI Response Generator */}
+                        <div className="bg-primary/5 border border-primary/15 rounded-xl p-4 space-y-3">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <LyssAvatar size="xs" pulse={generatingAi === inv.id} />
+                              <h4 className="text-xs font-medium text-foreground">
+                                Réponse suggérée par Lyss
+                              </h4>
+                            </div>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => generateAiResponse(inv.id)}
+                              disabled={generatingAi === inv.id}
+                              className="text-xs h-7 border-primary/30 text-primary hover:bg-primary/10"
+                            >
+                              {generatingAi === inv.id ? (
+                                <><Loader2 className="w-3 h-3 animate-spin mr-1" /> Analyse…</>
+                              ) : aiResponses[inv.id] ? (
+                                <><Sparkles className="w-3 h-3 mr-1" /> Régénérer</>
+                              ) : (
+                                <><Sparkles className="w-3 h-3 mr-1" /> Générer une réponse</>
+                              )}
+                            </Button>
+                          </div>
+
+                          {generatingAi === inv.id && !aiResponses[inv.id] && (
+                            <div className="flex items-center gap-2 py-3">
+                              <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                              <p className="text-xs text-muted-foreground">
+                                Lyss analyse la timeline et le sentiment du client…
+                              </p>
+                            </div>
+                          )}
+
+                          <AnimatePresence>
+                            {aiResponses[inv.id] && (
+                              <motion.div
+                                initial={{ opacity: 0, y: 5 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="space-y-2"
+                              >
+                                <div className="bg-card rounded-lg p-3 border border-border">
+                                  <div className="prose prose-sm prose-invert max-w-none text-xs leading-relaxed">
+                                    <ReactMarkdown>{aiResponses[inv.id]}</ReactMarkdown>
+                                  </div>
+                                </div>
+                                <div className="flex gap-2">
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => copyToClipboard(aiResponses[inv.id], inv.id)}
+                                    className="text-xs h-7"
+                                  >
+                                    {copiedId === inv.id ? (
+                                      <><Check className="w-3 h-3 mr-1 text-primary" /> Copié</>
+                                    ) : (
+                                      <><Copy className="w-3 h-3 mr-1" /> Copier</>
+                                    )}
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => useAsNote(inv.id)}
+                                    className="text-xs h-7"
+                                  >
+                                    <Send className="w-3 h-3 mr-1" />
+                                    Utiliser comme note
+                                  </Button>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+
                         {/* Actions */}
                         <div className="space-y-3 pt-2">
                           <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">

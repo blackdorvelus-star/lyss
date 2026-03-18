@@ -15,7 +15,10 @@ import PerformanceCards from "./PerformanceCards";
 import LiveActivityFeed, { type FeedItem } from "./LiveActivityFeed";
 import PriorityRadar, { type PriorityItem } from "./PriorityRadar";
 import ActiveDossierIndicator from "./ActiveDossierIndicator";
+import SavingsWidget from "./SavingsWidget";
+import WeeklyProductivity from "./WeeklyProductivity";
 import type { CallLog } from "./CallHistory";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // Lazy-loaded heavy sections
 const SettingsWizard = lazy(() => import("./SettingsWizard"));

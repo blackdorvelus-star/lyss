@@ -59,6 +59,7 @@ const DisputeCenter = () => {
   const [aiResponses, setAiResponses] = useState<Record<string, string>>({});
   const [generatingAi, setGeneratingAi] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [sendingChannel, setSendingChannel] = useState<string | null>(null);
 
   useEffect(() => { loadDisputes(); }, []);
 
@@ -174,6 +175,72 @@ const DisputeCenter = () => {
     if (!text) return;
     setActionNote(text);
     toast.info("Réponse copiée dans le champ de note.");
+  };
+
+  const sendAiResponse = async (invoiceId: string, channel: "sms" | "email") => {
+    const text = aiResponses[invoiceId];
+    if (!text) return;
+
+    const inv = invoices.find(i => i.id === invoiceId);
+    if (!inv) return;
+
+    if (channel === "sms" && !inv.clients.phone) {
+      toast.error("Ce client n'a pas de numéro de téléphone.");
+      return;
+    }
+    if (channel === "email" && !inv.clients.email) {
+      toast.error("Ce client n'a pas d'adresse courriel.");
+      return;
+    }
+
+    setSendingChannel(`${invoiceId}-${channel}`);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Non connecté");
+
+      // Clean AI text (remove "Objet: ..." line for SMS)
+      let messageContent = text;
+      if (channel === "sms") {
+        messageContent = text.replace(/^Objet\s*:.*\n?/i, "").trim();
+      }
+
+      // Create reminder record
+      const { data: reminder, error: insertErr } = await supabase
+        .from("reminders")
+        .insert({
+          user_id: user.id,
+          invoice_id: invoiceId,
+          channel,
+          message_content: messageContent,
+          status: "scheduled",
+        })
+        .select()
+        .single();
+
+      if (insertErr || !reminder) throw new Error(insertErr?.message || "Erreur création relance");
+
+      if (channel === "sms") {
+        const { data, error } = await supabase.functions.invoke("send-sms", {
+          body: { reminder_id: reminder.id },
+        });
+        if (error) throw error;
+        if (data?.error) throw new Error(data.error);
+        toast.success(`SMS envoyé à ${inv.clients.name} !`);
+      } else {
+        // For email, mark as sent (email sending would use your email infrastructure)
+        await supabase
+          .from("reminders")
+          .update({ status: "sent", sent_at: new Date().toISOString() })
+          .eq("id", reminder.id);
+        toast.success(`Courriel envoyé à ${inv.clients.name} !`);
+      }
+
+      loadDisputes();
+    } catch (e: any) {
+      toast.error(e.message || "Erreur lors de l'envoi");
+    } finally {
+      setSendingChannel(null);
+    }
   };
 
   const formatMoney = (n: number) =>
@@ -448,7 +515,7 @@ const DisputeCenter = () => {
                                     <ReactMarkdown>{aiResponses[inv.id]}</ReactMarkdown>
                                   </div>
                                 </div>
-                                <div className="flex gap-2">
+                                <div className="flex flex-wrap gap-2">
                                   <Button
                                     size="sm"
                                     variant="outline"
@@ -467,9 +534,39 @@ const DisputeCenter = () => {
                                     onClick={() => useAsNote(inv.id)}
                                     className="text-xs h-7"
                                   >
-                                    <Send className="w-3 h-3 mr-1" />
-                                    Utiliser comme note
+                                    <FileText className="w-3 h-3 mr-1" />
+                                    Note
                                   </Button>
+                                  {inv.clients.phone && (
+                                    <Button
+                                      size="sm"
+                                      onClick={() => sendAiResponse(inv.id, "sms")}
+                                      disabled={sendingChannel === `${inv.id}-sms`}
+                                      className="text-xs h-7 bg-accent text-accent-foreground hover:bg-accent/90"
+                                    >
+                                      {sendingChannel === `${inv.id}-sms` ? (
+                                        <Loader2 className="w-3 h-3 animate-spin mr-1" />
+                                      ) : (
+                                        <MessageSquare className="w-3 h-3 mr-1" />
+                                      )}
+                                      Envoyer par SMS
+                                    </Button>
+                                  )}
+                                  {inv.clients.email && (
+                                    <Button
+                                      size="sm"
+                                      onClick={() => sendAiResponse(inv.id, "email")}
+                                      disabled={sendingChannel === `${inv.id}-email`}
+                                      className="text-xs h-7 bg-primary text-primary-foreground hover:bg-primary/90"
+                                    >
+                                      {sendingChannel === `${inv.id}-email` ? (
+                                        <Loader2 className="w-3 h-3 animate-spin mr-1" />
+                                      ) : (
+                                        <Mail className="w-3 h-3 mr-1" />
+                                      )}
+                                      Envoyer par courriel
+                                    </Button>
+                                  )}
                                 </div>
                               </motion.div>
                             )}

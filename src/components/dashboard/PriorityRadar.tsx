@@ -59,6 +59,7 @@ const PriorityRadar = ({ items, onNavigate }: PriorityRadarProps) => {
     { key: "negative", items: negatives },
     { key: "promise", items: promises },
     { key: "response", items: responses },
+    { key: "quote", items: quotes },
   ].filter((g) => g.items.length > 0);
 
   if (items.length === 0) {

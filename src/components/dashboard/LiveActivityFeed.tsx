@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Phone, Mail, MessageSquare, CheckCircle, AlertTriangle, Sparkles, Clock } from "lucide-react";
+import LyssAvatar from "@/components/LyssAvatar";
 
 export interface FeedItem {
   id: string;
@@ -25,10 +26,13 @@ const iconMap = {
 const LiveActivityFeed = ({ items }: LiveActivityFeedProps) => {
   return (
     <div className="bg-card border border-border rounded-xl p-3.5 sm:p-5 h-full flex flex-col">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
-          Journal d'activité
-        </h3>
+       <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <LyssAvatar size="xs" />
+          <h3 className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
+            Journal de Lyss
+          </h3>
+        </div>
         <div className="flex items-center gap-1.5">
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
@@ -40,9 +44,7 @@ const LiveActivityFeed = ({ items }: LiveActivityFeedProps) => {
 
       {items.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center py-8">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-3">
-            <Sparkles className="w-5 h-5 text-primary animate-pulse" />
-          </div>
+           <LyssAvatar size="md" />
           <p className="text-xs text-muted-foreground text-center">
             Lyss est prête à travailler.<br />
             Les actions apparaîtront ici en temps réel.

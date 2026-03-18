@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import NotificationBell from "@/components/notifications/NotificationBell";
+import LyssAvatar from "@/components/LyssAvatar";
 import AppSidebar, { type Section } from "./AppSidebar";
 import PerformanceCards from "./PerformanceCards";
 import LiveActivityFeed, { type FeedItem } from "./LiveActivityFeed";
@@ -525,8 +526,8 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
       <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
         <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border px-4 sm:px-6 py-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-primary" />
+            <div className="flex items-center gap-2.5">
+              <LyssAvatar size="sm" pulse />
               <h1 className="font-display font-bold text-sm sm:text-base truncate">
                 {activeSection === "clients" && "Relations clients"}
                 {activeSection === "billing" && "Centre de commandement"}

@@ -19,7 +19,7 @@ import SavingsWidget from "./SavingsWidget";
 import WeeklyProductivity from "./WeeklyProductivity";
 import type { CallLog } from "./CallHistory";
 import { useIsMobile } from "@/hooks/use-mobile";
-
+import GuidedTour from "@/components/onboarding/GuidedTour";
 // Lazy-loaded heavy sections
 const SettingsWizard = lazy(() => import("./SettingsWizard"));
 const ClientManagement = lazy(() => import("./ClientManagement"));

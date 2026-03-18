@@ -127,18 +127,18 @@ const CashflowForecast = ({ invoices, quotes = [], paymentPromises = [] }: Cashf
       </div>
 
       {/* Breakdown */}
-      <div className="grid grid-cols-3 gap-2">
-        <div className="bg-secondary/50 rounded-lg p-2.5 text-center">
-          <p className="font-display text-sm font-bold text-foreground">{formatMoney(forecast.totalPipeline)}</p>
-          <p className="text-[10px] text-muted-foreground">Pipeline total</p>
+      <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
+        <div className="bg-secondary/50 rounded-lg p-2 sm:p-2.5 text-center">
+          <p className="font-display text-xs sm:text-sm font-bold text-foreground">{formatMoney(forecast.totalPipeline)}</p>
+          <p className="text-[9px] sm:text-[10px] text-muted-foreground">Pipeline</p>
         </div>
-        <div className="bg-secondary/50 rounded-lg p-2.5 text-center">
-          <p className="font-display text-sm font-bold text-primary">{formatMoney(forecast.promiseTotal)}</p>
-          <p className="text-[10px] text-muted-foreground">Promesses</p>
+        <div className="bg-secondary/50 rounded-lg p-2 sm:p-2.5 text-center">
+          <p className="font-display text-xs sm:text-sm font-bold text-primary">{formatMoney(forecast.promiseTotal)}</p>
+          <p className="text-[9px] sm:text-[10px] text-muted-foreground">Promesses</p>
         </div>
-        <div className="bg-secondary/50 rounded-lg p-2.5 text-center">
-          <p className="font-display text-sm font-bold text-accent">{formatMoney(forecast.quoteValue)}</p>
-          <p className="text-[10px] text-muted-foreground">Soumissions</p>
+        <div className="bg-secondary/50 rounded-lg p-2 sm:p-2.5 text-center">
+          <p className="font-display text-xs sm:text-sm font-bold text-accent">{formatMoney(forecast.quoteValue)}</p>
+          <p className="text-[9px] sm:text-[10px] text-muted-foreground">Soumissions</p>
         </div>
       </div>
 

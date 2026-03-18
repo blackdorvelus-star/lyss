@@ -164,6 +164,13 @@ const SettingsWizard = () => {
       setNotifyPayment(d.notify_on_payment ?? true);
       setNotifyDispute(d.notify_on_dispute ?? true);
       setNotifyNegative(d.notify_on_negative_sentiment ?? true);
+      setScriptPromise(d.script_promise || "");
+      setScriptDispute(d.script_dispute || "");
+      setScriptNoResponse(d.script_no_response || "");
+      setScriptPartialPayment(d.script_partial_payment || "");
+      setScriptCallFull(d.script_call_full || "");
+      setScriptSmsFollowup(d.script_sms_followup || "");
+      setScriptEmailFollowup(d.script_email_followup || "");
     }
     setLoading(false);
   };

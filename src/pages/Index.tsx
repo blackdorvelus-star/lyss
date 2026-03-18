@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import HeroSection from "@/components/landing/HeroSection";
 import HowItWorks from "@/components/landing/HowItWorks";
 import MessagePreview from "@/components/landing/MessagePreview";
@@ -6,47 +7,13 @@ import PricingSection from "@/components/landing/PricingSection";
 import FAQSection from "@/components/landing/FAQSection";
 import IntegrationSection from "@/components/landing/IntegrationSection";
 import Footer from "@/components/landing/Footer";
-import Dashboard from "@/components/dashboard/Dashboard";
 import ExitIntentSurvey from "@/components/feedback/ExitIntentSurvey";
-import FeedbackWidget from "@/components/dashboard/FeedbackWidget";
-
-type View = "landing" | "dashboard" | "demo";
 
 const Index = () => {
-  const [view, setView] = useState<View>("landing");
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  useEffect(() => {
-    console.info("[Index] mode test sans auth activé");
-  }, []);
-
-  useEffect(() => {
-    console.info("[Index] état navigation", { view, mobileMenuOpen });
-  }, [view, mobileMenuOpen]);
-
-  const handleStart = () => {
-    console.info("[Index] ouverture du dashboard sans connexion");
-    setView("dashboard");
-  };
-
-  const handleBackToLanding = () => {
-    console.info("[Index] retour à la landing");
-    setView("landing");
-  };
-
-  const handleLogout = () => {
-    console.info("[Index] fermeture de session simulée en mode test");
-    setView("landing");
-  };
-
-  if (view === "dashboard" || view === "demo") {
-    return (
-      <>
-        <Dashboard onBack={handleBackToLanding} onLogout={handleLogout} demo={view === "demo"} />
-        <FeedbackWidget />
-      </>
-    );
-  }
+  const handleStart = () => navigate("/dashboard");
 
   return (
     <div className="min-h-screen bg-background">
@@ -104,10 +71,7 @@ const Index = () => {
               FAQ
             </a>
             <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                handleStart();
-              }}
+              onClick={() => { setMobileMenuOpen(false); handleStart(); }}
               className="text-sm text-left text-muted-foreground hover:text-foreground transition-colors"
             >
               Ouvrir le tableau de bord
@@ -116,7 +80,7 @@ const Index = () => {
         )}
       </header>
 
-      <HeroSection onStart={handleStart} onDemo={() => setView("demo")} />
+      <HeroSection onStart={handleStart} />
       <div id="how-it-works"><HowItWorks /></div>
       <MessagePreview />
       <div id="integrations"><IntegrationSection /></div>

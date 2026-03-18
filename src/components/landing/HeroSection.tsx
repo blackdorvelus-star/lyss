@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Sparkles, MessageSquare, Phone, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 import LyssAvatar from "@/components/LyssAvatar";
 
 interface HeroSectionProps {
@@ -15,6 +16,7 @@ const channels = [
 ];
 
 const HeroSection = ({ onStart, onDemo }: HeroSectionProps) => {
+  const navigate = useNavigate();
 
   return (
     <section className="relative px-5 pt-12 sm:pt-16 pb-8 overflow-hidden">
@@ -85,7 +87,7 @@ const HeroSection = ({ onStart, onDemo }: HeroSectionProps) => {
             <Button
               size="lg"
               variant="outline"
-              onClick={onDemo}
+              onClick={() => navigate("/demo")}
               className="font-display font-semibold text-sm px-7 h-11 border-primary/30 text-primary hover:bg-primary/5"
             >
               Voir la démo

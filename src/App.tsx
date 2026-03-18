@@ -6,6 +6,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 
 import Index from "./pages/Index.tsx";
 
+const DemoPage = lazy(() => import("./pages/DemoPage.tsx"));
+const DashboardPage = lazy(() => import("./pages/DashboardPage.tsx"));
 const PayerPortal = lazy(() => import("./pages/PayerPortal.tsx"));
 const ClientWidget = lazy(() => import("./pages/ClientWidget.tsx"));
 const AdminPage = lazy(() => import("./pages/AdminPage.tsx"));
@@ -29,6 +31,8 @@ const App = () => (
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/demo" element={<DemoPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/payer/:token" element={<PayerPortal />} />
           <Route path="/widget/:userId" element={<ClientWidget />} />
           <Route path="/admin" element={<AdminPage />} />

@@ -33,7 +33,7 @@ const AuthPage = ({ onAuth }: AuthPageProps) => {
         const { error } = await supabase.auth.signUp({
           email: email.trim(),
           password,
-          options: { emailRedirectTo: window.location.origin },
+          options: { emailRedirectTo: "https://lyss.ca" },
         });
         if (error) throw error;
         toast.success("Compte créé ! Tu es connecté(e).");

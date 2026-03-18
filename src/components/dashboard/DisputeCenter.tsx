@@ -56,6 +56,9 @@ const DisputeCenter = () => {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [actionNote, setActionNote] = useState("");
   const [processing, setProcessing] = useState<string | null>(null);
+  const [aiResponses, setAiResponses] = useState<Record<string, string>>({});
+  const [generatingAi, setGeneratingAi] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   useEffect(() => { loadDisputes(); }, []);
 

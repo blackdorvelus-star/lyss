@@ -1,9 +1,9 @@
 import { motion } from "framer-motion";
-import { AlertTriangle, Banknote, MessageSquare, ArrowRight, Clock } from "lucide-react";
+import { AlertTriangle, Banknote, MessageSquare, ArrowRight, Clock, FileSignature } from "lucide-react";
 
 interface PriorityItem {
   id: string;
-  type: "promise" | "negative" | "response";
+  type: "promise" | "negative" | "response" | "quote";
   clientName: string;
   detail: string;
   date: string;
@@ -39,17 +39,27 @@ const typeConfig = {
     color: "text-accent",
     dot: "bg-accent",
   },
+  quote: {
+    icon: FileSignature,
+    label: "Soumission sans réponse",
+    bg: "bg-amber-500/10",
+    ring: "ring-amber-500/20",
+    color: "text-amber-500",
+    dot: "bg-amber-500",
+  },
 };
 
 const PriorityRadar = ({ items, onNavigate }: PriorityRadarProps) => {
   const promises = items.filter((i) => i.type === "promise");
   const negatives = items.filter((i) => i.type === "negative");
   const responses = items.filter((i) => i.type === "response");
+  const quotes = items.filter((i) => i.type === "quote");
 
   const groups = [
     { key: "negative", items: negatives },
     { key: "promise", items: promises },
     { key: "response", items: responses },
+    { key: "quote", items: quotes },
   ].filter((g) => g.items.length > 0);
 
   if (items.length === 0) {
@@ -101,6 +111,11 @@ const PriorityRadar = ({ items, onNavigate }: PriorityRadarProps) => {
         {responses.length > 0 && (
           <span className="text-[10px] font-medium px-2 py-1 rounded-full bg-accent/10 text-accent ring-1 ring-accent/20">
             {responses.length} réponse{responses.length > 1 ? "s" : ""}
+          </span>
+        )}
+        {quotes.length > 0 && (
+          <span className="text-[10px] font-medium px-2 py-1 rounded-full bg-amber-500/10 text-amber-500 ring-1 ring-amber-500/20">
+            {quotes.length} soumission{quotes.length > 1 ? "s" : ""}
           </span>
         )}
       </div>

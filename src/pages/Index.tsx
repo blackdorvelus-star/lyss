@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import HeroSection from "@/components/landing/HeroSection";
 import HowItWorks from "@/components/landing/HowItWorks";
 import MessagePreview from "@/components/landing/MessagePreview";
+import DashboardShowcase from "@/components/landing/DashboardShowcase";
 import PricingSection from "@/components/landing/PricingSection";
 import FAQSection from "@/components/landing/FAQSection";
 import IntegrationSection from "@/components/landing/IntegrationSection";
@@ -57,6 +58,9 @@ const Index = () => {
           <nav className="hidden sm:flex items-center gap-6">
             <a href="#how-it-works" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Comment ça marche
+            </a>
+            <a href="#showcase" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              Aperçu
             </a>
             <a href="#integrations" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Intégrations
@@ -118,6 +122,7 @@ const Index = () => {
 
       <HeroSection onStart={handleStart} />
       <div id="how-it-works"><HowItWorks /></div>
+      <div id="showcase"><DashboardShowcase /></div>
       <MessagePreview />
       <div id="integrations"><IntegrationSection /></div>
       <div id="pricing"><PricingSection /></div>

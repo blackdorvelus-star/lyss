@@ -19,7 +19,7 @@ import SavingsWidget from "./SavingsWidget";
 import WeeklyProductivity from "./WeeklyProductivity";
 import type { CallLog } from "./CallHistory";
 import { useIsMobile } from "@/hooks/use-mobile";
-
+import GuidedTour from "@/components/onboarding/GuidedTour";
 // Lazy-loaded heavy sections
 const SettingsWizard = lazy(() => import("./SettingsWizard"));
 const ClientManagement = lazy(() => import("./ClientManagement"));
@@ -275,6 +275,8 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
   });
   const [personality, setPersonality] = useState<import("./PersonalitySelector").Personality>("chaleureuse");
   const [sendingSmsId, setSendingSmsId] = useState<string | null>(null);
+  const [quotes, setQuotes] = useState<any[]>([]);
+  const [showTour, setShowTour] = useState(() => !localStorage.getItem("lyss_tour_done"));
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -308,6 +310,14 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
       .select("*")
       .order("created_at", { ascending: false });
     if (calls) setCallLogs(calls as any as CallLog[]);
+
+    // Fetch quotes for radar
+    const { data: quotesData } = await supabase
+      .from("quotes")
+      .select("*, clients(*)")
+      .in("status", ["sent", "viewed"])
+      .order("created_at", { ascending: false });
+    if (quotesData) setQuotes(quotesData);
 
     setLoading(false);
   }, []);
@@ -519,8 +529,22 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
         });
     });
 
+    // Unanswered quotes (sent > 3 days ago)
+    quotes.forEach((q: any) => {
+      const daysSinceSent = q.sent_at ? (Date.now() - new Date(q.sent_at).getTime()) / 86400000 : 999;
+      if (daysSinceSent > 3) {
+        items.push({
+          id: q.id,
+          type: "quote",
+          clientName: q.clients?.name || "Client",
+          detail: `Soumission ${q.quote_number || ""} (${formatMoney(q.amount)}) sans réponse depuis ${Math.floor(daysSinceSent)}j`,
+          date: new Date(q.sent_at || q.created_at).toLocaleDateString("fr-CA", { day: "numeric", month: "short" }),
+        });
+      }
+    });
+
     return items;
-  }, [invoices, callLogs, reminders]);
+  }, [invoices, callLogs, reminders, quotes]);
 
   const getClientName = useCallback((invoiceId: string) => {
     const inv = invoices.find((i) => i.id === invoiceId);
@@ -528,6 +552,17 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
   }, [invoices]);
 
   return (
+    <>
+      {showTour && (
+        <GuidedTour
+          urgentCount={priorityItems.filter(i => i.type === "negative").length}
+          onComplete={() => {
+            setShowTour(false);
+            localStorage.setItem("lyss_tour_done", "1");
+          }}
+          onNavigate={(section) => setActiveSection(section as Section)}
+        />
+      )}
     <div className="min-h-screen bg-background flex">
       <AppSidebar activeSection={activeSection} onSectionChange={setActiveSection} onLogout={onLogout} />
 
@@ -754,6 +789,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
         </main>
       </div>
     </div>
+    </>
   );
 };
 

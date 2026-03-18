@@ -336,6 +336,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout, demo = false }: DashboardPr
 
   // ── Realtime subscriptions ────────────────────────────────────────────
   useEffect(() => {
+    if (demo) return;
     const channel = supabase
       .channel("dashboard-realtime")
       .on("postgres_changes", { event: "*", schema: "public", table: "reminders" }, () => fetchData())
@@ -346,7 +347,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout, demo = false }: DashboardPr
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [fetchData]);
+  }, [fetchData, demo]);
 
   const markRecovered = useCallback(async (invoiceId: string, amount: number, maxAmount: number) => {
     if (amount <= 0 || amount > maxAmount) {

@@ -20,6 +20,7 @@ import WeeklyProductivity from "./WeeklyProductivity";
 import type { CallLog } from "./CallHistory";
 import { useIsMobile } from "@/hooks/use-mobile";
 import GuidedTour from "@/components/onboarding/GuidedTour";
+import { demoInvoices, demoReminders, demoCallLogs, demoFeedItems, demoPriorityItems, demoQuotes } from "./demoData";
 // Lazy-loaded heavy sections
 const SettingsWizard = lazy(() => import("./SettingsWizard"));
 const ClientManagement = lazy(() => import("./ClientManagement"));
@@ -49,6 +50,7 @@ interface DashboardProps {
   onBack: () => void;
   onNewInvoice?: () => void;
   onLogout?: () => void;
+  demo?: boolean;
 }
 
 interface InvoiceWithClient {
@@ -258,7 +260,7 @@ InvoiceCard.displayName = "InvoiceCard";
 
 // ── Main Dashboard ──────────────────────────────────────────────────────
 
-const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
+const Dashboard = ({ onBack, onNewInvoice, onLogout, demo = false }: DashboardProps) => {
   const isMobile = useIsMobile();
   const [invoices, setInvoices] = useState<InvoiceWithClient[]>([]);
   const [reminders, setReminders] = useState<Record<string, Reminder[]>>({});
@@ -279,6 +281,14 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
   const [showTour, setShowTour] = useState(() => !localStorage.getItem("lyss_tour_done"));
 
   const fetchData = useCallback(async () => {
+    if (demo) {
+      setInvoices(demoInvoices as unknown as InvoiceWithClient[]);
+      setReminders(demoReminders);
+      setCallLogs(demoCallLogs);
+      setQuotes(demoQuotes);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     const { data: inv } = await supabase
       .from("invoices")
@@ -320,12 +330,13 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
     if (quotesData) setQuotes(quotesData);
 
     setLoading(false);
-  }, []);
+  }, [demo]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
   // ── Realtime subscriptions ────────────────────────────────────────────
   useEffect(() => {
+    if (demo) return;
     const channel = supabase
       .channel("dashboard-realtime")
       .on("postgres_changes", { event: "*", schema: "public", table: "reminders" }, () => fetchData())
@@ -336,9 +347,10 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [fetchData]);
+  }, [fetchData, demo]);
 
   const markRecovered = useCallback(async (invoiceId: string, amount: number, maxAmount: number) => {
+    if (demo) { toast.info("Mode démo — action désactivée"); return; }
     if (amount <= 0 || amount > maxAmount) {
       toast.error(`Le montant doit être entre 1 $ et ${maxAmount} $.`);
       return;
@@ -364,6 +376,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
   }, [fetchData]);
 
   const sendSms = useCallback(async (reminderId: string) => {
+    if (demo) { toast.info("Mode démo — action désactivée"); return; }
     setSendingSmsId(reminderId);
     try {
       const { data, error } = await supabase.functions.invoke("send-sms", {
@@ -405,6 +418,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
 
   // Build live activity feed
   const feedItems: FeedItem[] = useMemo(() => {
+    if (demo) return demoFeedItems;
     const allRems = Object.entries(reminders).flatMap(([invoiceId, rems]) =>
       rems.map((r) => {
         const inv = invoices.find((i) => i.id === invoiceId);
@@ -477,6 +491,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
 
   // Build priority radar items
   const priorityItems: PriorityItem[] = useMemo(() => {
+    if (demo) return demoPriorityItems;
     const items: PriorityItem[] = [];
 
     // Payment promises from call logs
@@ -567,6 +582,17 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
       <AppSidebar activeSection={activeSection} onSectionChange={setActiveSection} onLogout={onLogout} />
 
       <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
+        {demo && (
+          <div className="bg-primary/10 border-b border-primary/20 px-4 py-2 flex items-center justify-between">
+            <p className="text-xs font-medium text-primary">
+              <Sparkles className="w-3 h-3 inline mr-1" />
+              Mode démo — Données fictives pour explorer le dashboard
+            </p>
+            <Button size="sm" variant="outline" onClick={onBack} className="h-7 text-xs border-primary/30 text-primary hover:bg-primary/5">
+              Retour à l'accueil
+            </Button>
+          </div>
+        )}
         <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border px-4 sm:px-6 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">

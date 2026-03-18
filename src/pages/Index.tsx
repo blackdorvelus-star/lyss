@@ -10,7 +10,7 @@ import Dashboard from "@/components/dashboard/Dashboard";
 import ExitIntentSurvey from "@/components/feedback/ExitIntentSurvey";
 import FeedbackWidget from "@/components/dashboard/FeedbackWidget";
 
-type View = "landing" | "dashboard";
+type View = "landing" | "dashboard" | "demo";
 
 const Index = () => {
   const [view, setView] = useState<View>("landing");
@@ -39,10 +39,10 @@ const Index = () => {
     setView("landing");
   };
 
-  if (view === "dashboard") {
+  if (view === "dashboard" || view === "demo") {
     return (
       <>
-        <Dashboard onBack={handleBackToLanding} onLogout={handleLogout} />
+        <Dashboard onBack={handleBackToLanding} onLogout={handleLogout} demo={view === "demo"} />
         <FeedbackWidget />
       </>
     );
@@ -116,7 +116,7 @@ const Index = () => {
         )}
       </header>
 
-      <HeroSection onStart={handleStart} />
+      <HeroSection onStart={handleStart} onDemo={() => setView("demo")} />
       <div id="how-it-works"><HowItWorks /></div>
       <MessagePreview />
       <div id="integrations"><IntegrationSection /></div>

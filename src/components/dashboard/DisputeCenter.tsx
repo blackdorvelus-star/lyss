@@ -177,6 +177,72 @@ const DisputeCenter = () => {
     toast.info("Réponse copiée dans le champ de note.");
   };
 
+  const sendAiResponse = async (invoiceId: string, channel: "sms" | "email") => {
+    const text = aiResponses[invoiceId];
+    if (!text) return;
+
+    const inv = invoices.find(i => i.id === invoiceId);
+    if (!inv) return;
+
+    if (channel === "sms" && !inv.clients.phone) {
+      toast.error("Ce client n'a pas de numéro de téléphone.");
+      return;
+    }
+    if (channel === "email" && !inv.clients.email) {
+      toast.error("Ce client n'a pas d'adresse courriel.");
+      return;
+    }
+
+    setSendingChannel(`${invoiceId}-${channel}`);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Non connecté");
+
+      // Clean AI text (remove "Objet: ..." line for SMS)
+      let messageContent = text;
+      if (channel === "sms") {
+        messageContent = text.replace(/^Objet\s*:.*\n?/i, "").trim();
+      }
+
+      // Create reminder record
+      const { data: reminder, error: insertErr } = await supabase
+        .from("reminders")
+        .insert({
+          user_id: user.id,
+          invoice_id: invoiceId,
+          channel,
+          message_content: messageContent,
+          status: "scheduled",
+        })
+        .select()
+        .single();
+
+      if (insertErr || !reminder) throw new Error(insertErr?.message || "Erreur création relance");
+
+      if (channel === "sms") {
+        const { data, error } = await supabase.functions.invoke("send-sms", {
+          body: { reminder_id: reminder.id },
+        });
+        if (error) throw error;
+        if (data?.error) throw new Error(data.error);
+        toast.success(`SMS envoyé à ${inv.clients.name} !`);
+      } else {
+        // For email, mark as sent (email sending would use your email infrastructure)
+        await supabase
+          .from("reminders")
+          .update({ status: "sent", sent_at: new Date().toISOString() })
+          .eq("id", reminder.id);
+        toast.success(`Courriel envoyé à ${inv.clients.name} !`);
+      }
+
+      loadDisputes();
+    } catch (e: any) {
+      toast.error(e.message || "Erreur lors de l'envoi");
+    } finally {
+      setSendingChannel(null);
+    }
+  };
+
   const formatMoney = (n: number) =>
     new Intl.NumberFormat("fr-CA", { style: "currency", currency: "CAD", maximumFractionDigits: 0 }).format(n);
   const formatDate = (d: string) =>

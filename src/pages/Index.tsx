@@ -50,14 +50,9 @@ const Index = () => {
     return (data as any)?.onboarding_completed === true;
   };
 
-  const handleStart = async () => {
-    // Skip auth for testing — go directly to dashboard
-    if (session) {
-      const completed = await checkOnboarding();
-      setView(completed ? "dashboard" : "onboarding");
-    } else {
-      setView("dashboard");
-    }
+  const handleStart = () => {
+    // Skip auth entirely for testing
+    setView("dashboard");
   };
 
   const handleAuth = async () => {

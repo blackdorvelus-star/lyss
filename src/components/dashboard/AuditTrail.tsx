@@ -152,7 +152,7 @@ const AuditTrail = () => {
       </div>
 
       {/* Filters */}
-      <div className="flex items-center gap-2 flex-wrap">
+      <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap overflow-x-auto pb-1 -mx-1 px-1">
         <Filter className="w-3.5 h-3.5 text-muted-foreground" />
         {[
           { key: "all", label: "Tout" },

@@ -154,18 +154,18 @@ const BatchReminder = () => {
       </div>
 
       {/* Select all + count */}
-      <div className="flex items-center justify-between">
-        <button onClick={selectAll} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <button onClick={selectAll} className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground hover:text-foreground transition-colors">
           {selected.size === eligible.length && eligible.length > 0 ? (
             <CheckSquare className="w-4 h-4 text-primary" />
           ) : (
             <Square className="w-4 h-4" />
           )}
-          Tout sélectionner ({eligible.length} éligible{eligible.length !== 1 ? "s" : ""})
+          Tout sélectionner ({eligible.length})
         </button>
         {selected.size > 0 && (
-          <span className="text-xs font-medium text-primary">
-            {selected.size} sélectionné{selected.size > 1 ? "s" : ""} · {formatMoney(
+          <span className="text-[10px] sm:text-xs font-medium text-primary">
+            {selected.size} · {formatMoney(
               invoices.filter((i) => selected.has(i.id)).reduce((s, i) => s + i.amount, 0)
             )}
           </span>

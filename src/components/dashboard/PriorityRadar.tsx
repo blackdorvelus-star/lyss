@@ -3,7 +3,7 @@ import { AlertTriangle, Banknote, MessageSquare, ArrowRight, Clock, FileSignatur
 
 interface PriorityItem {
   id: string;
-  type: "promise" | "negative" | "response";
+  type: "promise" | "negative" | "response" | "quote";
   clientName: string;
   detail: string;
   date: string;

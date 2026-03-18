@@ -789,6 +789,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout }: DashboardProps) => {
         </main>
       </div>
     </div>
+    </>
   );
 };
 

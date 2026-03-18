@@ -738,15 +738,6 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout, demo = false }: DashboardPr
                   )}
                 </div>
 
-                {/* ── Colonne latérale (1/3) — sticky ── */}
-                <div className="lg:col-span-1 space-y-4 sm:space-y-6">
-                  <div className="sticky top-20 space-y-4 sm:space-y-6">
-                    <PriorityRadar
-                      items={priorityItems}
-                      onNavigate={(id) => setExpandedId(expandedId === id ? null : id)}
-                    />
-                  </div>
-                </div>
               </div>
 
               {/* Floating mobile CTA */}

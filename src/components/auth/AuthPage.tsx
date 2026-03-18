@@ -62,7 +62,7 @@ const AuthPage = ({ onAuth }: AuthPageProps) => {
     setAppleLoading(true);
     try {
       const { error } = await lovable.auth.signInWithOAuth("apple", {
-        redirect_uri: window.location.origin,
+        redirect_uri: window.location.origin + "/dashboard",
       });
       if (error) throw error;
     } catch (err: unknown) {
@@ -76,7 +76,7 @@ const AuthPage = ({ onAuth }: AuthPageProps) => {
     setGoogleLoading(true);
     try {
       const { error } = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
+        redirect_uri: window.location.origin + "/dashboard",
       });
       if (error) throw error;
     } catch (err: unknown) {

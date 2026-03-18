@@ -35,7 +35,7 @@ const DashboardPage = () => {
   }
 
   if (!session) {
-    return <AuthPage onAuth={() => {}} />;
+    return <AuthPage onAuth={() => navigate("/dashboard")} />;
   }
 
   return (

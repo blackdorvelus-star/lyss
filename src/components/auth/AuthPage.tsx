@@ -6,13 +6,14 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { safeSupabase as supabase } from "@/lib/supabase-safe";
 import { lovable } from "@/integrations/lovable/index";
+import ForgotPasswordForm from "@/components/auth/ForgotPasswordForm";
 
 interface AuthPageProps {
   onAuth: () => void;
 }
 
 const AuthPage = ({ onAuth }: AuthPageProps) => {
-  const [mode, setMode] = useState<"login" | "signup">("login");
+  const [mode, setMode] = useState<"login" | "signup" | "forgot">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -94,10 +95,15 @@ const AuthPage = ({ onAuth }: AuthPageProps) => {
 
       <div className="flex-1 flex items-center justify-center px-5 pb-12">
         <motion.div
+          key={mode}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="w-full max-w-sm"
         >
+          {mode === "forgot" ? (
+            <ForgotPasswordForm onBack={() => setMode("login")} />
+          ) : (
+            <>
           <div className="flex items-center gap-2 mb-2">
             <Sparkles className="w-5 h-5 text-primary" />
             <h1 className="font-display text-2xl font-bold">
@@ -149,6 +155,16 @@ const AuthPage = ({ onAuth }: AuthPageProps) => {
                 </>
               )}
             </Button>
+
+            {mode === "login" && (
+              <button
+                type="button"
+                onClick={() => setMode("forgot")}
+                className="text-xs text-muted-foreground hover:text-primary transition-colors w-full text-right mt-1"
+              >
+                Mot de passe oublié ?
+              </button>
+            )}
           </form>
 
           <div className="relative my-6">
@@ -210,6 +226,8 @@ const AuthPage = ({ onAuth }: AuthPageProps) => {
               {mode === "login" ? "S'inscrire" : "Se connecter"}
             </button>
           </p>
+          </>
+          )}
         </motion.div>
       </div>
     </div>

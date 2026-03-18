@@ -193,10 +193,10 @@ const ClientManagement = () => {
             className="overflow-hidden"
           >
             <div className="bg-card border border-border rounded-xl p-4 space-y-3">
-              <Input placeholder="Nom du client *" value={newClient.name} onChange={(e) => setNewClient({ ...newClient, name: e.target.value })} className="bg-secondary" />
+               <Input placeholder="ex: Construction Roy inc." value={newClient.name} onChange={(e) => setNewClient({ ...newClient, name: e.target.value })} className="bg-secondary" />
               <div className="grid grid-cols-2 gap-3">
-                <Input placeholder="Courriel" value={newClient.email} onChange={(e) => setNewClient({ ...newClient, email: e.target.value })} className="bg-secondary" />
-                <Input placeholder="Téléphone" value={newClient.phone} onChange={(e) => setNewClient({ ...newClient, phone: e.target.value })} className="bg-secondary" />
+                <Input placeholder="ex: info@constructionroy.ca" value={newClient.email} onChange={(e) => setNewClient({ ...newClient, email: e.target.value })} className="bg-secondary" />
+                <Input placeholder="ex: 418-555-3210" value={newClient.phone} onChange={(e) => setNewClient({ ...newClient, phone: e.target.value })} className="bg-secondary" />
               </div>
               <Button onClick={handleAdd} disabled={!newClient.name.trim() || saving} className="w-full" size="sm">
                 {saving ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Plus className="w-4 h-4 mr-1" />}
@@ -211,7 +211,7 @@ const ClientManagement = () => {
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
-          placeholder="Rechercher un client..."
+          placeholder="Rechercher un client… ex: Tremblay"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="pl-9 bg-card"
@@ -244,8 +244,8 @@ const ClientManagement = () => {
                   <div className="flex-1 space-y-2">
                     <Input value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} className="bg-secondary h-8 text-sm" />
                     <div className="grid grid-cols-2 gap-2">
-                      <Input value={editForm.email} onChange={(e) => setEditForm({ ...editForm, email: e.target.value })} placeholder="Courriel" className="bg-secondary h-8 text-sm" />
-                      <Input value={editForm.phone} onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })} placeholder="Téléphone" className="bg-secondary h-8 text-sm" />
+                       <Input value={editForm.email} onChange={(e) => setEditForm({ ...editForm, email: e.target.value })} placeholder="ex: info@entreprise.ca" className="bg-secondary h-8 text-sm" />
+                      <Input value={editForm.phone} onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })} placeholder="ex: 514-555-1234" className="bg-secondary h-8 text-sm" />
                     </div>
                     <div className="flex gap-2">
                       <Button size="sm" variant="default" onClick={() => handleEdit(client.id)} disabled={saving} className="h-7 text-xs">

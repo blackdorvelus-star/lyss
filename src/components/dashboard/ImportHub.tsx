@@ -307,7 +307,7 @@ const ImportHub = ({ onComplete }: ImportHubProps) => {
                 </div>
                 <div>
                   <label className="text-sm font-medium mb-1.5 block">Courriel du client</label>
-                  <Input type="email" placeholder="ex: marc@email.com" value={active.email} onChange={(e) => updateField("email", e.target.value)} className="bg-card" />
+                  <Input type="email" placeholder="ex: marc@constructionxl.ca" value={active.email} onChange={(e) => updateField("email", e.target.value)} className="bg-card" />
                 </div>
                 <div>
                   <label className="text-sm font-medium mb-1.5 block">Téléphone du client</label>

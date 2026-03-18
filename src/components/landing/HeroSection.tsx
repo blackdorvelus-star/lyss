@@ -10,6 +10,7 @@ import screenshotMobile from "@/assets/screenshot-mobile.jpg";
 
 interface HeroSectionProps {
   onStart: () => void;
+  onDemo?: () => void;
 }
 
 const screenshots = [

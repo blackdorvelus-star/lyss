@@ -39,6 +39,14 @@ const typeConfig = {
     color: "text-accent",
     dot: "bg-accent",
   },
+  quote: {
+    icon: FileSignature,
+    label: "Soumission sans réponse",
+    bg: "bg-amber-500/10",
+    ring: "ring-amber-500/20",
+    color: "text-amber-500",
+    dot: "bg-amber-500",
+  },
 };
 
 const PriorityRadar = ({ items, onNavigate }: PriorityRadarProps) => {

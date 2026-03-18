@@ -95,10 +95,15 @@ const AuthPage = ({ onAuth }: AuthPageProps) => {
 
       <div className="flex-1 flex items-center justify-center px-5 pb-12">
         <motion.div
+          key={mode}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="w-full max-w-sm"
         >
+          {mode === "forgot" ? (
+            <ForgotPasswordForm onBack={() => setMode("login")} />
+          ) : (
+            <>
           <div className="flex items-center gap-2 mb-2">
             <Sparkles className="w-5 h-5 text-primary" />
             <h1 className="font-display text-2xl font-bold">

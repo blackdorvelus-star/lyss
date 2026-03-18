@@ -418,6 +418,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout, demo = false }: DashboardPr
 
   // Build live activity feed
   const feedItems: FeedItem[] = useMemo(() => {
+    if (demo) return demoFeedItems;
     const allRems = Object.entries(reminders).flatMap(([invoiceId, rems]) =>
       rems.map((r) => {
         const inv = invoices.find((i) => i.id === invoiceId);

@@ -20,6 +20,7 @@ import WeeklyProductivity from "./WeeklyProductivity";
 import type { CallLog } from "./CallHistory";
 import { useIsMobile } from "@/hooks/use-mobile";
 import GuidedTour from "@/components/onboarding/GuidedTour";
+import { demoInvoices, demoReminders, demoCallLogs, demoFeedItems, demoPriorityItems, demoQuotes } from "./demoData";
 // Lazy-loaded heavy sections
 const SettingsWizard = lazy(() => import("./SettingsWizard"));
 const ClientManagement = lazy(() => import("./ClientManagement"));

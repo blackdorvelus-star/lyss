@@ -57,6 +57,20 @@ const AuthPage = ({ onAuth }: AuthPageProps) => {
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    setGoogleLoading(true);
+    try {
+      const { error } = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      if (error) throw error;
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Erreur inconnue";
+      toast.error(message);
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <header className="px-5 py-4">

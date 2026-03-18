@@ -88,6 +88,15 @@ const SettingsWizard = () => {
   const [emailSubjectTemplate, setEmailSubjectTemplate] = useState("");
   const [emailBodyTemplate, setEmailBodyTemplate] = useState("");
 
+  // Scenario scripts
+  const [scriptPromise, setScriptPromise] = useState("");
+  const [scriptDispute, setScriptDispute] = useState("");
+  const [scriptNoResponse, setScriptNoResponse] = useState("");
+  const [scriptPartialPayment, setScriptPartialPayment] = useState("");
+  const [scriptCallFull, setScriptCallFull] = useState("");
+  const [scriptSmsFollowup, setScriptSmsFollowup] = useState("");
+  const [scriptEmailFollowup, setScriptEmailFollowup] = useState("");
+
   // AI behavior
   const [aiProposePlan, setAiProposePlan] = useState(true);
   const [aiNegotiate, setAiNegotiate] = useState(false);

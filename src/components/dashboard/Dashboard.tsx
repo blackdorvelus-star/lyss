@@ -350,6 +350,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout, demo = false }: DashboardPr
   }, [fetchData, demo]);
 
   const markRecovered = useCallback(async (invoiceId: string, amount: number, maxAmount: number) => {
+    if (demo) { toast.info("Mode démo — action désactivée"); return; }
     if (amount <= 0 || amount > maxAmount) {
       toast.error(`Le montant doit être entre 1 $ et ${maxAmount} $.`);
       return;

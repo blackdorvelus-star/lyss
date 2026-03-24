@@ -61,7 +61,7 @@ const AssistantIdentity = () => {
       .from("payment_settings")
       .upsert({
         user_id: user.id,
-        assistant_name: name || "Lyss",
+        assistant_name: canCustomizeName ? (name || "Lyss") : "Lyss",
         assistant_role: role,
         company_name: company || null,
       }, { onConflict: "user_id" });

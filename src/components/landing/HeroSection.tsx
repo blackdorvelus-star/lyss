@@ -51,8 +51,8 @@ const HeroSection = ({ onStart, onDemo }: HeroSectionProps) => {
             transition={{ delay: 0.2 }}
             className="text-muted-foreground text-sm sm:text-base leading-relaxed mb-5 max-w-md mx-auto"
           >
-            Lyss relance tes clients par SMS, courriel et appel vocal — 
-            avec un ton québécois professionnel. Zéro stress.
+            Lyss fait le suivi de tes factures par SMS, courriel et appel vocal — 
+            tes clients paient directement dans ton compte. Zéro stress.
           </motion.p>
 
           {/* Channel badges */}

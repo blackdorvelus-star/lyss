@@ -118,9 +118,10 @@ ${(callsRes.data || []).map((c: any) => {
 - Négociation IA: ${settings.ai_negotiate ? `Oui (max ${settings.ai_max_discount_percent || 0}%)` : "Non"}
 - Plan de paiement: ${settings.ai_propose_payment_plan ? "Oui" : "Non"}
 
-🎯 ACTION DEMANDÉE: ${action_type || "Décider la meilleure prochaine action de relance"}
+🎯 ACTION DEMANDÉE: ${action_type || "Décider la meilleure prochaine action de suivi"}
 
 Instructions: Analyse ce dossier et décide la meilleure action à prendre. Respecte les lois québécoises (RLRQ, c. R-2.2). Ne menace jamais. Sois professionnel et empathique.
+IMPORTANT: Le paiement doit TOUJOURS être dirigé vers ${settings.company_name || "l'entreprise"}, JAMAIS vers Lyss ou ${settings.assistant_name || "l'assistante"}. Lyss ne perçoit aucun paiement. Formule toujours comme : "envoyer le paiement à ${settings.company_name || "l'entreprise"}".
 `.trim();
 
     // Trigger Relevance AI agent

@@ -39,6 +39,7 @@ RÈGLES ABSOLUES :
 - N'inclus AUCUN lien de paiement dans le message.
 - Ne mentionne JAMAIS d'intérêts de retard, de frais, ou de conséquences légales.
 - Utilise le terme "suivi de courtoisie" et non "relance" ou "recouvrement".
+- TRÈS IMPORTANT : Le paiement doit TOUJOURS être dirigé vers ${company}, JAMAIS vers ${name} ou Lyss. Le client paie ${company} directement. ${name} ne perçoit aucun paiement. Formule toujours comme : "envoyer votre paiement à ${company}" ou "régler directement auprès de ${company}".
 - Termine chaque message par : "${closing}"${smsSig}${emailSig}
 
 Tu dois retourner exactement un JSON (pas de markdown, pas de texte autour) :

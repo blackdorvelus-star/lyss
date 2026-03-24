@@ -101,6 +101,7 @@ const SettingsWizard = () => {
   const [aiProposePlan, setAiProposePlan] = useState(true);
   const [aiNegotiate, setAiNegotiate] = useState(false);
   const [aiMaxDiscount, setAiMaxDiscount] = useState(0);
+  const [useRelevanceAi, setUseRelevanceAi] = useState(false);
 
   // Messages
   const [smsSignature, setSmsSignature] = useState("");
@@ -153,6 +154,7 @@ const SettingsWizard = () => {
       setAiProposePlan(d.ai_propose_payment_plan ?? true);
       setAiNegotiate(d.ai_negotiate ?? false);
       setAiMaxDiscount(d.ai_max_discount_percent ?? 0);
+      setUseRelevanceAi((d as any).use_relevance_ai ?? false);
       setSmsSignature(d.sms_signature || "");
       setEmailSignature(d.email_signature || "");
       setInteracEmail(d.interac_email || "");
@@ -204,6 +206,7 @@ const SettingsWizard = () => {
         ai_propose_payment_plan: aiProposePlan,
         ai_negotiate: aiNegotiate,
         ai_max_discount_percent: aiMaxDiscount,
+        use_relevance_ai: useRelevanceAi,
         sms_signature: smsSignature || null,
         email_signature: emailSignature || null,
         interac_email: interacEmail || null,
@@ -566,6 +569,20 @@ const SettingsWizard = () => {
           <Field icon={FileText} label="Instructions personnalisées (optionnel)" hint="Ajoutées au prompt de l'IA. Ex: mentionner la promo du mois.">
             <Textarea value={customInstructions} onChange={e => setCustomInstructions(e.target.value)} placeholder="Toujours mentionner que le paiement Interac est instantané…" className="bg-secondary min-h-[70px] text-sm" />
           </Field>
+          <div className="border-t border-border pt-4 mt-4">
+            <ToggleRow
+              icon={Globe}
+              title="Relevance AI — Orchestration autonome"
+              description="Délègue les décisions de relance à ton agent Relevance AI (SMS, courriel, appel)"
+              checked={useRelevanceAi}
+              onChange={setUseRelevanceAi}
+            />
+            {useRelevanceAi && (
+              <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-xs text-muted-foreground mt-2 ml-8">
+                ✅ Ton agent Relevance AI orchestrera les séquences de relance automatiquement.
+              </motion.p>
+            )}
+          </div>
         </div>
       </SettingsSection>
 

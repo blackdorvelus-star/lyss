@@ -1,0 +1,1 @@
+ALTER TABLE public.payment_settings ADD COLUMN use_relevance_ai boolean NOT NULL DEFAULT false;

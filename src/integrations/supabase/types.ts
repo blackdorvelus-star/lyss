@@ -124,6 +124,71 @@ export type Database = {
         }
         Relationships: []
       }
+      collection_sequences: {
+        Row: {
+          amount_due: number
+          company_id: string
+          created_at: string
+          customer_email: string | null
+          customer_name: string
+          customer_phone: string | null
+          due_date: string | null
+          id: string
+          invoice_id: string
+          last_action_at: string | null
+          next_action_at: string | null
+          sequence_step: string
+          status: string
+          stopped_reason: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_due?: number
+          company_id: string
+          created_at?: string
+          customer_email?: string | null
+          customer_name: string
+          customer_phone?: string | null
+          due_date?: string | null
+          id?: string
+          invoice_id: string
+          last_action_at?: string | null
+          next_action_at?: string | null
+          sequence_step?: string
+          status?: string
+          stopped_reason?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_due?: number
+          company_id?: string
+          created_at?: string
+          customer_email?: string | null
+          customer_name?: string
+          customer_phone?: string | null
+          due_date?: string | null
+          id?: string
+          invoice_id?: string
+          last_action_at?: string | null
+          next_action_at?: string | null
+          sequence_step?: string
+          status?: string
+          stopped_reason?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collection_sequences_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invoices: {
         Row: {
           amount: number

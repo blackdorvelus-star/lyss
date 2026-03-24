@@ -60,7 +60,8 @@ const OnboardingWizard = ({ onComplete }: OnboardingWizardProps) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Non connecté");
 
-      // Save company & assistant settings
+      // Save company & assistant settings + marketing attribution
+      const marketingSource = localStorage.getItem("lyss_marketing_source");
       await supabase.from("payment_settings").upsert({
         user_id: user.id,
         company_name: companyName.trim(),
@@ -69,7 +70,10 @@ const OnboardingWizard = ({ onComplete }: OnboardingWizardProps) => {
         assistant_name: assistantName.trim(),
         assistant_role: assistantRole.trim(),
         onboarding_completed: true,
+        ...(marketingSource ? { marketing_source: marketingSource } : {}),
       } as any, { onConflict: "user_id" });
+      // Clear the stored source after saving
+      if (marketingSource) localStorage.removeItem("lyss_marketing_source");
 
       // Create client
       const { data: newClient, error: clientErr } = await supabase

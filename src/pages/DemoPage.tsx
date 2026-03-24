@@ -1,9 +1,19 @@
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import Dashboard from "@/components/dashboard/Dashboard";
 import FeedbackWidget from "@/components/dashboard/FeedbackWidget";
 
 const DemoPage = () => {
   const navigate = useNavigate();
+
+  // Capture UTM / source param for marketing attribution
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const source = params.get("source");
+    if (source) {
+      localStorage.setItem("lyss_marketing_source", source);
+    }
+  }, []);
 
   return (
     <>

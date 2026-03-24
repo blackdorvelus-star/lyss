@@ -38,3 +38,9 @@ verify_jwt = false
 
 [functions.hangup-call]
 verify_jwt = false
+
+[functions.relevance-ai-trigger]
+verify_jwt = false
+
+[functions.relevance-ai-webhook]
+verify_jwt = false

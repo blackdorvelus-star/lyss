@@ -282,7 +282,7 @@ serve(async (req) => {
     });
 
     // Update invoice timestamp
-    if (result.success) {
+    if (result.success && action !== "mark_resolved" && action !== "mark_paid") {
       await supabase
         .from("invoices")
         .update({

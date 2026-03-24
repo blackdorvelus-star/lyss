@@ -359,6 +359,7 @@ export type Database = {
           interac_answer: string | null
           interac_email: string | null
           interac_question: string | null
+          marketing_source: string | null
           notify_on_dispute: boolean | null
           notify_on_negative_sentiment: boolean | null
           notify_on_payment: boolean | null
@@ -417,6 +418,7 @@ export type Database = {
           interac_answer?: string | null
           interac_email?: string | null
           interac_question?: string | null
+          marketing_source?: string | null
           notify_on_dispute?: boolean | null
           notify_on_negative_sentiment?: boolean | null
           notify_on_payment?: boolean | null
@@ -475,6 +477,7 @@ export type Database = {
           interac_answer?: string | null
           interac_email?: string | null
           interac_question?: string | null
+          marketing_source?: string | null
           notify_on_dispute?: boolean | null
           notify_on_negative_sentiment?: boolean | null
           notify_on_payment?: boolean | null

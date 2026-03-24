@@ -13,6 +13,15 @@ const Index = () => {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // Capture UTM / source param for marketing attribution
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const source = params.get("source");
+    if (source) {
+      localStorage.setItem("lyss_marketing_source", source);
+    }
+  }, []);
+
   const handleStart = () => navigate("/dashboard");
 
   return (

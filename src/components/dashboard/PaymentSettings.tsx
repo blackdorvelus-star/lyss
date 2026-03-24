@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Banknote, CreditCard, Building2, Save, Loader2, Link2, ShieldAlert } from "lucide-react";
+import { Banknote, CreditCard, Building2, Save, Loader2, Link2, ShieldAlert, Landmark, Mail, MapPin } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import { safeSupabase as supabase } from "@/lib/supabase-safe";
 import { toast } from "sonner";
 
@@ -14,6 +15,13 @@ const PaymentSettings = () => {
   const [stripeLink, setStripeLink] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [allowDisputes, setAllowDisputes] = useState(false);
+  const [paypalLink, setPaypalLink] = useState("");
+  const [bankInstitution, setBankInstitution] = useState("");
+  const [bankTransit, setBankTransit] = useState("");
+  const [bankAccount, setBankAccount] = useState("");
+  const [bankName, setBankName] = useState("");
+  const [chequeAddress, setChequeAddress] = useState("");
+  const [depositInstructions, setDepositInstructions] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -38,6 +46,13 @@ const PaymentSettings = () => {
       setStripeLink(data.stripe_link || "");
       setCompanyName(data.company_name || "");
       setAllowDisputes((data as any).allow_disputes ?? false);
+      setPaypalLink((data as any).paypal_link || "");
+      setBankInstitution((data as any).bank_institution || "");
+      setBankTransit((data as any).bank_transit || "");
+      setBankAccount((data as any).bank_account || "");
+      setBankName((data as any).bank_name || "");
+      setChequeAddress((data as any).cheque_address || "");
+      setDepositInstructions((data as any).deposit_instructions || "");
     }
     setLoading(false);
   };
@@ -55,6 +70,13 @@ const PaymentSettings = () => {
       stripe_link: stripeLink || null,
       company_name: companyName || null,
       allow_disputes: allowDisputes,
+      paypal_link: paypalLink || null,
+      bank_institution: bankInstitution || null,
+      bank_transit: bankTransit || null,
+      bank_account: bankAccount || null,
+      bank_name: bankName || null,
+      cheque_address: chequeAddress || null,
+      deposit_instructions: depositInstructions || null,
     } as any;
 
     const { error } = await supabase
@@ -89,7 +111,7 @@ const PaymentSettings = () => {
           Portail de paiement client
         </h3>
         <p className="text-xs text-muted-foreground mt-1">
-          Ces informations apparaissent sur le portail de paiement de tes clients.
+          Configure les moyens de paiement que tes clients verront sur le portail.
           Lyss ne traite aucune transaction — les paiements vont directement dans ton compte.
         </p>
       </div>
@@ -151,11 +173,11 @@ const PaymentSettings = () => {
       <div className="bg-card border border-border rounded-xl p-4 space-y-3">
         <div className="flex items-center gap-2">
           <CreditCard className="w-4 h-4 text-primary" />
-          <h4 className="font-medium text-sm">Paiement par carte (Stripe)</h4>
+          <h4 className="font-medium text-sm">Carte de crédit / débit (Stripe)</h4>
         </div>
         <div className="space-y-1.5">
           <label className="text-xs text-muted-foreground">
-            Lien Stripe Payment Link (optionnel)
+            Lien Stripe Payment Link
           </label>
           <Input
             value={stripeLink}
@@ -164,8 +186,116 @@ const PaymentSettings = () => {
             className="bg-secondary"
           />
           <p className="text-xs text-muted-foreground">
-            Crée un lien depuis ton tableau de bord Stripe → Payment Links.
+            Accepte Visa, Mastercard, débit Visa et plus. Crée un lien depuis ton tableau de bord Stripe.
           </p>
+        </div>
+      </div>
+
+      {/* PayPal section */}
+      <div className="bg-card border border-border rounded-xl p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <Mail className="w-4 h-4 text-blue-500" />
+          <h4 className="font-medium text-sm">PayPal</h4>
+        </div>
+        <div className="space-y-1.5">
+          <label className="text-xs text-muted-foreground">
+            Lien PayPal.me ou adresse PayPal
+          </label>
+          <Input
+            value={paypalLink}
+            onChange={(e) => setPaypalLink(e.target.value)}
+            placeholder="https://paypal.me/monentreprise ou paiements@entreprise.ca"
+            className="bg-secondary"
+          />
+        </div>
+      </div>
+
+      {/* Virement bancaire direct */}
+      <div className="bg-card border border-border rounded-xl p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <Landmark className="w-4 h-4 text-emerald-500" />
+          <h4 className="font-medium text-sm">Virement bancaire direct</h4>
+        </div>
+        <div className="space-y-3">
+          <div className="space-y-1.5">
+            <label className="text-xs text-muted-foreground">Nom de la banque</label>
+            <Input
+              value={bankName}
+              onChange={(e) => setBankName(e.target.value)}
+              placeholder="Desjardins, BMO, TD..."
+              className="bg-secondary"
+            />
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            <div className="space-y-1.5">
+              <label className="text-xs text-muted-foreground">No institution</label>
+              <Input
+                value={bankInstitution}
+                onChange={(e) => setBankInstitution(e.target.value)}
+                placeholder="815"
+                className="bg-secondary"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs text-muted-foreground">No transit</label>
+              <Input
+                value={bankTransit}
+                onChange={(e) => setBankTransit(e.target.value)}
+                placeholder="12345"
+                className="bg-secondary"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs text-muted-foreground">No compte</label>
+              <Input
+                value={bankAccount}
+                onChange={(e) => setBankAccount(e.target.value)}
+                placeholder="1234567"
+                className="bg-secondary"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Chèque */}
+      <div className="bg-card border border-border rounded-xl p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <MapPin className="w-4 h-4 text-orange-500" />
+          <h4 className="font-medium text-sm">Chèque par la poste</h4>
+        </div>
+        <div className="space-y-1.5">
+          <label className="text-xs text-muted-foreground">
+            Adresse postale pour les chèques
+          </label>
+          <Textarea
+            value={chequeAddress}
+            onChange={(e) => setChequeAddress(e.target.value)}
+            placeholder="Plomberie Lévis Inc.&#10;123 rue Principale&#10;Lévis, QC G6V 1A1"
+            className="bg-secondary min-h-[70px] text-sm"
+          />
+          <p className="text-xs text-muted-foreground">
+            Le chèque doit être libellé au nom de ton entreprise.
+          </p>
+        </div>
+      </div>
+
+      {/* Dépôt direct */}
+      <div className="bg-card border border-border rounded-xl p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <Landmark className="w-4 h-4 text-violet-500" />
+          <h4 className="font-medium text-sm">Dépôt direct</h4>
+        </div>
+        <div className="space-y-1.5">
+          <label className="text-xs text-muted-foreground">
+            Instructions pour le dépôt direct
+          </label>
+          <Textarea
+            value={depositInstructions}
+            onChange={(e) => setDepositInstructions(e.target.value)}
+            placeholder="Instructions spécifiques pour le dépôt direct..."
+            className="bg-secondary min-h-[70px] text-sm"
+          />
         </div>
       </div>
 

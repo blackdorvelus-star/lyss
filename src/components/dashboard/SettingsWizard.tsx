@@ -585,6 +585,18 @@ const SettingsWizard = () => {
                 ✅ Ton agent Relevance AI orchestrera les séquences de relance automatiquement.
               </motion.p>
             )}
+
+            <ToggleRow
+              title="Démarrage automatique des séquences"
+              description="Quand tu confies un dossier, Lyss démarre la relance immédiatement sans action manuelle"
+              checked={autoStartSequences}
+              onChange={setAutoStartSequences}
+            />
+            {!autoStartSequences && (
+              <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-xs text-muted-foreground mt-2 ml-8">
+                ⚙️ Mode manuel : tu devras lancer chaque séquence depuis l'onglet Séquences.
+              </motion.p>
+            )}
           </div>
         </div>
       </SettingsSection>

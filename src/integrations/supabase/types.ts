@@ -298,6 +298,7 @@ export type Database = {
           allow_disputes: boolean
           assistant_name: string | null
           assistant_role: string | null
+          auto_start_sequences: boolean
           bank_account: string | null
           bank_institution: string | null
           bank_name: string | null
@@ -355,6 +356,7 @@ export type Database = {
           allow_disputes?: boolean
           assistant_name?: string | null
           assistant_role?: string | null
+          auto_start_sequences?: boolean
           bank_account?: string | null
           bank_institution?: string | null
           bank_name?: string | null
@@ -412,6 +414,7 @@ export type Database = {
           allow_disputes?: boolean
           assistant_name?: string | null
           assistant_role?: string | null
+          auto_start_sequences?: boolean
           bank_account?: string | null
           bank_institution?: string | null
           bank_name?: string | null

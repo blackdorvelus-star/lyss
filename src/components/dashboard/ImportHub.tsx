@@ -147,6 +147,30 @@ const ImportHub = ({ onComplete }: ImportHubProps) => {
 
         if (invoiceError || !newInvoice) throw new Error(invoiceError?.message || "Erreur création dossier");
 
+        // Check if auto-start sequences is enabled
+        const { data: settings } = await supabase
+          .from("payment_settings")
+          .select("auto_start_sequences, company_name")
+          .eq("user_id", user.id)
+          .single();
+
+        const autoStart = (settings as any)?.auto_start_sequences ?? true;
+
+        // Create collection_sequence
+        await supabase.from("collection_sequences" as any).insert({
+          user_id: user.id,
+          company_id: (settings as any)?.company_name || "Mon entreprise",
+          invoice_id: newInvoice.id,
+          customer_name: inv.clientName.trim(),
+          customer_email: inv.email.trim() || null,
+          customer_phone: inv.phone.trim() || null,
+          amount_due: parseFloat(inv.amount),
+          status: autoStart ? "active" : "waiting",
+          sequence_step: "email_1",
+          next_action_at: autoStart ? new Date().toISOString() : null,
+        } as any);
+
+        // Trigger reminder generation
         try {
           const { data: session } = await supabase.auth.getSession();
           const token = session?.session?.access_token;

@@ -1,0 +1,1 @@
+ALTER TABLE public.payment_settings ADD COLUMN IF NOT EXISTS auto_start_sequences boolean NOT NULL DEFAULT true;

@@ -102,6 +102,7 @@ const SettingsWizard = () => {
   const [aiNegotiate, setAiNegotiate] = useState(false);
   const [aiMaxDiscount, setAiMaxDiscount] = useState(0);
   const [useRelevanceAi, setUseRelevanceAi] = useState(false);
+  const [autoStartSequences, setAutoStartSequences] = useState(true);
 
   // Messages
   const [smsSignature, setSmsSignature] = useState("");
@@ -155,6 +156,7 @@ const SettingsWizard = () => {
       setAiNegotiate(d.ai_negotiate ?? false);
       setAiMaxDiscount(d.ai_max_discount_percent ?? 0);
       setUseRelevanceAi((d as any).use_relevance_ai ?? false);
+      setAutoStartSequences((d as any).auto_start_sequences ?? true);
       setSmsSignature(d.sms_signature || "");
       setEmailSignature(d.email_signature || "");
       setInteracEmail(d.interac_email || "");
@@ -207,6 +209,7 @@ const SettingsWizard = () => {
         ai_negotiate: aiNegotiate,
         ai_max_discount_percent: aiMaxDiscount,
         use_relevance_ai: useRelevanceAi,
+        auto_start_sequences: autoStartSequences,
         sms_signature: smsSignature || null,
         email_signature: emailSignature || null,
         interac_email: interacEmail || null,
@@ -582,6 +585,18 @@ const SettingsWizard = () => {
                 ✅ Ton agent Relevance AI orchestrera les séquences de relance automatiquement.
               </motion.p>
             )}
+
+            <ToggleRow
+              title="Démarrage automatique des séquences"
+              description="Quand tu confies un dossier, Lyss démarre la relance immédiatement sans action manuelle"
+              checked={autoStartSequences}
+              onChange={setAutoStartSequences}
+            />
+            {!autoStartSequences && (
+              <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-xs text-muted-foreground mt-2 ml-8">
+                ⚙️ Mode manuel : tu devras lancer chaque séquence depuis l'onglet Séquences.
+              </motion.p>
+            )}
           </div>
         </div>
       </SettingsSection>
@@ -867,11 +882,11 @@ const SettingsSection = ({ icon: Icon, title, description, open, onToggle, child
 );
 
 const ToggleRow = ({ icon: Icon, title, description, checked, onChange }: {
-  icon: any; title: string; description: string; checked: boolean; onChange: (v: boolean) => void;
+  icon?: any; title: string; description: string; checked: boolean; onChange: (v: boolean) => void;
 }) => (
   <div className="flex items-center justify-between gap-3 py-1">
     <div className="flex items-center gap-3">
-      <Icon className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+      {Icon && <Icon className="w-4 h-4 text-muted-foreground flex-shrink-0" />}
       <div>
         <p className="text-sm font-medium">{title}</p>
         <p className="text-[11px] text-muted-foreground">{description}</p>

@@ -39,6 +39,7 @@ const QuoteManagement = lazy(() => import("./QuoteManagement"));
 const BatchReminder = lazy(() => import("./BatchReminder"));
 const AuditTrail = lazy(() => import("./AuditTrail"));
 const CashflowForecast = lazy(() => import("./CashflowForecast"));
+const SequenceTracker = lazy(() => import("./SequenceTracker"));
 
 const SectionLoader = () => (
   <div className="flex items-center justify-center py-16">
@@ -630,6 +631,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout, demo = false }: DashboardPr
                 {activeSection === "quotes" && "Soumissions"}
                 {activeSection === "batch" && "Relance en lot"}
                 {activeSection === "audit" && "Journal d'audit"}
+                {activeSection === "sequences" && "Séquences de recouvrement"}
               </h1>
                 <p className="text-[10px] text-muted-foreground leading-none hidden sm:block">{assistantName} · Adjointe IA</p>
               </div>
@@ -839,6 +841,10 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout, demo = false }: DashboardPr
               ) : activeSection === "audit" ? (
                 <Suspense fallback={<SectionLoader />}>
                   <AuditTrail />
+                </Suspense>
+              ) : activeSection === "sequences" ? (
+                <Suspense fallback={<SectionLoader />}>
+                  <SequenceTracker />
                 </Suspense>
               ) : (
                 <PlaceholderSection title="Gestion d'agenda" desc="La prise de rendez-vous et les confirmations automatiques arrivent bientôt." />

@@ -50,6 +50,7 @@ const plans = [
     extra: "20 $/dossier supplémentaire",
     features: [
       "Tout le plan Solo, plus :",
+      "Nom d'adjointe personnalisable (marque blanche)",
       "Appels vocaux IA avancés",
       "Négociation de plans de paiement",
       "Intégration QuickBooks & Sage",
@@ -68,6 +69,7 @@ const plans = [
     extra: "Tarification dégressive",
     features: [
       "Tout le plan Pro, plus :",
+      "Marque blanche complète",
       "Synchronisation comptable avancée",
       "API complète",
       "Gestionnaire de compte dédié",

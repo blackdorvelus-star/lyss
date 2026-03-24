@@ -230,9 +230,15 @@ export type Database = {
           allow_disputes: boolean
           assistant_name: string | null
           assistant_role: string | null
+          bank_account: string | null
+          bank_institution: string | null
+          bank_name: string | null
+          bank_transit: string | null
+          cheque_address: string | null
           company_logo_url: string | null
           company_name: string | null
           created_at: string
+          deposit_instructions: string | null
           email_body_template: string | null
           email_signature: string | null
           email_subject_template: string | null
@@ -247,6 +253,7 @@ export type Database = {
           notify_on_payment: boolean | null
           notify_on_response: boolean | null
           onboarding_completed: boolean
+          paypal_link: string | null
           script_call_full: string | null
           script_dispute: string | null
           script_email_followup: string | null
@@ -280,9 +287,15 @@ export type Database = {
           allow_disputes?: boolean
           assistant_name?: string | null
           assistant_role?: string | null
+          bank_account?: string | null
+          bank_institution?: string | null
+          bank_name?: string | null
+          bank_transit?: string | null
+          cheque_address?: string | null
           company_logo_url?: string | null
           company_name?: string | null
           created_at?: string
+          deposit_instructions?: string | null
           email_body_template?: string | null
           email_signature?: string | null
           email_subject_template?: string | null
@@ -297,6 +310,7 @@ export type Database = {
           notify_on_payment?: boolean | null
           notify_on_response?: boolean | null
           onboarding_completed?: boolean
+          paypal_link?: string | null
           script_call_full?: string | null
           script_dispute?: string | null
           script_email_followup?: string | null
@@ -330,9 +344,15 @@ export type Database = {
           allow_disputes?: boolean
           assistant_name?: string | null
           assistant_role?: string | null
+          bank_account?: string | null
+          bank_institution?: string | null
+          bank_name?: string | null
+          bank_transit?: string | null
+          cheque_address?: string | null
           company_logo_url?: string | null
           company_name?: string | null
           created_at?: string
+          deposit_instructions?: string | null
           email_body_template?: string | null
           email_signature?: string | null
           email_subject_template?: string | null
@@ -347,6 +367,7 @@ export type Database = {
           notify_on_payment?: boolean | null
           notify_on_response?: boolean | null
           onboarding_completed?: boolean
+          paypal_link?: string | null
           script_call_full?: string | null
           script_dispute?: string | null
           script_email_followup?: string | null

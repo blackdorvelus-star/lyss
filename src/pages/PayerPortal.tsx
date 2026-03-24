@@ -12,6 +12,9 @@ import {
   Copy,
   Check,
   ChevronDown,
+  Landmark,
+  Mail,
+  MapPin,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -35,6 +38,13 @@ interface PortalData {
     interac_question: string | null;
     interac_answer: string | null;
     stripe_link: string | null;
+    paypal_link: string | null;
+    bank_name: string | null;
+    bank_institution: string | null;
+    bank_transit: string | null;
+    bank_account: string | null;
+    cheque_address: string | null;
+    deposit_instructions: string | null;
     allow_disputes: boolean;
   };
 }
@@ -367,7 +377,104 @@ const PayerPortal = () => {
                 </a>
               )}
 
-              {!business.interac_email && !business.stripe_link && (
+              {/* PayPal */}
+              {business.paypal_link && (
+                <a
+                  href={business.paypal_link.startsWith("http") ? business.paypal_link : `https://${business.paypal_link}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 p-4 bg-card border border-border rounded-xl hover:border-primary/30 transition-colors"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                    <Mail className="w-5 h-5 text-blue-500" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-medium text-sm">PayPal</p>
+                    <p className="text-xs text-muted-foreground">
+                      Paiement sécurisé à {business.company_name}
+                    </p>
+                  </div>
+                </a>
+              )}
+
+              {/* Virement bancaire */}
+              {business.bank_account && business.bank_institution && (
+                <div className="bg-card border border-border rounded-xl p-4 space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                      <Landmark className="w-5 h-5 text-emerald-500" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm">Virement bancaire direct</p>
+                      <p className="text-xs text-muted-foreground">
+                        Vers le compte de {business.company_name}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="bg-secondary rounded-lg p-3 space-y-2 text-sm">
+                    {business.bank_name && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Banque</span>
+                        <span className="font-medium">{business.bank_name}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Institution</span>
+                      <span className="font-mono font-medium">{business.bank_institution}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Transit</span>
+                      <span className="font-mono font-medium">{business.bank_transit}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Compte</span>
+                      <span className="font-mono font-medium">{business.bank_account}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Chèque */}
+              {business.cheque_address && (
+                <div className="bg-card border border-border rounded-xl p-4 space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center">
+                      <MapPin className="w-5 h-5 text-orange-500" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm">Chèque par la poste</p>
+                      <p className="text-xs text-muted-foreground">
+                        Libeller au nom de {business.company_name}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="bg-secondary rounded-lg p-3">
+                    <p className="text-sm whitespace-pre-line">{business.cheque_address}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Dépôt direct */}
+              {business.deposit_instructions && (
+                <div className="bg-card border border-border rounded-xl p-4 space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-violet-500/20 flex items-center justify-center">
+                      <Landmark className="w-5 h-5 text-violet-500" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm">Dépôt direct</p>
+                      <p className="text-xs text-muted-foreground">
+                        Paiement vers {business.company_name}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="bg-secondary rounded-lg p-3">
+                    <p className="text-sm whitespace-pre-line">{business.deposit_instructions}</p>
+                  </div>
+                </div>
+              )}
+
+              {!business.interac_email && !business.stripe_link && !business.paypal_link && !business.bank_account && !business.cheque_address && !business.deposit_instructions && (
                 <div className="bg-secondary rounded-xl p-4 text-center">
                   <p className="text-sm text-muted-foreground">
                     Contactez directement {business.company_name} pour régler

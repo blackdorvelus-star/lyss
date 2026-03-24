@@ -102,6 +102,7 @@ const SettingsWizard = () => {
   const [aiNegotiate, setAiNegotiate] = useState(false);
   const [aiMaxDiscount, setAiMaxDiscount] = useState(0);
   const [useRelevanceAi, setUseRelevanceAi] = useState(false);
+  const [autoStartSequences, setAutoStartSequences] = useState(true);
 
   // Messages
   const [smsSignature, setSmsSignature] = useState("");
@@ -155,6 +156,7 @@ const SettingsWizard = () => {
       setAiNegotiate(d.ai_negotiate ?? false);
       setAiMaxDiscount(d.ai_max_discount_percent ?? 0);
       setUseRelevanceAi((d as any).use_relevance_ai ?? false);
+      setAutoStartSequences((d as any).auto_start_sequences ?? true);
       setSmsSignature(d.sms_signature || "");
       setEmailSignature(d.email_signature || "");
       setInteracEmail(d.interac_email || "");
@@ -207,6 +209,7 @@ const SettingsWizard = () => {
         ai_negotiate: aiNegotiate,
         ai_max_discount_percent: aiMaxDiscount,
         use_relevance_ai: useRelevanceAi,
+        auto_start_sequences: autoStartSequences,
         sms_signature: smsSignature || null,
         email_signature: emailSignature || null,
         interac_email: interacEmail || null,

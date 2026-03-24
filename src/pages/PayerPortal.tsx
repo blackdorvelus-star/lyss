@@ -12,6 +12,9 @@ import {
   Copy,
   Check,
   ChevronDown,
+  Landmark,
+  Mail,
+  MapPin,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -35,6 +38,13 @@ interface PortalData {
     interac_question: string | null;
     interac_answer: string | null;
     stripe_link: string | null;
+    paypal_link: string | null;
+    bank_name: string | null;
+    bank_institution: string | null;
+    bank_transit: string | null;
+    bank_account: string | null;
+    cheque_address: string | null;
+    deposit_instructions: string | null;
     allow_disputes: boolean;
   };
 }

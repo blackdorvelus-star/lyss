@@ -882,7 +882,7 @@ const SettingsSection = ({ icon: Icon, title, description, open, onToggle, child
 );
 
 const ToggleRow = ({ icon: Icon, title, description, checked, onChange }: {
-  icon: any; title: string; description: string; checked: boolean; onChange: (v: boolean) => void;
+  icon?: any; title: string; description: string; checked: boolean; onChange: (v: boolean) => void;
 }) => (
   <div className="flex items-center justify-between gap-3 py-1">
     <div className="flex items-center gap-3">

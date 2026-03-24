@@ -18,7 +18,7 @@ const plans = [
     price: "149",
     desc: "PME",
     included: "10 dossiers/mois",
-    features: ["Tout Solo +", "Appels vocaux IA", "QuickBooks & Sage", "Rapports hebdo"],
+    features: ["Tout Solo +", "Nom d'adjointe personnalisable", "Appels vocaux IA", "QuickBooks & Sage", "Rapports hebdo"],
     accent: true,
     popular: true,
   },
@@ -27,7 +27,7 @@ const plans = [
     price: "Sur mesure",
     desc: "Volume élevé",
     included: "Illimité",
-    features: ["Tout Pro +", "API complète", "Gestionnaire dédié", "SLA garanti"],
+    features: ["Tout Pro +", "Marque blanche complète", "API complète", "Gestionnaire dédié", "SLA garanti"],
     accent: false,
   },
 ];

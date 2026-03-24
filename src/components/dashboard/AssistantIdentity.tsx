@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { UserCircle, Building2, BadgeCheck, MessageSquare, Phone, Save, Loader2, Check } from "lucide-react";
+import { UserCircle, Building2, BadgeCheck, MessageSquare, Phone, Save, Loader2, Check, Lock } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { safeSupabase as supabase } from "@/lib/supabase-safe";
 import { toast } from "sonner";
+import { usePlan } from "@/hooks/usePlan";
 
 const roles = [
   { value: "adjointe", label: "Adjointe administrative" },
@@ -20,6 +21,8 @@ const roles = [
 ];
 
 const AssistantIdentity = () => {
+  const { plan } = usePlan();
+  const canCustomizeName = plan === "pro" || plan === "enterprise";
   const [name, setName] = useState("Lyss");
   const [role, setRole] = useState("adjointe");
   const [company, setCompany] = useState("");
@@ -58,7 +61,7 @@ const AssistantIdentity = () => {
       .from("payment_settings")
       .upsert({
         user_id: user.id,
-        assistant_name: name || "Lyss",
+        assistant_name: canCustomizeName ? (name || "Lyss") : "Lyss",
         assistant_role: role,
         company_name: company || null,
       }, { onConflict: "user_id" });
@@ -99,15 +102,19 @@ const AssistantIdentity = () => {
           <label className="text-sm font-medium flex items-center gap-2">
             <UserCircle className="w-4 h-4 text-primary" />
             Prénom de l'adjointe
+            {!canCustomizeName && <Lock className="w-3 h-3 text-muted-foreground" />}
           </label>
           <Input
-            value={name}
+            value={canCustomizeName ? name : "Lyss"}
             onChange={(e) => setName(e.target.value)}
             placeholder="Lyss"
             className="bg-card"
+            disabled={!canCustomizeName}
           />
           <p className="text-xs text-muted-foreground">
-            Le prénom utilisé dans les SMS, courriels et appels.
+            {canCustomizeName
+              ? "Le prénom utilisé dans les SMS, courriels et appels."
+              : "Disponible avec le plan Pro ou Entreprise. Passe au Pro pour personnaliser le nom."}
           </p>
         </div>
 

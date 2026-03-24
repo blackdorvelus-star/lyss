@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Users, FileText, Calendar, Settings, LogOut, ChevronLeft, ChevronRight, Shield, ShieldAlert, Menu, X, FileBarChart, Link2, Globe, PlusCircle, FileSignature, Zap, ScrollText, MoreHorizontal } from "lucide-react";
+import { Users, FileText, Calendar, Settings, LogOut, ChevronLeft, ChevronRight, Shield, ShieldAlert, Menu, X, FileBarChart, Link2, Globe, PlusCircle, FileSignature, Zap, ScrollText, MoreHorizontal, Rocket } from "lucide-react";
 import { useAdmin } from "@/hooks/useAdmin";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 
-export type Section = "clients" | "billing" | "disputes" | "reports" | "calendar" | "settings" | "integrations" | "widget" | "import" | "quotes" | "batch" | "audit";
+export type Section = "clients" | "billing" | "disputes" | "reports" | "calendar" | "settings" | "integrations" | "widget" | "import" | "quotes" | "batch" | "audit" | "sequences";
 
 interface AppSidebarProps {
   activeSection: Section;
@@ -19,6 +19,7 @@ const navItems: { id: Section; label: string; icon: typeof Users }[] = [
   { id: "import", label: "Confier", icon: PlusCircle },
   { id: "clients", label: "Clients", icon: Users },
   { id: "widget", label: "Widget", icon: Globe },
+  { id: "sequences", label: "Séquences", icon: Rocket },
   { id: "batch", label: "Lot", icon: Zap },
   { id: "integrations", label: "Intégrations", icon: Link2 },
   { id: "disputes", label: "Litiges", icon: ShieldAlert },

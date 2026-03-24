@@ -8,12 +8,12 @@ type Formality = "tu" | "vous";
 
 const smsVariants: Record<Formality, { greeting: string; body: string }> = {
   tu: {
-    greeting: "Bonjour Marc, c'est un suivi pour la facture #1247 de Plomberie Lévis (850 $, due le 12 mars).",
-    body: "On comprend que ça peut arriver ! Si tu préfères, on peut diviser ça en 2 paiements Interac. Clique ici pour régler ça en 2 minutes 👇",
+    greeting: "Bonjour Marc, c'est Lyss de Plomberie Lévis. Je fais un suivi pour la facture #1247 (850 $, due le 12 mars).",
+    body: "On comprend que ça peut arriver ! Tu peux envoyer ton paiement directement à Plomberie Lévis par Interac. Si tu préfères, on peut diviser ça en 2 versements 👇",
   },
   vous: {
-    greeting: "Bonjour M. Tremblay, nous effectuons un suivi concernant la facture #1247 de Plomberie Lévis (850 $, échéance : 12 mars).",
-    body: "Nous comprenons que des imprévus peuvent survenir. Si vous le souhaitez, il est possible de diviser ce montant en 2 versements par Interac.",
+    greeting: "Bonjour M. Tremblay, c'est Lyss de Plomberie Lévis. Nous effectuons un suivi concernant la facture #1247 (850 $, échéance : 12 mars).",
+    body: "Nous comprenons que des imprévus peuvent survenir. Vous pouvez effectuer votre paiement directement à Plomberie Lévis par Interac ou en 2 versements.",
   },
 };
 

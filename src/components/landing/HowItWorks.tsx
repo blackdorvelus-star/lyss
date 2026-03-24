@@ -11,14 +11,14 @@ const steps = [
   {
     icon: Bot,
     num: "02",
-    title: "Lyss s'en occupe",
+    title: "Lyss fait le suivi",
     desc: "SMS, courriels et appels — ton québécois pro.",
   },
   {
     icon: Banknote,
     num: "03",
-    title: "Tu es payé",
-    desc: "73 % de taux de réponse moyen.",
+    title: "Ton client te paie",
+    desc: "Directement dans ton Interac ou Stripe. 73 % de réponse.",
   },
 ];
 

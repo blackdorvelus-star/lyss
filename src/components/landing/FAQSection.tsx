@@ -7,10 +7,11 @@ import {
 } from "@/components/ui/accordion";
 
 const faqs = [
-  { q: "C'est quoi Lyss ?", a: "Une adjointe administrative IA qui relance tes clients par SMS, courriel et appel vocal — avec un ton québécois professionnel." },
+  { q: "C'est quoi Lyss ?", a: "Une adjointe administrative IA qui fait le suivi de tes factures par SMS, courriel et appel vocal — avec un ton québécois professionnel." },
+  { q: "Est-ce que Lyss perçoit les paiements ?", a: "Non. Lyss ne touche jamais à ton argent. Elle fait le suivi auprès de tes clients, et ceux-ci te paient directement via ton Interac ou Stripe. Lyss est une facilitatrice, pas un intermédiaire financier." },
   { q: "Est-ce légal au Québec ?", a: "Oui. Lyss envoie des suivis de courtoisie, pas du recouvrement agressif. Aucune menace, jamais." },
   { q: "Mes clients sauront que c'est une IA ?", a: "Non. Lyss se présente comme faisant partie de ton équipe. Messages naturels et personnalisés." },
-  { q: "Combien de relances par dossier ?", a: "Jusqu'à 5 SMS, 3 courriels et 2 appels vocaux. Arrêt automatique dès le paiement reçu." },
+  { q: "Combien de suivis par dossier ?", a: "Jusqu'à 5 SMS, 3 courriels et 2 appels vocaux. Arrêt automatique dès le paiement reçu." },
   { q: "Si un client est mécontent ?", a: "L'adjointe respecte toute demande de cessation. Le dossier est pausé et tu es notifié." },
   { q: "Puis-je annuler ?", a: "Oui, en tout temps, sans frais ni pénalité depuis ton tableau de bord." },
 ];

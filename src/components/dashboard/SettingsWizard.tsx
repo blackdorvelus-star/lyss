@@ -886,7 +886,7 @@ const ToggleRow = ({ icon: Icon, title, description, checked, onChange }: {
 }) => (
   <div className="flex items-center justify-between gap-3 py-1">
     <div className="flex items-center gap-3">
-      <Icon className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+      {Icon && <Icon className="w-4 h-4 text-muted-foreground flex-shrink-0" />}
       <div>
         <p className="text-sm font-medium">{title}</p>
         <p className="text-[11px] text-muted-foreground">{description}</p>

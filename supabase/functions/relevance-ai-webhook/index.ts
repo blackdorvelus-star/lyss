@@ -248,6 +248,32 @@ serve(async (req) => {
         break;
       }
 
+      // ── CREATE LEAD ──
+      case "create_lead": {
+        if (!data?.nom_entreprise) {
+          result.error = "data.nom_entreprise requis pour create_lead";
+          break;
+        }
+
+        const { error: leadErr } = await supabase.from("leads").insert({
+          user_id,
+          nom_entreprise: data.nom_entreprise,
+          contact_nom: data.contact_nom || null,
+          email: data.email || null,
+          telephone: data.telephone || null,
+          statut: data.statut || "nouveau",
+          source: data.source || "relevance_ai",
+          notes: data.notes || null,
+        });
+
+        if (leadErr) {
+          result.error = `Erreur DB: ${leadErr.message}`;
+        } else {
+          result.success = true;
+        }
+        break;
+      }
+
       // ── ESCALATE TO HUMAN ──
       case "escalate": {
         const { data: escSettings } = await supabase

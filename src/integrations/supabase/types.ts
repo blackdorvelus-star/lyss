@@ -248,6 +248,48 @@ export type Database = {
           },
         ]
       }
+      leads: {
+        Row: {
+          contact_nom: string | null
+          created_at: string
+          email: string | null
+          id: string
+          nom_entreprise: string
+          notes: string | null
+          source: string | null
+          statut: string
+          telephone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          contact_nom?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          nom_entreprise: string
+          notes?: string | null
+          source?: string | null
+          statut?: string
+          telephone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          contact_nom?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          nom_entreprise?: string
+          notes?: string | null
+          source?: string | null
+          statut?: string
+          telephone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string

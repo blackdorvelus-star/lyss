@@ -136,6 +136,7 @@ export type Database = {
           id: string
           invoice_number: string | null
           last_sequence_action_at: string | null
+          next_action_at: string | null
           status: string
           updated_at: string
           user_id: string
@@ -151,6 +152,7 @@ export type Database = {
           id?: string
           invoice_number?: string | null
           last_sequence_action_at?: string | null
+          next_action_at?: string | null
           status?: string
           updated_at?: string
           user_id: string
@@ -166,6 +168,7 @@ export type Database = {
           id?: string
           invoice_number?: string | null
           last_sequence_action_at?: string | null
+          next_action_at?: string | null
           status?: string
           updated_at?: string
           user_id?: string

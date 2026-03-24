@@ -231,13 +231,15 @@ serve(async (req) => {
         break;
       }
 
-      // ── MARK RESOLVED ──
-      case "mark_resolved": {
+      // ── MARK RESOLVED / PAID ──
+      case "mark_resolved":
+      case "mark_paid": {
         await supabase
           .from("invoices")
           .update({
             status: "recovered",
             amount_recovered: invoice.amount,
+            next_action_at: null,
             updated_at: new Date().toISOString(),
           })
           .eq("id", invoice_id);
@@ -280,7 +282,7 @@ serve(async (req) => {
     });
 
     // Update invoice timestamp
-    if (result.success) {
+    if (result.success && action !== "mark_resolved" && action !== "mark_paid") {
       await supabase
         .from("invoices")
         .update({

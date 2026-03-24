@@ -56,6 +56,69 @@ function isWithinWorkingHours(settings: any): boolean {
   return workingDays.includes(currentDay);
 }
 
+// ── Check payment status via QuickBooks or Sage ──
+async function checkPaymentStatus(
+  supabase: any,
+  invoice: any,
+  userId: string,
+  supabaseUrl: string
+): Promise<"paid" | "partial" | "unpaid" | "unknown"> {
+  try {
+    // Try QuickBooks first
+    const { data: qbConn } = await supabase
+      .from("quickbooks_connections")
+      .select("*")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (qbConn && invoice.invoice_number) {
+      try {
+        const checkRes = await fetch(`${supabaseUrl}/functions/v1/quickbooks-sync`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ scheduled: false, check_payment: true, invoice_number: invoice.invoice_number, user_id: userId }),
+        });
+        if (checkRes.ok) {
+          const result = await checkRes.json();
+          if (result.payment_status) return result.payment_status;
+        }
+      } catch (e) {
+        console.error("QB payment check failed:", e);
+      }
+    }
+
+    // Try Sage
+    const { data: sageConn } = await supabase
+      .from("sage_connections")
+      .select("*")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (sageConn && invoice.invoice_number) {
+      try {
+        const checkRes = await fetch(`${supabaseUrl}/functions/v1/sage-sync`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ scheduled: false, check_payment: true, invoice_number: invoice.invoice_number, user_id: userId }),
+        });
+        if (checkRes.ok) {
+          const result = await checkRes.json();
+          if (result.payment_status) return result.payment_status;
+        }
+      } catch (e) {
+        console.error("Sage payment check failed:", e);
+      }
+    }
+
+    // Check if manually marked recovered
+    if (invoice.status === "recovered") return "paid";
+
+    return "unknown";
+  } catch {
+    return "unknown";
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -85,14 +148,12 @@ serve(async (req) => {
     }
 
     for (const seq of sequences) {
-      // Fetch user settings for this sequence owner
       const { data: settings } = await supabase
         .from("payment_settings")
         .select("*")
         .eq("user_id", seq.user_id)
         .single();
 
-      // Skip if outside working hours
       if (!isWithinWorkingHours(settings)) {
         console.log(`Skipping user ${seq.user_id}: outside working hours`);
         continue;
@@ -115,10 +176,38 @@ serve(async (req) => {
           const daysPastDue = Math.floor((now.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
           if (daysPastDue < 0) continue;
 
-          // Cooldown check
-          if (invoice.last_sequence_action_at) {
+          // Use next_action_at if set — skip if not yet due
+          if (invoice.next_action_at) {
+            const nextAction = new Date(invoice.next_action_at);
+            if (now < nextAction) continue;
+          } else if (invoice.last_sequence_action_at) {
             const lastAction = new Date(invoice.last_sequence_action_at);
             if ((now.getTime() - lastAction.getTime()) / (1000 * 60 * 60) < 20) continue;
+          }
+
+          // ── Payment check before acting ──
+          const paymentStatus = await checkPaymentStatus(supabase, invoice, seq.user_id, SUPABASE_URL);
+          if (paymentStatus === "paid") {
+            console.log(`Invoice ${invoice.id} already paid, closing sequence`);
+            await supabase.from("invoices").update({
+              status: "recovered",
+              amount_recovered: invoice.amount,
+              next_action_at: null,
+              last_sequence_action_at: now.toISOString(),
+            }).eq("id", invoice.id);
+            continue;
+          }
+          if (paymentStatus === "partial") {
+            console.log(`Invoice ${invoice.id} partially paid, escalating`);
+            await supabase.from("notifications").insert({
+              user_id: seq.user_id,
+              invoice_id: invoice.id,
+              title: "💰 Paiement partiel détecté",
+              message: `Un paiement partiel a été détecté pour ${invoice.clients?.name} (${invoice.amount} $). Intervention recommandée.`,
+              type: "warning",
+            });
+            await supabase.from("invoices").update({ next_action_at: null }).eq("id", invoice.id);
+            continue;
           }
 
           try {
@@ -133,8 +222,11 @@ serve(async (req) => {
             });
 
             if (triggerRes.ok) {
+              // Schedule next action in 3 days
+              const nextAt = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
               await supabase.from("invoices").update({
                 last_sequence_action_at: now.toISOString(),
+                next_action_at: nextAt.toISOString(),
                 status: invoice.status === "pending" ? "in_progress" : invoice.status,
               }).eq("id", invoice.id);
               totalProcessed++;
@@ -145,7 +237,7 @@ serve(async (req) => {
             console.error(`Relevance AI trigger error for invoice ${invoice.id}:`, e);
           }
         }
-        continue; // Skip built-in logic for this user
+        continue;
       }
 
       const activeChannels = (settings?.active_channels as string[]) || ["sms", "email", "phone"];
@@ -156,29 +248,33 @@ serve(async (req) => {
         .from("invoices")
         .select("*, clients(*)")
         .eq("user_id", seq.user_id)
-        .in("status", ["pending", "in_progress"]) // exclut "recovered" et "disputed"
+        .in("status", ["pending", "in_progress"])
         .not("due_date", "is", null);
 
       if (!invoices || invoices.length === 0) continue;
 
-      // ── Vérifier les appels avec sentiment négatif pour escalade humaine ──
       const { data: negativeCalls } = await supabase
         .from("call_logs")
         .select("invoice_id")
         .eq("user_id", seq.user_id)
         .eq("client_sentiment", "negative");
 
-      const negativeInvoiceIds = new Set((negativeCalls || []).map(c => c.invoice_id));
+      const negativeInvoiceIds = new Set((negativeCalls || []).map((c: any) => c.invoice_id));
 
       for (const invoice of invoices) {
         const dueDate = new Date(invoice.due_date);
         const daysPastDue = Math.floor((now.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
         if (daysPastDue < 0) continue;
 
-        // ── Escalade humaine : suspendre les relances si sentiment négatif ──
+        // Use next_action_at if set
+        if (invoice.next_action_at) {
+          const nextAction = new Date(invoice.next_action_at);
+          if (now < nextAction) continue;
+        }
+
+        // Escalade humaine
         if (negativeInvoiceIds.has(invoice.id)) {
-          console.log(`Skipping invoice ${invoice.id}: negative sentiment detected, human escalation required`);
-          // Créer une notification d'escalade (une seule fois)
+          console.log(`Skipping invoice ${invoice.id}: negative sentiment detected`);
           const { count: existingEscalation } = await supabase
             .from("notifications")
             .select("*", { count: "exact", head: true })
@@ -192,7 +288,7 @@ serve(async (req) => {
               user_id: seq.user_id,
               invoice_id: invoice.id,
               title: "🚨 Intervention humaine requise",
-              message: `${assistantName} a suspendu les relances pour ${invoice.clients?.name} (${invoice.amount} $) suite à une réponse négative. Veuillez intervenir personnellement.`,
+              message: `${assistantName} a suspendu les relances pour ${invoice.clients?.name} (${invoice.amount} $) suite à une réponse négative.`,
               type: "warning",
             });
           }
@@ -205,13 +301,45 @@ serve(async (req) => {
         const nextStep = steps[currentStep];
         if (daysPastDue < nextStep.day) continue;
 
-        // Check cooldown
-        if (invoice.last_sequence_action_at) {
+        // Cooldown fallback (when next_action_at not set)
+        if (!invoice.next_action_at && invoice.last_sequence_action_at) {
           const lastAction = new Date(invoice.last_sequence_action_at);
           if ((now.getTime() - lastAction.getTime()) / (1000 * 60 * 60) < 20) continue;
         }
 
-        // Skip if channel is disabled in user settings
+        // ── Payment check before each reminder ──
+        const paymentStatus = await checkPaymentStatus(supabase, invoice, seq.user_id, SUPABASE_URL);
+        if (paymentStatus === "paid") {
+          console.log(`Invoice ${invoice.id} paid — stopping sequence`);
+          await supabase.from("invoices").update({
+            status: "recovered",
+            amount_recovered: invoice.amount,
+            next_action_at: null,
+            last_sequence_action_at: now.toISOString(),
+          }).eq("id", invoice.id);
+          await supabase.from("notifications").insert({
+            user_id: seq.user_id,
+            invoice_id: invoice.id,
+            title: "✅ Paiement détecté automatiquement",
+            message: `Le paiement de ${invoice.amount} $ de ${invoice.clients?.name} a été confirmé. Séquence arrêtée.`,
+            type: "success",
+          });
+          continue;
+        }
+        if (paymentStatus === "partial") {
+          console.log(`Invoice ${invoice.id} partially paid — escalating`);
+          await supabase.from("notifications").insert({
+            user_id: seq.user_id,
+            invoice_id: invoice.id,
+            title: "💰 Paiement partiel détecté",
+            message: `Un paiement partiel a été détecté pour ${invoice.clients?.name} (${invoice.amount} $). Intervention recommandée.`,
+            type: "warning",
+          });
+          await supabase.from("invoices").update({ next_action_at: null }).eq("id", invoice.id);
+          continue;
+        }
+
+        // Skip if channel is disabled
         if (!activeChannels.includes(nextStep.channel)) {
           await supabase.from("invoices").update({
             current_sequence_step: currentStep + 1,
@@ -220,7 +348,7 @@ serve(async (req) => {
           continue;
         }
 
-        // Check max attempts for this channel
+        // Check max attempts
         const { count } = await supabase
           .from("reminders")
           .select("*", { count: "exact", head: true })
@@ -237,6 +365,16 @@ serve(async (req) => {
         }
 
         const client = invoice.clients;
+
+        // Calculate next_action_at based on next step
+        const nextStepIndex = currentStep + 1;
+        let nextActionAt: string | null = null;
+        if (nextStepIndex < steps.length) {
+          const nextStepDef = steps[nextStepIndex];
+          const daysUntilNext = nextStepDef.day - nextStep.day;
+          const delayMs = Math.max(daysUntilNext, 1) * 24 * 60 * 60 * 1000;
+          nextActionAt = new Date(now.getTime() + delayMs).toISOString();
+        }
 
         if (nextStep.channel === "sms" && client.phone && TELNYX_API_KEY && TELNYX_PHONE_NUMBER) {
           try {
@@ -297,6 +435,7 @@ serve(async (req) => {
         await supabase.from("invoices").update({
           current_sequence_step: currentStep + 1,
           last_sequence_action_at: now.toISOString(),
+          next_action_at: nextActionAt,
           status: invoice.status === "pending" ? "in_progress" : invoice.status,
         }).eq("id", invoice.id);
 
@@ -316,20 +455,15 @@ serve(async (req) => {
   }
 });
 
-// Generate reminder messages via Lovable AI using user settings
+// Generate reminder messages via Lovable AI
 async function generateMessage(
-  apiKey: string,
-  settings: any,
-  invoice: any,
-  client: any,
-  channel: string
+  apiKey: string, settings: any, invoice: any, client: any, channel: string
 ): Promise<{ sms: string; email_subject: string; email_body: string } | null> {
   const dueDateStr = invoice.due_date
     ? new Date(invoice.due_date).toLocaleDateString("fr-CA", { day: "numeric", month: "long" })
     : "récemment";
 
   const systemPrompt = buildSystemPrompt(settings || {});
-
   const userPrompt = `Génère les messages pour :
 - Client : ${client.name}
 - Montant : ${invoice.amount} $

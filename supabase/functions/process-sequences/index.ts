@@ -98,6 +98,56 @@ serve(async (req) => {
         continue;
       }
 
+      // ── Relevance AI orchestration mode ──
+      if ((settings as any)?.use_relevance_ai) {
+        console.log(`User ${seq.user_id}: Relevance AI mode enabled, delegating...`);
+        const { data: invoices } = await supabase
+          .from("invoices")
+          .select("*, clients(*)")
+          .eq("user_id", seq.user_id)
+          .in("status", ["pending", "in_progress"])
+          .not("due_date", "is", null);
+
+        if (!invoices || invoices.length === 0) continue;
+
+        for (const invoice of invoices) {
+          const dueDate = new Date(invoice.due_date);
+          const daysPastDue = Math.floor((now.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
+          if (daysPastDue < 0) continue;
+
+          // Cooldown check
+          if (invoice.last_sequence_action_at) {
+            const lastAction = new Date(invoice.last_sequence_action_at);
+            if ((now.getTime() - lastAction.getTime()) / (1000 * 60 * 60) < 20) continue;
+          }
+
+          try {
+            const triggerRes = await fetch(`${SUPABASE_URL}/functions/v1/relevance-ai-trigger`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                invoice_id: invoice.id,
+                user_id: seq.user_id,
+                action_type: "auto_sequence",
+              }),
+            });
+
+            if (triggerRes.ok) {
+              await supabase.from("invoices").update({
+                last_sequence_action_at: now.toISOString(),
+                status: invoice.status === "pending" ? "in_progress" : invoice.status,
+              }).eq("id", invoice.id);
+              totalProcessed++;
+            } else {
+              console.error(`Relevance AI trigger failed for invoice ${invoice.id}:`, await triggerRes.text());
+            }
+          } catch (e) {
+            console.error(`Relevance AI trigger error for invoice ${invoice.id}:`, e);
+          }
+        }
+        continue; // Skip built-in logic for this user
+      }
+
       const activeChannels = (settings?.active_channels as string[]) || ["sms", "email", "phone"];
       const steps = seq.steps as Array<{ day: number; channel: string; label: string }>;
       const maxAttempts = seq.max_attempts_per_channel as Record<string, number>;

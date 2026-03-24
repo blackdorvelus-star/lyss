@@ -260,6 +260,7 @@ export type Database = {
           tone: string | null
           updated_at: string
           use_custom_templates: boolean
+          use_relevance_ai: boolean
           user_id: string
           vapi_custom_instructions: string | null
           vapi_first_message_template: string | null
@@ -309,6 +310,7 @@ export type Database = {
           tone?: string | null
           updated_at?: string
           use_custom_templates?: boolean
+          use_relevance_ai?: boolean
           user_id: string
           vapi_custom_instructions?: string | null
           vapi_first_message_template?: string | null
@@ -358,6 +360,7 @@ export type Database = {
           tone?: string | null
           updated_at?: string
           use_custom_templates?: boolean
+          use_relevance_ai?: boolean
           user_id?: string
           vapi_custom_instructions?: string | null
           vapi_first_message_template?: string | null

@@ -31,6 +31,9 @@ const Index = () => {
           <img src="/logo-lyss.png" alt="Lyss" className="h-9 object-contain" />
 
           <nav className="hidden sm:flex items-center gap-6">
+            <a href="/fonctionnalites" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              Fonctionnalités
+            </a>
             <a href="#how-it-works" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Comment ça marche
             </a>
@@ -67,6 +70,9 @@ const Index = () => {
 
         {mobileMenuOpen && (
           <nav className="sm:hidden mt-3 pb-2 border-t border-border pt-3 flex flex-col gap-3">
+            <a href="/fonctionnalites" onClick={() => setMobileMenuOpen(false)} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              Fonctionnalités
+            </a>
             <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Comment ça marche
             </a>

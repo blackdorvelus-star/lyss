@@ -12,6 +12,7 @@ const PayerPortal = lazy(() => import("./pages/PayerPortal.tsx"));
 const ClientWidget = lazy(() => import("./pages/ClientWidget.tsx"));
 const AdminPage = lazy(() => import("./pages/AdminPage.tsx"));
 const TarifsPage = lazy(() => import("./pages/TarifsPage.tsx"));
+const FeaturesPage = lazy(() => import("./pages/FeaturesPage.tsx"));
 const PrivacyPage = lazy(() => import("./pages/PrivacyPage.tsx"));
 const TermsPage = lazy(() => import("./pages/TermsPage.tsx"));
 const LitigesPage = lazy(() => import("./pages/LitigesPage.tsx"));
@@ -38,6 +39,7 @@ const App = () => (
           <Route path="/widget/:userId" element={<ClientWidget />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/tarifs" element={<TarifsPage />} />
+          <Route path="/fonctionnalites" element={<FeaturesPage />} />
           <Route path="/litiges" element={<LitigesPage />} />
           <Route path="/politique-confidentialite" element={<PrivacyPage />} />
           <Route path="/confidentialite" element={<PrivacyPage />} />

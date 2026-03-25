@@ -45,31 +45,35 @@ const results = [
 
 const scenarios = [
   {
-    title: "Tu envoies une facture. Lyss fait le reste.",
+    title: "Lyss ouvre un dossier et ne lâche pas.",
     steps: [
-      "Tu déposes ta facture — manuellement, par CSV ou via QuickBooks.",
-      "Lyss envoie un premier rappel courtois par courriel, 3 jours après l'échéance.",
-      "Pas de réponse ? Un SMS poli suit automatiquement.",
-      "Toujours rien ? Lyss passe un appel vocal professionnel.",
-      "Ton client paie. Tu reçois une notification. C'est tout.",
+      "Tu déposes ta facture — manuellement, par CSV ou via QuickBooks/Sage.",
+      "Lyss ouvre un dossier de suivi et planifie la séquence complète.",
+      "Premier rappel courtois par courriel, 3 jours après l'échéance.",
+      "Pas de réponse ? SMS automatique avec lien de paiement sécurisé.",
+      "Toujours rien ? Appel vocal IA — professionnel, jamais agressif.",
+      "Lyss vérifie le paiement (QuickBooks, Sage, Stripe) avant chaque relance.",
+      "Dossier fermé seulement quand le paiement est confirmé.",
     ],
   },
   {
-    title: "Ton client conteste ? Lyss gère la conversation.",
+    title: "Ton client conteste ? Le dossier continue, adapté.",
     steps: [
-      "Le client signale un problème via le portail sécurisé.",
+      "Le client signale un problème via son portail sécurisé.",
+      "Les relances sont suspendues automatiquement — pas de harcèlement.",
       "Lyss analyse le ton et propose une réponse empathique.",
-      "Tu valides ou ajustes — toujours toi qui décides.",
-      "L'historique complet reste dans ton dossier.",
+      "Tu valides, ajustes, ou reprends le suivi — toujours toi qui décides.",
+      "L'historique complet du dossier reste accessible : échanges, paiements partiels, notes.",
     ],
   },
   {
-    title: "Tu veux savoir où en est ton argent ? Un coup d'œil suffit.",
+    title: "Chaque dossier a son tableau de bord.",
     steps: [
-      "Tableau de bord en temps réel : montants dus, recouvrés, en attente.",
-      "Prévisions de cashflow pour les 30 prochains jours.",
-      "Rapports hebdomadaires envoyés automatiquement.",
-      "Radar de priorité pour tes dossiers urgents.",
+      "Vue en temps réel : où en est chaque facture dans le cycle de suivi.",
+      "Historique complet par client : factures, relances, appels, litiges.",
+      "Radar de priorité : les dossiers urgents remontent en premier.",
+      "Prévisions de cashflow basées sur tes dossiers en cours.",
+      "Rapports hebdomadaires automatiques — tu sais exactement combien rentre.",
     ],
   },
 ];
@@ -119,19 +123,19 @@ const FeaturesPage = () => {
       <section className="px-5 pt-16 pb-12 text-center">
         <div className="max-w-2xl mx-auto">
           <motion.p {...fade()} className="text-xs font-medium text-primary mb-3 tracking-wide uppercase">
-            Comment ça fonctionne
+            Suivi de dossier complet
           </motion.p>
           <motion.h1
             {...fade(0.1)}
             className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold leading-[1.1] tracking-tight mb-4"
           >
-            Tes factures rentrent.{" "}
-            <span className="text-primary">Tu fais autre chose.</span>
+            Du premier rappel au dernier dollar.{" "}
+            <span className="text-primary">Lyss gère tout le dossier.</span>
           </motion.h1>
           <motion.p {...fade(0.2)} className="text-muted-foreground text-sm sm:text-base leading-relaxed max-w-lg mx-auto">
-            Lyss est ton adjointe administrative IA. Elle fait le suivi de tes factures
-            en retard par SMS, courriel et appel vocal — avec le ton que tu choisis.
-            Pas de stress. Pas de confrontation. Juste des résultats.
+            Lyss ne se contente pas d'envoyer un rappel. Elle ouvre un dossier, relance par SMS, courriel et appel vocal,
+            négocie si nécessaire, gère les litiges, et ne lâche pas tant que ton argent n'est pas rentré.
+            C'est un suivi de dossier complet, pas un simple envoi de message.
           </motion.p>
         </div>
       </section>

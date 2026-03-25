@@ -11,6 +11,12 @@ import {
   Bell,
   Users,
   CheckCircle2,
+  FileText,
+  Phone,
+  CalendarCheck,
+  BookOpen,
+  Send,
+  Eye,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Footer from "@/components/landing/Footer";
@@ -25,21 +31,69 @@ const fade = (delay = 0) => ({
 const results = [
   {
     icon: Clock,
-    stat: "73 %",
-    label: "de réponse en moins de 48 h",
-    desc: "Tes clients reçoivent un rappel courtois au bon moment — avant que la facture devienne un problème.",
+    stat: "10 h",
+    label: "économisées par semaine",
+    desc: "Suivi de factures, relances, appels, rapports — Lyss fait le travail administratif que tu repousses chaque jour.",
   },
   {
     icon: TrendingUp,
-    stat: "2×",
-    label: "plus vite que le suivi manuel",
-    desc: "Ce qui te prenait 3 heures par semaine se fait maintenant tout seul, pendant que tu travailles.",
+    stat: "73 %",
+    label: "de réponse en 48 h",
+    desc: "Tes clients sont relancés au bon moment, sur le bon canal. Résultat : ils paient plus vite.",
   },
   {
     icon: ShieldCheck,
-    stat: "0",
-    label: "appel gênant à passer",
-    desc: "Lyss communique avec le ton que tu choisis. Professionnel, chaleureux, direct — jamais agressif.",
+    stat: "24/7",
+    label: "sans pause ni vacances",
+    desc: "Lyss travaille les soirs, fins de semaine et jours fériés. Ton bureau ne ferme jamais.",
+  },
+];
+
+const duties = [
+  {
+    icon: FileText,
+    title: "Gestion des factures",
+    desc: "Import manuel, CSV, QuickBooks ou Sage. Lyss classe, organise et suit chaque facture de l'émission au paiement.",
+  },
+  {
+    icon: Send,
+    title: "Relances automatiques",
+    desc: "Courriels, SMS et appels vocaux — dans l'ordre, avec les bons délais. Lyss ne lâche pas tant que c'est pas payé.",
+  },
+  {
+    icon: Phone,
+    title: "Appels professionnels",
+    desc: "Lyss appelle tes clients avec un ton professionnel québécois. Elle négocie, prend des engagements et te fait un résumé.",
+  },
+  {
+    icon: MessageSquare,
+    title: "Gestion des litiges",
+    desc: "Un client conteste ? Lyss suspend les relances, analyse la situation et te propose une réponse. Toi tu décides.",
+  },
+  {
+    icon: Users,
+    title: "Relations clients",
+    desc: "Fiche complète par client : historique des factures, échanges, comportement de paiement. Lyss connaît tes clients.",
+  },
+  {
+    icon: BarChart3,
+    title: "Rapports et prévisions",
+    desc: "Tableau de bord en temps réel, prévisions de cashflow, rapports hebdomadaires. Tu sais exactement où en est ton argent.",
+  },
+  {
+    icon: CalendarCheck,
+    title: "Suivi de soumissions",
+    desc: "Lyss suit aussi tes soumissions envoyées. Rappels automatiques avant expiration pour ne perdre aucun contrat.",
+  },
+  {
+    icon: BookOpen,
+    title: "Piste d'audit complète",
+    desc: "Chaque action est enregistrée : relance envoyée, appel passé, réponse reçue. Traçabilité totale pour ta tranquillité.",
+  },
+  {
+    icon: Eye,
+    title: "Portail client sécurisé",
+    desc: "Ton client voit son solde, paie en ligne, discute avec Lyss ou signale un problème — sans t'appeler.",
   },
 ];
 
@@ -66,34 +120,24 @@ const scenarios = [
       "L'historique complet du dossier reste accessible : échanges, paiements partiels, notes.",
     ],
   },
-  {
-    title: "Chaque dossier a son tableau de bord.",
-    steps: [
-      "Vue en temps réel : où en est chaque facture dans le cycle de suivi.",
-      "Historique complet par client : factures, relances, appels, litiges.",
-      "Radar de priorité : les dossiers urgents remontent en premier.",
-      "Prévisions de cashflow basées sur tes dossiers en cours.",
-      "Rapports hebdomadaires automatiques — tu sais exactement combien rentre.",
-    ],
-  },
 ];
 
 const objections = [
+  {
+    q: "C'est quoi la différence avec une vraie secrétaire ?",
+    a: "Lyss fait le même travail administratif — suivi, relances, classement, rapports — mais elle travaille 24/7, ne prend pas de vacances, et coûte 49 $/mois au lieu de 3 500 $. Elle ne remplace pas ton jugement : elle exécute ce que tu décides.",
+  },
   {
     q: "C'est pas du harcèlement, ça ?",
     a: "Non. Lyss envoie des rappels de courtoisie, pas des menaces. Le ton est calibré, les délais sont respectueux, et ton client peut répondre ou contester à tout moment.",
   },
   {
     q: "Mes clients vont mal le prendre ?",
-    a: "Au contraire. 78 % des retards sont des oublis. Un rappel poli au bon moment, c'est un service, pas une agression. Ton client apprécie qu'on le traite avec respect.",
+    a: "Au contraire. 78 % des retards sont des oublis. Un rappel poli au bon moment, c'est un service. Ton client apprécie qu'on le traite avec respect.",
   },
   {
     q: "Je peux quand même garder le contrôle ?",
     a: "Absolument. Tu personnalises le ton, les délais, les canaux. Tu approuves les litiges. Lyss est ton adjointe, pas ta remplaçante.",
-  },
-  {
-    q: "Et si j'ai juste 3-4 factures en retard ?",
-    a: "Le plan Solo est fait pour toi : 49 $/mois, 3 dossiers inclus. Moins cher qu'une heure de ton temps à courir après un chèque.",
   },
 ];
 
@@ -123,19 +167,19 @@ const FeaturesPage = () => {
       <section className="px-5 pt-16 pb-12 text-center">
         <div className="max-w-2xl mx-auto">
           <motion.p {...fade()} className="text-xs font-medium text-primary mb-3 tracking-wide uppercase">
-            Suivi de dossier complet
+            Ton adjointe administrative IA
           </motion.p>
           <motion.h1
             {...fade(0.1)}
             className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold leading-[1.1] tracking-tight mb-4"
           >
-            Du premier rappel au dernier dollar.{" "}
-            <span className="text-primary">Lyss gère tout le dossier.</span>
+            Tout ce qu'une secrétaire fait.{" "}
+            <span className="text-primary">Sans en embaucher une.</span>
           </motion.h1>
           <motion.p {...fade(0.2)} className="text-muted-foreground text-sm sm:text-base leading-relaxed max-w-lg mx-auto">
-            Lyss ne se contente pas d'envoyer un rappel. Elle ouvre un dossier, relance par SMS, courriel et appel vocal,
-            négocie si nécessaire, gère les litiges, et ne lâche pas tant que ton argent n'est pas rentré.
-            C'est un suivi de dossier complet, pas un simple envoi de message.
+            Suivi de factures, relances par SMS, courriel et appel, gestion des litiges,
+            rapports financiers, relations clients — Lyss gère toute ton administration
+            de facturation du début à la fin. Tu travailles, elle s'occupe du reste.
           </motion.p>
         </div>
       </section>
@@ -162,16 +206,49 @@ const FeaturesPage = () => {
         </div>
       </section>
 
-      {/* Scenarios */}
+      {/* What Lyss does — full secretary duties */}
       <section className="px-5 py-12 bg-card/50">
+        <div className="max-w-4xl mx-auto">
+          <motion.div {...fade()} className="text-center mb-8">
+            <h2 className="font-display text-xl sm:text-2xl font-bold mb-2">
+              Tout ce que Lyss fait pour toi
+            </h2>
+            <p className="text-xs text-muted-foreground max-w-md mx-auto">
+              Le même travail qu'une adjointe administrative — automatisé, précis, et disponible 24/7.
+            </p>
+          </motion.div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {duties.map((d, i) => (
+              <motion.div
+                key={i}
+                {...fade(i * 0.04)}
+                className="bg-card border border-border rounded-xl p-4 hover:border-primary/20 transition-colors"
+              >
+                <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center mb-2.5">
+                  <d.icon className="w-4 h-4 text-primary" />
+                </div>
+                <h3 className="font-display font-bold text-sm mb-1">{d.title}</h3>
+                <p className="text-[11px] text-muted-foreground leading-relaxed">{d.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Scenarios */}
+      <section className="px-5 py-12">
         <div className="max-w-3xl mx-auto space-y-12">
+          <motion.div {...fade()} className="text-center mb-4">
+            <h2 className="font-display text-xl sm:text-2xl font-bold mb-2">
+              Comment ça se passe, concrètement
+            </h2>
+          </motion.div>
           {scenarios.map((s, i) => (
             <motion.div key={i} {...fade()}>
               <div className="flex items-center gap-3 mb-4">
                 {i === 0 && <Zap className="w-5 h-5 text-primary flex-shrink-0" />}
                 {i === 1 && <MessageSquare className="w-5 h-5 text-primary flex-shrink-0" />}
-                {i === 2 && <BarChart3 className="w-5 h-5 text-primary flex-shrink-0" />}
-                <h2 className="font-display text-lg sm:text-xl font-bold">{s.title}</h2>
+                <h3 className="font-display text-lg font-bold">{s.title}</h3>
               </div>
               <div className="space-y-2.5 ml-8">
                 {s.steps.map((step, j) => (
@@ -187,7 +264,7 @@ const FeaturesPage = () => {
       </section>
 
       {/* Who it's for */}
-      <section className="px-5 py-12">
+      <section className="px-5 py-12 bg-card/50">
         <div className="max-w-3xl mx-auto">
           <motion.div {...fade()} className="text-center mb-8">
             <h2 className="font-display text-xl sm:text-2xl font-bold mb-2">
@@ -196,10 +273,10 @@ const FeaturesPage = () => {
           </motion.div>
           <div className="grid sm:grid-cols-2 gap-3">
             {[
-              { icon: Users, text: "Tu es travailleur autonome et tu perds du temps à courir après tes paiements." },
-              { icon: Bell, text: "Tu gères une PME et tes factures en retard s'accumulent sans que personne ne fasse le suivi." },
-              { icon: Clock, text: "Tu passes des heures chaque semaine à écrire des courriels de rappel qui restent sans réponse." },
-              { icon: ShieldCheck, text: "Tu veux un suivi professionnel sans confrontation — parce que tes clients sont aussi tes relations." },
+              { icon: Users, text: "Tu es travailleur autonome et tu n'as pas les moyens d'embaucher une secrétaire." },
+              { icon: Bell, text: "Tu gères une PME et personne ne fait le suivi administratif de tes factures." },
+              { icon: Clock, text: "Tu passes des heures chaque semaine sur de l'administratif au lieu de travailler sur ton métier." },
+              { icon: ShieldCheck, text: "Tu veux un suivi professionnel sans confrontation — tes clients sont aussi tes relations." },
             ].map((item, i) => (
               <motion.div
                 key={i}
@@ -215,7 +292,7 @@ const FeaturesPage = () => {
       </section>
 
       {/* Objections */}
-      <section className="px-5 py-12 bg-card/50">
+      <section className="px-5 py-12">
         <div className="max-w-3xl mx-auto">
           <motion.div {...fade()} className="text-center mb-8">
             <h2 className="font-display text-xl sm:text-2xl font-bold mb-2">
@@ -241,7 +318,7 @@ const FeaturesPage = () => {
       <section className="px-5 py-16 text-center">
         <div className="max-w-lg mx-auto">
           <motion.h2 {...fade()} className="font-display text-2xl sm:text-3xl font-bold mb-3">
-            Prêt à récupérer ton argent ?
+            Ton adjointe commence aujourd'hui.
           </motion.h2>
           <motion.p {...fade(0.1)} className="text-sm text-muted-foreground mb-6">
             3 crédits offerts. Aucun engagement. Configuration en 2 minutes.

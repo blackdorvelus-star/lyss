@@ -31,7 +31,7 @@ const HeroSection = ({ onStart, onDemo }: HeroSectionProps) => {
             className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary text-xs font-medium mb-5"
           >
             <Sparkles className="w-3 h-3" />
-            Adjointe IA pour PME québécoises
+            Ta secrétaire IA — disponible 24/7
           </motion.div>
 
           <motion.h1

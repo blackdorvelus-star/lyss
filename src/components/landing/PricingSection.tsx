@@ -10,15 +10,15 @@ const plans = [
     price: "49",
     desc: "Travailleur autonome",
     included: "3 dossiers/mois",
-    features: ["SMS + courriels", "Tableau de bord", "Ton personnalisable"],
+    features: ["Suivi complet jusqu'au paiement", "SMS + courriels automatisés", "Tableau de bord & rapports"],
     accent: false,
   },
   {
     name: "Pro",
     price: "149",
-    desc: "PME",
+    desc: "PME en croissance",
     included: "10 dossiers/mois",
-    features: ["Tout Solo +", "Nom d'adjointe personnalisable", "Appels vocaux IA", "QuickBooks & Sage", "Rapports hebdo"],
+    features: ["Tout Solo +", "Adjointe à ton nom", "Appels vocaux IA", "QuickBooks & Sage", "Gestion de litiges"],
     accent: true,
     popular: true,
   },
@@ -26,8 +26,8 @@ const plans = [
     name: "Entreprise",
     price: "Sur mesure",
     desc: "Volume élevé",
-    included: "Illimité",
-    features: ["Tout Pro +", "Marque blanche complète", "API complète", "Gestionnaire dédié", "SLA garanti"],
+    included: "Dossiers illimités",
+    features: ["Tout Pro +", "Marque blanche complète", "API & intégrations custom", "Gestionnaire dédié", "SLA garanti"],
     accent: false,
   },
 ];
@@ -51,10 +51,10 @@ const PricingSection = () => {
           className="text-center mb-8"
         >
           <h2 className="font-display text-xl sm:text-2xl font-bold mb-1.5">
-            Moins cher qu'un café par jour
+            Une adjointe complète, moins cher qu'un café par jour
           </h2>
           <p className="text-xs text-muted-foreground">
-            Ton adjointe IA travaille 24/7 — sans vacances ni avantages sociaux.
+            Lyss gère tes dossiers 24/7 — du premier rappel au dernier dollar.
           </p>
         </motion.div>
 

@@ -11,7 +11,7 @@ const Footer = () => {
           <div className="col-span-2 sm:col-span-1">
             <img src="/logo-lyss.png" alt="Lyss" className="h-8 object-contain mb-3" />
             <p className="text-xs text-muted-foreground">
-              Adjointe administrative IA pour PME québécoises.
+              Ton adjointe IA qui gère ton admin pendant que tu travailles.
             </p>
           </div>
 
@@ -82,7 +82,7 @@ const Footer = () => {
             © {new Date().getFullYear()} Lyss · Québec, Canada
           </p>
           <p className="text-xs text-muted-foreground">
-            Service de gestion administrative automatisée pour PME.
+            Ton adjointe administrative IA — du premier rappel au dernier dollar.
           </p>
         </div>
       </div>

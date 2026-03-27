@@ -7,12 +7,12 @@ import {
 } from "@/components/ui/accordion";
 
 const faqs = [
-  { q: "C'est quoi Lyss ?", a: "Une adjointe administrative IA qui fait le suivi de tes factures par SMS, courriel et appel vocal — avec un ton québécois professionnel." },
-  { q: "Est-ce que Lyss perçoit les paiements ?", a: "Non. Lyss ne touche jamais à ton argent. Elle fait le suivi auprès de tes clients, et ceux-ci te paient directement via ton Interac ou Stripe. Lyss est une facilitatrice, pas un intermédiaire financier." },
-  { q: "Est-ce légal au Québec ?", a: "Oui. Lyss envoie des suivis de courtoisie, pas du recouvrement agressif. Aucune menace, jamais." },
-  { q: "Mes clients sauront que c'est une IA ?", a: "Non. Lyss se présente comme faisant partie de ton équipe. Messages naturels et personnalisés." },
-  { q: "Combien de suivis par dossier ?", a: "Jusqu'à 5 SMS, 3 courriels et 2 appels vocaux. Arrêt automatique dès le paiement reçu." },
-  { q: "Si un client est mécontent ?", a: "L'adjointe respecte toute demande de cessation. Le dossier est pausé et tu es notifié." },
+  { q: "C'est quoi Lyss ?", a: "Lyss est ton adjointe administrative IA. Elle gère tes factures, relance tes clients par SMS, courriel et appel vocal, suit les litiges, vérifie les paiements et ferme tes dossiers — du début à la fin, 24/7." },
+  { q: "Est-ce que Lyss perçoit les paiements ?", a: "Non. Lyss ne touche jamais à ton argent. Elle facilite le suivi et guide tes clients vers tes propres méthodes de paiement (Interac, Stripe, virement, etc.). C'est une adjointe, pas un intermédiaire financier." },
+  { q: "Qu'est-ce que Lyss fait exactement pour moi ?", a: "Tout ce qu'une secrétaire ferait : suivi de factures, relances multicanales, appels de courtoisie, gestion des litiges, suivi de soumissions, rapports hebdomadaires et prévisions de trésorerie. Elle ne ferme un dossier que quand le paiement est confirmé." },
+  { q: "Est-ce légal au Québec ?", a: "Oui. Lyss envoie des suivis de courtoisie professionnels, pas du recouvrement agressif. Aucune menace, aucune pression indue — jamais." },
+  { q: "Mes clients sauront que c'est une IA ?", a: "Non. Lyss se présente comme faisant partie de ton équipe, avec le nom de ton entreprise. Messages naturels et personnalisés en québécois." },
+  { q: "Si un client est mécontent ?", a: "Lyss respecte immédiatement toute demande de cessation. Le dossier est pausé et tu es notifié pour intervenir personnellement." },
   { q: "Puis-je annuler ?", a: "Oui, en tout temps, sans frais ni pénalité depuis ton tableau de bord." },
 ];
 

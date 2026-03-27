@@ -2,10 +2,10 @@ import { motion } from "framer-motion";
 import { Pencil, FileSpreadsheet, Code, Link2 } from "lucide-react";
 
 const methods = [
-  { icon: Pencil, title: "Manuel", desc: "Ajoute tes factures une par une." },
-  { icon: FileSpreadsheet, title: "Import CSV", desc: "Importe en lot depuis ton logiciel." },
-  { icon: Code, title: "QuickBooks & Sage", desc: "Sync automatique des impayés." },
-  { icon: Link2, title: "Widget web", desc: "Portail client sur ton site." },
+  { icon: Pencil, title: "Manuel", desc: "Ajoute un dossier en quelques clics." },
+  { icon: FileSpreadsheet, title: "Import CSV", desc: "Importe tous tes dossiers en lot." },
+  { icon: Code, title: "QuickBooks & Sage", desc: "Sync automatique — Lyss détecte les impayés." },
+  { icon: Link2, title: "Portail client", desc: "Tes clients consultent et paient en ligne." },
 ];
 
 const IntegrationSection = () => {
@@ -19,10 +19,10 @@ const IntegrationSection = () => {
           className="text-center mb-6"
         >
           <h2 className="font-display text-xl sm:text-2xl font-bold mb-1.5">
-            S'intègre en 2 minutes
+            Branche Lyss en 2 minutes
           </h2>
           <p className="text-xs text-muted-foreground">
-            Pas besoin de changer tes habitudes. Lyss s'adapte.
+            Ton adjointe s'adapte à tes outils. Pas l'inverse.
           </p>
         </motion.div>
 

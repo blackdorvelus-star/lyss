@@ -49,8 +49,8 @@ const MessagePreview = () => {
           viewport={{ once: true }}
           className="bg-card border border-border rounded-xl p-4"
         >
-          <h3 className="font-display font-bold text-sm mb-1">Que doit faire Lyss ?</h3>
-          <p className="text-[10px] text-muted-foreground mb-3">Active ou désactive les canaux selon tes besoins.</p>
+          <h3 className="font-display font-bold text-sm mb-1">Configure ton adjointe</h3>
+          <p className="text-[10px] text-muted-foreground mb-3">Choisis ce que Lyss gère pour toi.</p>
           <div className="grid grid-cols-3 gap-1.5">
             {actions.map((a) => {
               const isOn = enabled.has(a.id);

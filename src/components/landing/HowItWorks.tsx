@@ -5,20 +5,20 @@ const steps = [
   {
     icon: Upload,
     num: "01",
-    title: "Dépose ta facture",
-    desc: "Manuel, CSV ou QuickBooks. 30 secondes.",
+    title: "Dépose ton dossier",
+    desc: "Facture, soumission ou client — en 30 secondes.",
   },
   {
     icon: Bot,
     num: "02",
-    title: "Lyss fait le suivi",
-    desc: "SMS, courriels et appels — ton québécois pro.",
+    title: "Lyss prend le relais",
+    desc: "Relances, appels, litiges, suivi complet jusqu'au règlement.",
   },
   {
     icon: Banknote,
     num: "03",
-    title: "Ton client te paie",
-    desc: "Directement dans ton Interac ou Stripe. 73 % de réponse.",
+    title: "Ton argent rentre",
+    desc: "Paiement confirmé, dossier fermé. Tu fais autre chose.",
   },
 ];
 

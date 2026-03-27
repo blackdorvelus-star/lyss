@@ -40,8 +40,8 @@ const HeroSection = ({ onStart, onDemo }: HeroSectionProps) => {
             transition={{ delay: 0.1 }}
             className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold leading-[1.1] tracking-tight mb-4"
           >
-            Récupère tes{" "}
-            <span className="text-primary">factures impayées</span>
+            Ton adjointe IA qui{" "}
+            <span className="text-primary">gère ton admin</span>
             {" "}pendant que tu travailles.
           </motion.h1>
 
@@ -51,8 +51,8 @@ const HeroSection = ({ onStart, onDemo }: HeroSectionProps) => {
             transition={{ delay: 0.2 }}
             className="text-muted-foreground text-sm sm:text-base leading-relaxed mb-5 max-w-md mx-auto"
           >
-            Lyss fait le suivi de tes factures par SMS, courriel et appel vocal — 
-            tes clients paient directement dans ton compte. Zéro stress.
+            Lyss suit tes factures, relance tes clients, gère les litiges et ferme tes dossiers — 
+            du premier rappel au dernier dollar. Zéro stress.
           </motion.p>
 
           {/* Channel badges */}
@@ -93,7 +93,7 @@ const HeroSection = ({ onStart, onDemo }: HeroSectionProps) => {
               Voir la démo
             </Button>
             <span className="text-xs text-muted-foreground">
-              3 crédits offerts · 49 $/mois · Sans engagement
+              Libère 10h/semaine · 49 $/mois · Sans engagement
             </span>
           </motion.div>
         </div>

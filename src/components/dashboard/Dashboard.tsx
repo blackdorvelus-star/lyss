@@ -40,6 +40,7 @@ const BatchReminder = lazy(() => import("./BatchReminder"));
 const AuditTrail = lazy(() => import("./AuditTrail"));
 const CashflowForecast = lazy(() => import("./CashflowForecast"));
 const SequenceTracker = lazy(() => import("./SequenceTracker"));
+const CalendarSection = lazy(() => import("./CalendarSection"));
 
 const SectionLoader = () => (
   <div className="flex items-center justify-center py-16">
@@ -273,7 +274,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout, demo = false }: DashboardPr
   const [saving, setSaving] = useState(false);
   const [activeSection, setActiveSection] = useState<Section>(() => {
     const hash = window.location.hash.replace("#", "");
-    const validSections: Section[] = ["clients", "billing", "disputes", "reports", "settings", "integrations", "widget", "import", "quotes", "batch", "audit", "sequences"];
+    const validSections: Section[] = ["clients", "billing", "disputes", "reports", "calendar", "settings", "integrations", "widget", "import", "quotes", "batch", "audit", "sequences"];
     return validSections.includes(hash as Section) ? (hash as Section) : "billing";
   });
   const [personality, setPersonality] = useState<import("./PersonalitySelector").Personality>("chaleureuse");
@@ -845,6 +846,10 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout, demo = false }: DashboardPr
               ) : activeSection === "sequences" ? (
                 <Suspense fallback={<SectionLoader />}>
                   <SequenceTracker />
+                </Suspense>
+              ) : activeSection === "calendar" ? (
+                <Suspense fallback={<SectionLoader />}>
+                  <CalendarSection />
                 </Suspense>
               ) : (
                 <PlaceholderSection title="Section en développement" desc="Cette fonctionnalité sera disponible prochainement." />

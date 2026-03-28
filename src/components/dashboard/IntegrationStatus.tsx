@@ -304,7 +304,7 @@ const IntegrationStatus = () => {
                     <div className="pt-2 border-t">
                       <Button variant="outline" size="sm" className="w-full" asChild>
                         <a 
-                          href={`/INTEGRATIONS_GUIDE.md#${integration.type}`} 
+                          href={`/guide-integrations#${integration.type}`} 
                           target="_blank" 
                           rel="noopener noreferrer"
                         >
@@ -329,7 +329,7 @@ const IntegrationStatus = () => {
                   <h3 className="font-medium text-blue-800 mb-1">Configuration requise</h3>
                   <p className="text-sm text-blue-700">
                     {integrations.filter(i => i.status === 'config_required').length} intégration(s) nécessite(nt) une configuration.
-                    Consultez le <a href="/INTEGRATIONS_GUIDE.md" className="underline font-medium">guide de configuration</a>.
+                    Consultez le <a href="/guide-integrations" className="underline font-medium">guide de configuration</a>.
                   </p>
                 </div>
               )}
@@ -417,7 +417,7 @@ const IntegrationStatus = () => {
       </Tabs>
 
       <div className="text-sm text-muted-foreground">
-        <p>🔧 Consultez <a href="/INTEGRATIONS_GUIDE.md" className="text-primary hover:underline">INTEGRATIONS_GUIDE.md</a> pour la configuration complète.</p>
+        <p>🔧 Consultez <a href="/guide-integrations" className="text-primary hover:underline">le guide d'intégration</a> pour la configuration complète.</p>
         <p>📊 Le statut se met à jour automatiquement toutes les heures.</p>
       </div>
     </div>

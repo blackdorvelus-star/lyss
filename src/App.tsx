@@ -31,6 +31,7 @@ const PrivacyPage = lazy(() => import("./pages/PrivacyPage.tsx"));
 const TermsPage = lazy(() => import("./pages/TermsPage.tsx"));
 const LitigesPage = lazy(() => import("./pages/LitigesPage.tsx"));
 const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage.tsx"));
+const IntegrationGuidePage = lazy(() => import("./pages/IntegrationGuidePage.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
 const PageLoader = () => (
@@ -63,6 +64,7 @@ const App = () => (
           <Route path="/conditions-utilisation" element={<TermsPage />} />
           <Route path="/conditions" element={<TermsPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/guide-integrations" element={<IntegrationGuidePage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>

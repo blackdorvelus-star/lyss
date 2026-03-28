@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 222 22% 5%;
+    --foreground: 210 15% 92%;
+
+    --card: 220 20% 9%;
+    --card-foreground: 210 15% 92%;
+
+    --popover: 220 20% 9%;
+    --popover-foreground: 210 15% 92%;
+
+    --primary: 160 30% 46%;
+    --primary-foreground: 222 22% 5%;
+
+    --secondary: 220 16% 14%;
+    --secondary-foreground: 210 12% 72%;
+
+    --muted: 220 16% 12%;
+    --muted-foreground: 218 10% 46%;
+
+    --accent: 42 70% 52%;
+    --accent-foreground: 222 22% 5%;
+
+    --destructive: 15 50% 48%;
+    --destructive-foreground: 210 15% 95%;
+
+    --border: 220 16% 16%;
+    --input: 220 16% 16%;
+    --ring: 160 30% 46%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 224 22% 7%;
+    --sidebar-foreground: 210 12% 72%;
+    --sidebar-primary: 160 30% 46%;
+    --sidebar-primary-foreground: 222 22% 5%;
+    --sidebar-accent: 220 16% 13%;
+    --sidebar-accent-foreground: 210 12% 72%;
+    --sidebar-border: 220 16% 14%;
+    --sidebar-ring: 160 30% 46%;
+
+    --gradient-sage: linear-gradient(135deg, hsl(160, 30%, 46%), hsl(170, 28%, 50%));
+    --gradient-navy: linear-gradient(135deg, hsl(220, 35%, 22%), hsl(230, 30%, 18%));
+    --gradient-gold: linear-gradient(135deg, hsl(42, 70%, 52%), hsl(36, 65%, 48%));
+    --shadow-glow: 0 0 40px -10px hsl(160 30% 46% / 0.15);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', sans-serif;
+  }
+}
+
+@layer utilities {
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+/* Hide Lovable badge in production */
+a[href*="lovable.dev"],
+#lovable-badge,
+[data-lovable-badge] {
+  display: none !important;
+}

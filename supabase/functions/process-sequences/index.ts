@@ -1,0 +1,495 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
+};
+
+// Build a dynamic system prompt from user settings
+function buildSystemPrompt(settings: any): string {
+  const name = settings.assistant_name || "Lyss";
+  const role = settings.assistant_role || "adjointe";
+  const company = settings.company_name || "l'entreprise";
+  const tone = settings.tone === "vous" ? "Vouvoie le client." : "Tutoie le client.";
+  const personality = settings.vapi_personality || "chaleureuse";
+  const closing = settings.follow_up_closing || "Bonne journée !";
+  const smsSig = settings.sms_signature ? `\n- Termine le SMS par : "${settings.sms_signature}"` : "";
+  const emailSig = settings.email_signature ? `\n- Termine le courriel par :\n${settings.email_signature}` : "";
+  const negotiate = settings.ai_negotiate
+    ? `\n- Tu peux proposer un rabais jusqu'à ${settings.ai_max_discount_percent || 0}% si le client hésite.`
+    : "\n- Ne propose AUCUN rabais.";
+  const paymentPlan = settings.ai_propose_payment_plan
+    ? "\n- Propose une solution flexible (paiement en 2-3 fois, Interac)."
+    : "\n- Ne propose PAS de plan de paiement.";
+
+  return `Tu es ${name}, ${role} IA pour ${company}. Tu génères des messages de suivi de courtoisie pour des factures en attente.
+
+PERSONNALITÉ : ${personality}
+${tone}
+
+RÈGLES :
+- Ton québécois professionnel, naturel, jamais robotique.
+- Toujours poli et empathique. JAMAIS menaçant.${paymentPlan}${negotiate}
+- Message court : max 4-5 phrases pour SMS, max 6-8 phrases pour courriel.
+- N'inclus AUCUN lien de paiement.
+- Ne mentionne JAMAIS d'intérêts, frais ou conséquences légales.
+- Termine chaque message par : "${closing}"${smsSig}${emailSig}
+
+Retourne exactement un JSON : {"sms":"...","email_subject":"...","email_body":"..."}`;
+}
+
+// Check if current time is within user's working hours (Montreal TZ)
+function isWithinWorkingHours(settings: any): boolean {
+  if (!settings) return true;
+  const now = new Date();
+  const montrealTime = new Date(now.toLocaleString("en-US", { timeZone: "America/Montreal" }));
+  const currentHour = `${String(montrealTime.getHours()).padStart(2, "0")}:${String(montrealTime.getMinutes()).padStart(2, "0")}`;
+  const start = settings.working_hours_start || "08:00";
+  const end = settings.working_hours_end || "18:00";
+  if (currentHour < start || currentHour > end) return false;
+
+  const dayMap = ["dim", "lun", "mar", "mer", "jeu", "ven", "sam"];
+  const currentDay = dayMap[montrealTime.getDay()];
+  const workingDays = (settings.working_days as string[]) || ["lun", "mar", "mer", "jeu", "ven"];
+  return workingDays.includes(currentDay);
+}
+
+// ── Check payment status via QuickBooks or Sage ──
+async function checkPaymentStatus(
+  supabase: any,
+  invoice: any,
+  userId: string,
+  supabaseUrl: string
+): Promise<"paid" | "partial" | "unpaid" | "unknown"> {
+  try {
+    // Try QuickBooks first
+    const { data: qbConn } = await supabase
+      .from("quickbooks_connections")
+      .select("*")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (qbConn && invoice.invoice_number) {
+      try {
+        const checkRes = await fetch(`${supabaseUrl}/functions/v1/quickbooks-sync`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ scheduled: false, check_payment: true, invoice_number: invoice.invoice_number, user_id: userId }),
+        });
+        if (checkRes.ok) {
+          const result = await checkRes.json();
+          if (result.payment_status) return result.payment_status;
+        }
+      } catch (e) {
+        console.error("QB payment check failed:", e);
+      }
+    }
+
+    // Try Sage
+    const { data: sageConn } = await supabase
+      .from("sage_connections")
+      .select("*")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (sageConn && invoice.invoice_number) {
+      try {
+        const checkRes = await fetch(`${supabaseUrl}/functions/v1/sage-sync`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ scheduled: false, check_payment: true, invoice_number: invoice.invoice_number, user_id: userId }),
+        });
+        if (checkRes.ok) {
+          const result = await checkRes.json();
+          if (result.payment_status) return result.payment_status;
+        }
+      } catch (e) {
+        console.error("Sage payment check failed:", e);
+      }
+    }
+
+    // Check if manually marked recovered
+    if (invoice.status === "recovered") return "paid";
+
+    return "unknown";
+  } catch {
+    return "unknown";
+  }
+}
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const TELNYX_API_KEY = Deno.env.get("TELNYX_API_KEY");
+    const TELNYX_PHONE_NUMBER = Deno.env.get("TELNYX_PHONE_NUMBER");
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    const now = new Date();
+    let totalProcessed = 0;
+
+    // Get all active sequences
+    const { data: sequences, error: seqErr } = await supabase
+      .from("reminder_sequences")
+      .select("*")
+      .eq("enabled", true);
+
+    if (seqErr || !sequences || sequences.length === 0) {
+      return new Response(JSON.stringify({ processed: 0, message: "No active sequences" }), {
+        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    for (const seq of sequences) {
+      const { data: settings } = await supabase
+        .from("payment_settings")
+        .select("*")
+        .eq("user_id", seq.user_id)
+        .single();
+
+      if (!isWithinWorkingHours(settings)) {
+        console.log(`Skipping user ${seq.user_id}: outside working hours`);
+        continue;
+      }
+
+      // ── Relevance AI orchestration mode ──
+      if ((settings as any)?.use_relevance_ai) {
+        console.log(`User ${seq.user_id}: Relevance AI mode enabled, delegating...`);
+        const { data: invoices } = await supabase
+          .from("invoices")
+          .select("*, clients(*)")
+          .eq("user_id", seq.user_id)
+          .in("status", ["pending", "in_progress"])
+          .not("due_date", "is", null);
+
+        if (!invoices || invoices.length === 0) continue;
+
+        for (const invoice of invoices) {
+          const dueDate = new Date(invoice.due_date);
+          const daysPastDue = Math.floor((now.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
+          if (daysPastDue < 0) continue;
+
+          // Use next_action_at if set — skip if not yet due
+          if (invoice.next_action_at) {
+            const nextAction = new Date(invoice.next_action_at);
+            if (now < nextAction) continue;
+          } else if (invoice.last_sequence_action_at) {
+            const lastAction = new Date(invoice.last_sequence_action_at);
+            if ((now.getTime() - lastAction.getTime()) / (1000 * 60 * 60) < 20) continue;
+          }
+
+          // ── Payment check before acting ──
+          const paymentStatus = await checkPaymentStatus(supabase, invoice, seq.user_id, SUPABASE_URL);
+          if (paymentStatus === "paid") {
+            console.log(`Invoice ${invoice.id} already paid, closing sequence`);
+            await supabase.from("invoices").update({
+              status: "recovered",
+              amount_recovered: invoice.amount,
+              next_action_at: null,
+              last_sequence_action_at: now.toISOString(),
+            }).eq("id", invoice.id);
+            continue;
+          }
+          if (paymentStatus === "partial") {
+            console.log(`Invoice ${invoice.id} partially paid, escalating`);
+            await supabase.from("notifications").insert({
+              user_id: seq.user_id,
+              invoice_id: invoice.id,
+              title: "💰 Paiement partiel détecté",
+              message: `Un paiement partiel a été détecté pour ${invoice.clients?.name} (${invoice.amount} $). Intervention recommandée.`,
+              type: "warning",
+            });
+            await supabase.from("invoices").update({ next_action_at: null }).eq("id", invoice.id);
+            continue;
+          }
+
+          try {
+            const triggerRes = await fetch(`${SUPABASE_URL}/functions/v1/relevance-ai-trigger`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                invoice_id: invoice.id,
+                user_id: seq.user_id,
+                action_type: "auto_sequence",
+              }),
+            });
+
+            if (triggerRes.ok) {
+              // Schedule next action in 3 days
+              const nextAt = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+              await supabase.from("invoices").update({
+                last_sequence_action_at: now.toISOString(),
+                next_action_at: nextAt.toISOString(),
+                status: invoice.status === "pending" ? "in_progress" : invoice.status,
+              }).eq("id", invoice.id);
+              totalProcessed++;
+            } else {
+              console.error(`Relevance AI trigger failed for invoice ${invoice.id}:`, await triggerRes.text());
+            }
+          } catch (e) {
+            console.error(`Relevance AI trigger error for invoice ${invoice.id}:`, e);
+          }
+        }
+        continue;
+      }
+
+      const activeChannels = (settings?.active_channels as string[]) || ["sms", "email", "phone"];
+      const steps = seq.steps as Array<{ day: number; channel: string; label: string }>;
+      const maxAttempts = seq.max_attempts_per_channel as Record<string, number>;
+
+      const { data: invoices } = await supabase
+        .from("invoices")
+        .select("*, clients(*)")
+        .eq("user_id", seq.user_id)
+        .in("status", ["pending", "in_progress"])
+        .not("due_date", "is", null);
+
+      if (!invoices || invoices.length === 0) continue;
+
+      const { data: negativeCalls } = await supabase
+        .from("call_logs")
+        .select("invoice_id")
+        .eq("user_id", seq.user_id)
+        .eq("client_sentiment", "negative");
+
+      const negativeInvoiceIds = new Set((negativeCalls || []).map((c: any) => c.invoice_id));
+
+      for (const invoice of invoices) {
+        const dueDate = new Date(invoice.due_date);
+        const daysPastDue = Math.floor((now.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
+        if (daysPastDue < 0) continue;
+
+        // Use next_action_at if set
+        if (invoice.next_action_at) {
+          const nextAction = new Date(invoice.next_action_at);
+          if (now < nextAction) continue;
+        }
+
+        // Escalade humaine
+        if (negativeInvoiceIds.has(invoice.id)) {
+          console.log(`Skipping invoice ${invoice.id}: negative sentiment detected`);
+          const { count: existingEscalation } = await supabase
+            .from("notifications")
+            .select("*", { count: "exact", head: true })
+            .eq("invoice_id", invoice.id)
+            .eq("type", "warning")
+            .ilike("title", "%intervention%");
+
+          if (!existingEscalation || existingEscalation === 0) {
+            const assistantName = settings?.assistant_name || "Lyss";
+            await supabase.from("notifications").insert({
+              user_id: seq.user_id,
+              invoice_id: invoice.id,
+              title: "🚨 Intervention humaine requise",
+              message: `${assistantName} a suspendu les relances pour ${invoice.clients?.name} (${invoice.amount} $) suite à une réponse négative.`,
+              type: "warning",
+            });
+          }
+          continue;
+        }
+
+        const currentStep = invoice.current_sequence_step || 0;
+        if (currentStep >= steps.length) continue;
+
+        const nextStep = steps[currentStep];
+        if (daysPastDue < nextStep.day) continue;
+
+        // Cooldown fallback (when next_action_at not set)
+        if (!invoice.next_action_at && invoice.last_sequence_action_at) {
+          const lastAction = new Date(invoice.last_sequence_action_at);
+          if ((now.getTime() - lastAction.getTime()) / (1000 * 60 * 60) < 20) continue;
+        }
+
+        // ── Payment check before each reminder ──
+        const paymentStatus = await checkPaymentStatus(supabase, invoice, seq.user_id, SUPABASE_URL);
+        if (paymentStatus === "paid") {
+          console.log(`Invoice ${invoice.id} paid — stopping sequence`);
+          await supabase.from("invoices").update({
+            status: "recovered",
+            amount_recovered: invoice.amount,
+            next_action_at: null,
+            last_sequence_action_at: now.toISOString(),
+          }).eq("id", invoice.id);
+          await supabase.from("notifications").insert({
+            user_id: seq.user_id,
+            invoice_id: invoice.id,
+            title: "✅ Paiement détecté automatiquement",
+            message: `Le paiement de ${invoice.amount} $ de ${invoice.clients?.name} a été confirmé. Séquence arrêtée.`,
+            type: "success",
+          });
+          continue;
+        }
+        if (paymentStatus === "partial") {
+          console.log(`Invoice ${invoice.id} partially paid — escalating`);
+          await supabase.from("notifications").insert({
+            user_id: seq.user_id,
+            invoice_id: invoice.id,
+            title: "💰 Paiement partiel détecté",
+            message: `Un paiement partiel a été détecté pour ${invoice.clients?.name} (${invoice.amount} $). Intervention recommandée.`,
+            type: "warning",
+          });
+          await supabase.from("invoices").update({ next_action_at: null }).eq("id", invoice.id);
+          continue;
+        }
+
+        // Skip if channel is disabled
+        if (!activeChannels.includes(nextStep.channel)) {
+          await supabase.from("invoices").update({
+            current_sequence_step: currentStep + 1,
+            last_sequence_action_at: now.toISOString(),
+          }).eq("id", invoice.id);
+          continue;
+        }
+
+        // Check max attempts
+        const { count } = await supabase
+          .from("reminders")
+          .select("*", { count: "exact", head: true })
+          .eq("invoice_id", invoice.id)
+          .eq("channel", nextStep.channel);
+
+        const maxForChannel = maxAttempts[nextStep.channel] || 3;
+        if ((count || 0) >= maxForChannel) {
+          await supabase.from("invoices").update({
+            current_sequence_step: currentStep + 1,
+            last_sequence_action_at: now.toISOString(),
+          }).eq("id", invoice.id);
+          continue;
+        }
+
+        const client = invoice.clients;
+
+        // Calculate next_action_at based on next step
+        const nextStepIndex = currentStep + 1;
+        let nextActionAt: string | null = null;
+        if (nextStepIndex < steps.length) {
+          const nextStepDef = steps[nextStepIndex];
+          const daysUntilNext = nextStepDef.day - nextStep.day;
+          const delayMs = Math.max(daysUntilNext, 1) * 24 * 60 * 60 * 1000;
+          nextActionAt = new Date(now.getTime() + delayMs).toISOString();
+        }
+
+        if (nextStep.channel === "sms" && client.phone && TELNYX_API_KEY && TELNYX_PHONE_NUMBER) {
+          try {
+            const message = await generateMessage(LOVABLE_API_KEY!, settings, invoice, client, "sms");
+            if (message) {
+              const { data: reminder } = await supabase.from("reminders").insert({
+                invoice_id: invoice.id, user_id: seq.user_id,
+                channel: "sms", message_content: message.sms, status: "scheduled",
+              }).select().single();
+
+              if (reminder) {
+                const telnyxRes = await fetch("https://api.telnyx.com/v2/messages", {
+                  method: "POST",
+                  headers: { Authorization: `Bearer ${TELNYX_API_KEY}`, "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    from: TELNYX_PHONE_NUMBER, to: client.phone,
+                    text: message.sms, type: "SMS",
+                    webhook_url: `${SUPABASE_URL}/functions/v1/telnyx-webhook`,
+                  }),
+                });
+
+                const telnyxData = await telnyxRes.json();
+                if (telnyxRes.ok) {
+                  await supabase.from("reminders").update({
+                    status: "sent", sent_at: now.toISOString(),
+                    delivery_status: "queued", delivery_provider_id: telnyxData.data?.id,
+                  }).eq("id", reminder.id);
+                }
+              }
+            }
+          } catch (e) {
+            console.error(`SMS step failed for invoice ${invoice.id}:`, e);
+          }
+        } else if (nextStep.channel === "email" && client.email) {
+          try {
+            const message = await generateMessage(LOVABLE_API_KEY!, settings, invoice, client, "email");
+            if (message) {
+              await supabase.from("reminders").insert({
+                invoice_id: invoice.id, user_id: seq.user_id,
+                channel: "email",
+                message_content: `Objet: ${message.email_subject}\n\n${message.email_body}`,
+                status: "scheduled",
+              });
+            }
+          } catch (e) {
+            console.error(`Email step failed for invoice ${invoice.id}:`, e);
+          }
+        } else if (nextStep.channel === "phone" && client.phone) {
+          const assistantName = settings?.assistant_name || "Lyss";
+          await supabase.from("notifications").insert({
+            user_id: seq.user_id, invoice_id: invoice.id,
+            title: "📞 Appel de suivi recommandé",
+            message: `${assistantName} recommande un appel à ${client.name} (${client.phone}) pour la facture de ${invoice.amount} $.`,
+            type: "info",
+          });
+        }
+
+        await supabase.from("invoices").update({
+          current_sequence_step: currentStep + 1,
+          last_sequence_action_at: now.toISOString(),
+          next_action_at: nextActionAt,
+          status: invoice.status === "pending" ? "in_progress" : invoice.status,
+        }).eq("id", invoice.id);
+
+        totalProcessed++;
+      }
+    }
+
+    return new Response(
+      JSON.stringify({ success: true, processed: totalProcessed }),
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  } catch (e) {
+    console.error("process-sequences error:", e);
+    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown" }), {
+      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+});
+
+// Generate reminder messages via Lovable AI
+async function generateMessage(
+  apiKey: string, settings: any, invoice: any, client: any, channel: string
+): Promise<{ sms: string; email_subject: string; email_body: string } | null> {
+  const dueDateStr = invoice.due_date
+    ? new Date(invoice.due_date).toLocaleDateString("fr-CA", { day: "numeric", month: "long" })
+    : "récemment";
+
+  const systemPrompt = buildSystemPrompt(settings || {});
+  const userPrompt = `Génère les messages pour :
+- Client : ${client.name}
+- Montant : ${invoice.amount} $
+- Facture : ${invoice.invoice_number || "N/A"}
+- Échéance : ${dueDateStr}
+- Canal prioritaire : ${channel}`;
+
+  try {
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "google/gemini-3-flash-preview",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
+        ],
+      }),
+    });
+
+    if (!res.ok) return null;
+    const data = await res.json();
+    const raw = data.choices?.[0]?.message?.content || "";
+    const cleaned = raw.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+    return JSON.parse(cleaned);
+  } catch {
+    return null;
+  }
+}

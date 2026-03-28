@@ -1,0 +1,202 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Users, FileText, Calendar, Settings, LogOut, ChevronLeft, ChevronRight, Shield, ShieldAlert, Menu, X, FileBarChart, Link2, Globe, PlusCircle, FileSignature, Zap, ScrollText, MoreHorizontal, Rocket } from "lucide-react";
+import { useAdmin } from "@/hooks/useAdmin";
+import { cn } from "@/lib/utils";
+import { AnimatePresence, motion } from "framer-motion";
+
+export type Section = "clients" | "billing" | "disputes" | "reports" | "calendar" | "settings" | "integrations" | "widget" | "import" | "quotes" | "batch" | "audit" | "sequences";
+
+interface AppSidebarProps {
+  activeSection: Section;
+  onSectionChange: (section: Section) => void;
+  onLogout?: () => void;
+}
+
+const navItems: { id: Section; label: string; icon: typeof Users }[] = [
+  { id: "billing", label: "Facturation", icon: FileText },
+  { id: "quotes", label: "Soumissions", icon: FileSignature },
+  { id: "import", label: "Confier", icon: PlusCircle },
+  { id: "clients", label: "Clients", icon: Users },
+  { id: "widget", label: "Widget", icon: Globe },
+  { id: "sequences", label: "Séquences", icon: Rocket },
+  { id: "batch", label: "Lot", icon: Zap },
+  { id: "integrations", label: "Intégrations", icon: Link2 },
+  { id: "disputes", label: "Litiges", icon: ShieldAlert },
+  { id: "reports", label: "Rapports", icon: FileBarChart },
+  { id: "audit", label: "Audit", icon: ScrollText },
+  { id: "calendar", label: "Agenda", icon: Calendar },
+  { id: "settings", label: "Réglages", icon: Settings },
+];
+
+// Primary tabs shown in mobile bottom bar (max 5)
+const mobileMainIds: Section[] = ["billing", "quotes", "import", "clients", "disputes"];
+const mobileMainItems = navItems.filter((i) => mobileMainIds.includes(i.id));
+const mobileMoreItems = navItems.filter((i) => !mobileMainIds.includes(i.id));
+
+const AppSidebar = ({ activeSection, onSectionChange, onLogout }: AppSidebarProps) => {
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
+  const { isAdmin } = useAdmin();
+  const navigate = useNavigate();
+
+  const handleNav = (section: Section) => {
+    onSectionChange(section);
+    setMobileMoreOpen(false);
+  };
+
+  const isMoreActive = mobileMoreItems.some((i) => i.id === activeSection);
+
+  return (
+    <>
+      {/* Mobile bottom nav — 5 tabs + More */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-sidebar border-t border-sidebar-border safe-bottom">
+        {/* More menu overlay */}
+        <AnimatePresence>
+          {mobileMoreOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 8 }}
+              transition={{ duration: 0.15 }}
+              className="absolute bottom-full left-0 right-0 bg-sidebar border-t border-sidebar-border shadow-lg rounded-t-xl px-2 py-2 grid grid-cols-4 gap-1"
+            >
+              {mobileMoreItems.map((item) => {
+                const isActive = activeSection === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleNav(item.id)}
+                    className={cn(
+                      "flex flex-col items-center gap-1 px-2 py-2.5 rounded-lg transition-colors",
+                      isActive ? "text-primary bg-primary/10" : "text-sidebar-foreground"
+                    )}
+                  >
+                    <item.icon className="w-5 h-5 flex-shrink-0" />
+                    <span className="text-[10px] font-medium truncate">{item.label}</span>
+                  </button>
+                );
+              })}
+              {onLogout && (
+                <button
+                  onClick={onLogout}
+                  className="flex flex-col items-center gap-1 px-2 py-2.5 rounded-lg text-sidebar-foreground"
+                >
+                  <LogOut className="w-5 h-5 flex-shrink-0" />
+                  <span className="text-[10px] font-medium">Sortir</span>
+                </button>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <div className="flex items-center justify-around px-1 py-1.5">
+          {mobileMainItems.map((item) => {
+            const isActive = activeSection === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => handleNav(item.id)}
+                className={cn(
+                  "flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg transition-colors min-w-0 flex-1",
+                  isActive ? "text-primary" : "text-sidebar-foreground"
+                )}
+              >
+                <item.icon className="w-5 h-5 flex-shrink-0" />
+                <span className="text-[10px] font-medium truncate">{item.label}</span>
+              </button>
+            );
+          })}
+          <button
+            onClick={() => setMobileMoreOpen(!mobileMoreOpen)}
+            className={cn(
+              "flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg transition-colors min-w-0 flex-1",
+              isMoreActive || mobileMoreOpen ? "text-primary" : "text-sidebar-foreground"
+            )}
+          >
+            <MoreHorizontal className="w-5 h-5 flex-shrink-0" />
+            <span className="text-[10px] font-medium">Plus</span>
+          </button>
+        </div>
+      </nav>
+
+      {/* Desktop sidebar */}
+      <aside
+        className={cn(
+          "h-screen sticky top-0 bg-sidebar border-r border-sidebar-border flex-col transition-all duration-200 hidden md:flex",
+          collapsed ? "w-16" : "w-56"
+        )}
+      >
+        {/* Brand */}
+        <div className="flex items-center px-2 py-3 border-b border-sidebar-border">
+          <img src="/logo-lyss.png" alt="Lyss" className={cn("flex-shrink-0 object-contain", collapsed ? "h-8" : "h-10")} />
+        </div>
+
+        {/* Nav */}
+        <nav className="flex-1 py-3 px-2 space-y-1 overflow-y-auto">
+          {navItems.map((item) => {
+            const isActive = activeSection === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => onSectionChange(item.id)}
+                className={cn(
+                  "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                  isActive
+                    ? "bg-sidebar-accent text-primary"
+                    : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-foreground"
+                )}
+                title={collapsed ? item.label : undefined}
+              >
+                <item.icon className="w-4.5 h-4.5 flex-shrink-0" />
+                {!collapsed && <span className="truncate">{item.label}</span>}
+              </button>
+            );
+          })}
+          {isAdmin && (
+            <button
+              onClick={() => navigate("/admin")}
+              className={cn(
+                "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                "text-primary hover:bg-sidebar-accent/50"
+              )}
+              title={collapsed ? "Administration" : undefined}
+            >
+              <Shield className="w-4.5 h-4.5 flex-shrink-0" />
+              {!collapsed && <span className="truncate">Administration</span>}
+            </button>
+          )}
+        </nav>
+
+        {/* Bottom */}
+        <div className="border-t border-sidebar-border px-2 py-3 space-y-1">
+          {onLogout && (
+            <button
+              onClick={onLogout}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-foreground transition-colors"
+              title={collapsed ? "Déconnexion" : undefined}
+            >
+              <LogOut className="w-4 h-4 flex-shrink-0" />
+              {!collapsed && <span>Déconnexion</span>}
+            </button>
+          )}
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors"
+          >
+            {collapsed ? (
+              <ChevronRight className="w-4 h-4 flex-shrink-0" />
+            ) : (
+              <>
+                <ChevronLeft className="w-4 h-4 flex-shrink-0" />
+                <span>Réduire</span>
+              </>
+            )}
+          </button>
+        </div>
+      </aside>
+    </>
+  );
+};
+
+export default AppSidebar;

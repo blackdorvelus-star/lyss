@@ -1,0 +1,1 @@
+ALTER TABLE public.payment_settings ADD COLUMN allow_disputes boolean NOT NULL DEFAULT false;

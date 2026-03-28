@@ -20,6 +20,7 @@ import WeeklyProductivity from "./WeeklyProductivity";
 import type { CallLog } from "./CallHistory";
 import { useIsMobile } from "@/hooks/use-mobile";
 import GuidedTour from "@/components/onboarding/GuidedTour";
+import WhatsNewModal from "@/components/onboarding/WhatsNewModal";
 import { demoInvoices, demoReminders, demoCallLogs, demoFeedItems, demoPriorityItems, demoQuotes } from "./demoData";
 // Lazy-loaded heavy sections
 const SettingsWizard = lazy(() => import("./SettingsWizard"));
@@ -597,6 +598,8 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout, demo = false }: DashboardPr
           onNavigate={(section) => setActiveSection(section as Section)}
         />
       )}
+      
+      <WhatsNewModal />
     <div className="min-h-screen bg-background flex">
       <AppSidebar activeSection={activeSection} onSectionChange={setActiveSection} onLogout={onLogout} />
 

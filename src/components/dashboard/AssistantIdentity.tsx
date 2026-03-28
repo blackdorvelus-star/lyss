@@ -16,8 +16,8 @@ import { usePlan } from "@/hooks/usePlan";
 
 const roles = [
   { value: "adjointe", label: "Adjointe administrative" },
-  { value: "secretaire", label: "Secrétaire" },
-  { value: "coordonnatrice", label: "Coordonnatrice de bureau" },
+  { value: "gestionnaire", label: "Gestionnaire de recouvrement" },
+  { value: "coordonnatrice", label: "Coordonnatrice financière" },
 ];
 
 const AssistantIdentity = () => {

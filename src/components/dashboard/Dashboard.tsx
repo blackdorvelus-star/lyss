@@ -273,7 +273,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout, demo = false }: DashboardPr
   const [saving, setSaving] = useState(false);
   const [activeSection, setActiveSection] = useState<Section>(() => {
     const hash = window.location.hash.replace("#", "");
-    const validSections: Section[] = ["clients", "billing", "disputes", "reports", "calendar", "settings", "integrations", "widget", "import", "quotes", "batch", "audit"];
+    const validSections: Section[] = ["clients", "billing", "disputes", "reports", "settings", "integrations", "widget", "import", "quotes", "batch", "audit", "sequences"];
     return validSections.includes(hash as Section) ? (hash as Section) : "billing";
   });
   const [personality, setPersonality] = useState<import("./PersonalitySelector").Personality>("chaleureuse");
@@ -847,7 +847,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout, demo = false }: DashboardPr
                   <SequenceTracker />
                 </Suspense>
               ) : (
-                <PlaceholderSection title="Gestion d'agenda" desc="La prise de rendez-vous et les confirmations automatiques arrivent bientôt." />
+                <PlaceholderSection title="Section en développement" desc="Cette fonctionnalité sera disponible prochainement." />
               )}
             </Suspense>
           )}

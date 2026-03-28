@@ -5,7 +5,7 @@ import { useAdmin } from "@/hooks/useAdmin";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 
-export type Section = "clients" | "billing" | "disputes" | "reports" | "calendar" | "settings" | "integrations" | "widget" | "import" | "quotes" | "batch" | "audit" | "sequences";
+export type Section = "clients" | "billing" | "disputes" | "reports" | "settings" | "integrations" | "widget" | "import" | "quotes" | "batch" | "audit" | "sequences";
 
 interface AppSidebarProps {
   activeSection: Section;
@@ -14,23 +14,23 @@ interface AppSidebarProps {
 }
 
 const navItems: { id: Section; label: string; icon: typeof Users }[] = [
-  { id: "billing", label: "Facturation", icon: FileText },
-  { id: "quotes", label: "Soumissions", icon: FileSignature },
-  { id: "import", label: "Confier", icon: PlusCircle },
+  { id: "import", label: "Nouvelle facture", icon: PlusCircle },
+  { id: "billing", label: "Factures en cours", icon: FileText },
+  { id: "quotes", label: "Devis", icon: FileSignature },
   { id: "clients", label: "Clients", icon: Users },
-  { id: "widget", label: "Widget", icon: Globe },
-  { id: "sequences", label: "Séquences", icon: Rocket },
-  { id: "batch", label: "Lot", icon: Zap },
+  { id: "sequences", label: "Automatisation", icon: Rocket },
+  { id: "widget", label: "Portail client", icon: Globe },
   { id: "integrations", label: "Intégrations", icon: Link2 },
   { id: "disputes", label: "Litiges", icon: ShieldAlert },
   { id: "reports", label: "Rapports", icon: FileBarChart },
-  { id: "audit", label: "Audit", icon: ScrollText },
-  { id: "calendar", label: "Agenda", icon: Calendar },
+  { id: "batch", label: "Traitement par lot", icon: Zap },
+  { id: "audit", label: "Journal", icon: ScrollText },
   { id: "settings", label: "Réglages", icon: Settings },
+  // { id: "calendar", label: "Agenda", icon: Calendar }, // Temporairement caché — en développement
 ];
 
 // Primary tabs shown in mobile bottom bar (max 5)
-const mobileMainIds: Section[] = ["billing", "quotes", "import", "clients", "disputes"];
+const mobileMainIds: Section[] = ["import", "billing", "quotes", "clients", "sequences"];
 const mobileMainItems = navItems.filter((i) => mobileMainIds.includes(i.id));
 const mobileMoreItems = navItems.filter((i) => !mobileMainIds.includes(i.id));
 

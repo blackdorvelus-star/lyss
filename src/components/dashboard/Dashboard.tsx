@@ -335,11 +335,17 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout, demo = false }: DashboardPr
       }
     }
 
-    const { data: calls } = await supabase
-      .from("call_logs" as any)
+    const { data: calls, error: callsError } = await supabase
+      .from("call_logs")
       .select("*")
       .order("created_at", { ascending: false });
-    if (calls) setCallLogs(calls as any as CallLog[]);
+    
+    if (callsError) {
+      console.error("Error loading call logs:", callsError);
+      setCallLogs(demoCallLogs);
+    } else if (calls) {
+      setCallLogs(calls as CallLog[]);
+    }
 
     // Fetch quotes for radar
     const { data: quotesData } = await supabase
@@ -632,10 +638,10 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout, demo = false }: DashboardPr
                 {activeSection === "settings" && "Réglages"}
                 {activeSection === "integrations" && "Intégrations comptables"}
                 {activeSection === "widget" && "Widget embarqué"}
-                {activeSection === "import" && "Confier un dossier"}
-                {activeSection === "quotes" && "Soumissions"}
+                {activeSection === "import" && "Nouvelle facture un dossier"}
+                {activeSection === "quotes" && "Devis"}
                 {activeSection === "batch" && "Relance en lot"}
-                {activeSection === "audit" && "Journal d'audit"}
+                {activeSection === "audit" && "Journal"}
                 {activeSection === "sequences" && "Séquences de recouvrement"}
               </h1>
                 <p className="text-[10px] text-muted-foreground leading-none hidden sm:block">{assistantName} · Adjointe IA</p>
@@ -674,7 +680,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout, demo = false }: DashboardPr
 
               <ActiveDossierIndicator activeDossiers={inProgressCount} />
 
-              {/* Confier un dossier — CTA rapide */}
+              {/* Nouvelle facture un dossier — CTA rapide */}
               <div
                 onClick={() => setActiveSection("import")}
                 className="group cursor-pointer rounded-2xl border border-dashed border-primary/30 bg-primary/5 hover:bg-primary/10 transition-all p-4 sm:p-5 flex items-center justify-between gap-4"
@@ -682,13 +688,13 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout, demo = false }: DashboardPr
                 <div className="min-w-0">
                   <h3 className="font-display text-sm sm:text-base font-bold text-foreground flex items-center gap-2">
                     <Plus className="w-4 h-4 text-primary" />
-                    Confier un dossier à {assistantName}
+                    Nouvelle facture un dossier à {assistantName}
                   </h3>
                   <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">Import manuel, CSV/Excel ou sync comptable</p>
                 </div>
                 <Button size="sm" className="bg-primary text-primary-foreground font-display text-xs flex-shrink-0 group-hover:scale-105 transition-transform">
                   <Plus className="w-4 h-4 sm:mr-1" />
-                  <span className="hidden sm:inline">Confier</span>
+                  <span className="hidden sm:inline">Nouvelle facture</span>
                 </Button>
               </div>
 
@@ -745,7 +751,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout, demo = false }: DashboardPr
                     </div>
                     <Button size="sm" onClick={() => setActiveSection("import")} className="bg-primary text-primary-foreground font-display text-xs sm:text-sm flex-shrink-0">
                       <Plus className="w-4 h-4 sm:mr-1" />
-                      <span className="hidden sm:inline">Confier un dossier</span>
+                      <span className="hidden sm:inline">Nouvelle facture un dossier</span>
                     </Button>
                   </div>
 
@@ -757,7 +763,7 @@ const Dashboard = ({ onBack, onNewInvoice, onLogout, demo = false }: DashboardPr
                       <p className="text-muted-foreground mb-4">Aucun dossier confié à l'adjointe.</p>
                       <Button onClick={() => setActiveSection("import")} className="bg-primary text-primary-foreground font-display">
                         <Plus className="w-4 h-4 mr-1" />
-                        Confier un premier dossier
+                        Nouvelle facture un premier dossier
                       </Button>
                     </motion.div>
                   ) : (

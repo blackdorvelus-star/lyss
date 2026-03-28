@@ -52,7 +52,7 @@ const AuditTrail = () => {
   const loadLogs = async () => {
     setLoading(true);
     let query = supabase
-      .from("audit_logs" as any)
+      .from("audit_logs")
       .select("*")
       .order("created_at", { ascending: false })
       .limit(limit);
@@ -61,8 +61,14 @@ const AuditTrail = () => {
       query = query.eq("entity_type", filter);
     }
 
-    const { data } = await query;
-    setLogs((data as any) || []);
+    const { data, error } = await query;
+    
+    if (error) {
+      console.error("Error loading audit logs:", error);
+      setLogs([]);
+    } else {
+      setLogs(data || []);
+    }
     setLoading(false);
   };
 
@@ -139,7 +145,7 @@ const AuditTrail = () => {
         <div className="min-w-0">
           <h2 className="font-display text-base sm:text-lg font-bold flex items-center gap-2">
             <ScrollText className="w-5 h-5 text-primary flex-shrink-0" />
-            Journal d'audit
+            Journal
           </h2>
           <p className="text-[10px] sm:text-xs text-muted-foreground">
             Historique horodaté pour conformité juridique.
@@ -159,7 +165,7 @@ const AuditTrail = () => {
           { key: "invoice", label: "Factures" },
           { key: "reminder", label: "Relances" },
           { key: "call", label: "Appels" },
-          { key: "quote", label: "Soumissions" },
+          { key: "quote", label: "Devis" },
         ].map((f) => (
           <button
             key={f.key}

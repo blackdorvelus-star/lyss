@@ -10,7 +10,10 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "check:terminology": "node scripts/check-terminology.js",
+    "check:types": "tsc --noEmit",
+    "check:all": "npm run check:terminology && npm run check:types"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

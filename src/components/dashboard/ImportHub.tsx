@@ -207,7 +207,7 @@ const ImportHub = ({ onComplete }: ImportHubProps) => {
     return (
       <div className="max-w-2xl space-y-6">
         <div>
-          <h2 className="font-display text-xl font-bold mb-1">Confier un dossier</h2>
+          <h2 className="font-display text-xl font-bold mb-1">Nouvelle facture un dossier</h2>
           <p className="text-sm text-muted-foreground">
             Choisis comment ajouter tes dossiers. L'adjointe s'occupe du reste.
           </p>
@@ -356,7 +356,7 @@ const ImportHub = ({ onComplete }: ImportHubProps) => {
               ) : (
                 <>
                   <Send className="w-4 h-4 mr-2" />
-                  Confier {invoices.length} dossier{invoices.length > 1 ? "s" : ""}
+                  Nouvelle facture {invoices.length} dossier{invoices.length > 1 ? "s" : ""}
                 </>
               )}
             </Button>

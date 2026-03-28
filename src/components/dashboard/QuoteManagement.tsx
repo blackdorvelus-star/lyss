@@ -189,7 +189,7 @@ const QuoteManagement = () => {
         <div>
           <h2 className="font-display text-lg font-bold flex items-center gap-2">
             <FileSignature className="w-5 h-5 text-primary" />
-            Soumissions
+            Devis
           </h2>
           <p className="text-xs text-muted-foreground">
             {quotes.length} soumission{quotes.length !== 1 ? "s" : ""} · Taux de conversion : {conversionRate}%

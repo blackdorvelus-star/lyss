@@ -26,7 +26,8 @@ const SettingsWizard = lazy(() => import("./SettingsWizard"));
 const ClientManagement = lazy(() => import("./ClientManagement"));
 const DisputeCenter = lazy(() => import("./DisputeCenter"));
 const MonthlyReports = lazy(() => import("./MonthlyReports"));
-const IntegrationStatus = lazy(() => import("./IntegrationStatus"));
+// const IntegrationStatus = lazy(() => import("./IntegrationStatus")); // Old component
+const IntegrationStatus = lazy(() => import("./IntegrationStatus")); // New enhanced component
 const FinancialHealth = lazy(() => import("./FinancialHealth"));
 const PersonalitySelector = lazy(() => import("./PersonalitySelector"));
 const TelnyxCallButton = lazy(() => import("./TelnyxCallButton"));

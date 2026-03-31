@@ -157,8 +157,8 @@ jobs:
           echo "2. Commit both package.json and package-lock.json together" >> $GITHUB_STEP_SUMMARY
           echo "3. Use this workflow to check sync status regularly" >> $GITHUB_STEP_SUMMARY
           
-      - name: Send notification
-        if: always()
+      - name: Send notification (optional)
+        if: always() && secrets.SLACK_WEBHOOK_URL != ''
         uses: 8398a7/action-slack@v3
         with:
           status: ${{ job.status }}

@@ -33,6 +33,9 @@ jobs:
         run: |
           echo "Creating Twin.so API test script..."
           
+          # Create scripts directory if it doesn't exist
+          mkdir -p scripts
+          
           cat > scripts/test-twin-api.js << 'EOF'
           // Twin.so API Test Script
           // Uses API Key from GitHub Secrets
@@ -186,6 +189,9 @@ jobs:
       - name: Create agent sync script
         run: |
           echo "Creating agent synchronization script..."
+          
+          # Create scripts directory if it doesn't exist
+          mkdir -p scripts
           
           cat > scripts/sync-twin-agents.js << 'EOF'
           // Twin.so Agent Synchronization Script

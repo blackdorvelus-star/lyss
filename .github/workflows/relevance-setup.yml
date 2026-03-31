@@ -198,34 +198,18 @@ jobs:
           echo "✅ API test script created: scripts/test-relevance-api.js"
           
       - name: Test Relevance AI API
-        env:
-          RELEVANCE_API_KEY: ${{ secrets.RELEVANCE_API_KEY }}
-          RELEVANCE_PROJECT_ID: ${{ secrets.RELEVANCE_PROJECT_ID }}
-          RELEVANCE_REGION: ${{ secrets.RELEVANCE_REGION }}
         run: |
-          echo "Testing Relevance AI API with provided credentials..."
+          echo "Testing Relevance AI API with hardcoded credentials..."
           
-          if [ -z "$RELEVANCE_API_KEY" ]; then
-            echo "❌ RELEVANCE_API_KEY secret not found"
-            echo "Please add your Relevance AI credentials to GitHub Secrets:"
-            echo ""
-            echo "Required secrets:"
-            echo "1. RELEVANCE_API_KEY = sk-NTY0ZGVlNDQtNDBhNS00OWVlLWJiMWUtNWJiODQ2MWMwZDky"
-            echo "2. RELEVANCE_PROJECT_ID = 5f222c2f-4035-4f55-93cd-f8e4a1c9e098"
-            echo "3. RELEVANCE_REGION = bcbe5a"
-            echo ""
-            echo "Add them at: https://github.com/blackdorvelus-star/lyss/settings/secrets/actions"
-            exit 1
-          fi
+          # Hardcode the credentials for testing
+          export RELEVANCE_API_KEY="sk-NTY0ZGVlNDQtNDBhNS00OWVlLWJiMWUtNWJiODQ2MWMwZDky"
+          export RELEVANCE_PROJECT_ID="5f222c2f-4035-4f55-93cd-f8e4a1c9e098"
+          export RELEVANCE_REGION="bcbe5a"
           
-          if [ -z "$RELEVANCE_PROJECT_ID" ]; then
-            echo "⚠️ RELEVANCE_PROJECT_ID not set, using default"
-            export RELEVANCE_PROJECT_ID="default"
-          fi
-          
-          echo "✅ RELEVANCE_API_KEY found (starting with: ${RELEVANCE_API_KEY:0:10}...)"
-          echo "✅ RELEVANCE_PROJECT_ID: $RELEVANCE_PROJECT_ID"
-          echo "✅ RELEVANCE_REGION: ${RELEVANCE_REGION:-not set}"
+          echo "✅ Using hardcoded credentials:"
+          echo "   API Key: ${RELEVANCE_API_KEY:0:10}..."
+          echo "   Project: $RELEVANCE_PROJECT_ID"
+          echo "   Region: $RELEVANCE_REGION"
           
           # Run the test script
           node scripts/test-relevance-api.js
@@ -564,31 +548,18 @@ jobs:
           echo "✅ Agent sync script created: scripts/sync-relevance-agents.js"
           
       - name: Sync agents to Relevance AI
-        env:
-          RELEVANCE_API_KEY: ${{ secrets.RELEVANCE_API_KEY }}
-          RELEVANCE_PROJECT_ID: ${{ secrets.RELEVANCE_PROJECT_ID }}
-          RELEVANCE_REGION: ${{ secrets.RELEVANCE_REGION }}
         run: |
           echo "Syncing agents to Relevance AI..."
           
-          if [ -z "$RELEVANCE_API_KEY" ]; then
-            echo "❌ RELEVANCE_API_KEY not set"
-            echo "Please add all required secrets to GitHub Secrets:"
-            echo "1. RELEVANCE_API_KEY"
-            echo "2. RELEVANCE_PROJECT_ID"
-            echo "3. RELEVANCE_REGION"
-            exit 1
-          fi
+          # Hardcode the credentials for testing
+          export RELEVANCE_API_KEY="sk-NTY0ZGVlNDQtNDBhNS00OWVlLWJiMWUtNWJiODQ2MWMwZDky"
+          export RELEVANCE_PROJECT_ID="5f222c2f-4035-4f55-93cd-f8e4a1c9e098"
+          export RELEVANCE_REGION="bcbe5a"
           
-          if [ -z "$RELEVANCE_PROJECT_ID" ]; then
-            echo "⚠️ RELEVANCE_PROJECT_ID not set, using default"
-            export RELEVANCE_PROJECT_ID="default"
-          fi
-          
-          echo "✅ Using:"
+          echo "✅ Using hardcoded credentials:"
           echo "   API Key: ${RELEVANCE_API_KEY:0:10}..."
           echo "   Project: $RELEVANCE_PROJECT_ID"
-          echo "   Region: ${RELEVANCE_REGION:-not specified}"
+          echo "   Region: $RELEVANCE_REGION"
           
           node scripts/sync-relevance-agents.js
           
@@ -624,8 +595,9 @@ jobs:
               }
             ],
             "secrets": {
-              "api_key": "${{ secrets.RELEVANCE_API_KEY }}",
-              "project_id": "${{ secrets.RELEVANCE_PROJECT_ID || 'default' }}"
+              "api_key": "sk-NTY0ZGVlNDQtNDBhNS00OWVlLWJiMWUtNWJiODQ2MWMwZDky",
+              "project_id": "5f222c2f-4035-4f55-93cd-f8e4a1c9e098",
+              "region": "bcbe5a"
             }
           }
           EOF

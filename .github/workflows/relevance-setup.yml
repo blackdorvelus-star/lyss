@@ -61,12 +61,11 @@ jobs:
           console.log('📁 Project ID:', projectId);
           console.log('📍 Region:', region || 'not specified');
           
-          // Determine API host based on region
-          let apiHost = 'api.relevanceai.com';
-          if (region) {
-            apiHost = `api.${region}.relevanceai.com`;
-            console.log(`🌍 Using regional API: ${apiHost}`);
-          }
+          // Note: Region "bcbe5a" appears to be a project code, not a regional endpoint
+          // Use default API host and pass region as parameter if needed
+          const apiHost = 'api.relevanceai.com';
+          console.log(`🌍 Using API host: ${apiHost}`);
+          console.log(`📍 Region parameter: ${region || 'none'}`);
           
           // Test API endpoints
           const endpoints = [
@@ -78,75 +77,78 @@ jobs:
           // Function to test an endpoint
           function testEndpoint(endpoint) {
             return new Promise((resolve, reject) => {
-              const options = {
-                hostname: apiHost,
-                port: 443,
-                path: endpoint.path,
-                method: endpoint.method,
-                headers: {
-                  'Authorization': `Bearer ${apiKey}`,
-                  'Content-Type': 'application/json',
-                  'Accept': 'application/json',
-                  'User-Agent': 'Lyss-Relevance-Integration/1.0',
-                  'X-Project-Id': projectId
-                }
-              };
+              const apiHost = 'api.relevanceai.com';
               
               console.log(`\n🔍 Testing: ${endpoint.name} (${endpoint.method} ${endpoint.path})`);
-              
-              const req = https.request(options, (res) => {
-                let data = '';
+              console.log(`   Host: ${apiHost}`);
                 
-                res.on('data', (chunk) => {
-                  data += chunk;
-                });
-                
-                res.on('end', () => {
-                  console.log(`📊 Status: ${res.statusCode} ${res.statusMessage}`);
-                  
-                  // Check for HTML responses (authentication failures)
-                  const isHtml = data.includes('<!doctype html>') || data.includes('<html') || 
-                                (res.headers['content-type'] && res.headers['content-type'].includes('text/html'));
-                  
-                  if (isHtml) {
-                    console.log('❌ Server returned HTML (authentication likely failed)');
-                    console.log('Response preview:', data.substring(0, 200));
-                    resolve({ endpoint: endpoint.name, status: res.statusCode, error: true, html: true });
-                    return;
+                const options = {
+                  hostname: apiHost,
+                  port: 443,
+                  path: endpoint.path,
+                  method: endpoint.method,
+                  headers: {
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'User-Agent': 'Lyss-Relevance-Integration/1.0',
+                    'X-Project-Id': projectId
                   }
+                };
+                
+                const req = https.request(options, (res) => {
+                  let data = '';
                   
-                  try {
-                    const response = JSON.parse(data);
+                  res.on('data', (chunk) => {
+                    data += chunk;
+                  });
+                  
+                  res.on('end', () => {
+                    console.log(`📊 Status: ${res.statusCode} ${res.statusMessage}`);
                     
-                    if (res.statusCode >= 200 && res.statusCode < 300) {
-                      console.log('✅ Success');
-                      console.log('Response keys:', Object.keys(response).join(', '));
-                      resolve({ endpoint: endpoint.name, status: res.statusCode, data: response });
-                    } else {
-                      console.log('❌ Failed');
-                      console.log('Error:', response.error || response.message || 'Unknown error');
-                      resolve({ endpoint: endpoint.name, status: res.statusCode, error: true, response });
+                    // Check for HTML responses (authentication failures)
+                    const isHtml = data.includes('<!doctype html>') || data.includes('<html') || 
+                                  (res.headers['content-type'] && res.headers['content-type'].includes('text/html'));
+                    
+                    if (isHtml) {
+                      console.log('❌ Server returned HTML (authentication likely failed)');
+                      console.log('   Response preview:', data.substring(0, 200));
+                      resolve({ endpoint: endpoint.name, status: res.statusCode, error: true, html: true });
+                      return;
                     }
-                  } catch (e) {
-                    console.log('❌ Failed to parse JSON');
-                    console.log('Response:', data.substring(0, 200));
-                    resolve({ endpoint: endpoint.name, status: res.statusCode, error: true, parseError: true });
-                  }
+                    
+                    try {
+                      const response = JSON.parse(data);
+                      
+                      if (res.statusCode >= 200 && res.statusCode < 300) {
+                        console.log('✅ Success');
+                        console.log('   Response keys:', Object.keys(response).join(', '));
+                        resolve({ endpoint: endpoint.name, status: res.statusCode, data: response });
+                      } else {
+                        console.log('❌ Failed');
+                        console.log('   Error:', response.error || response.message || 'Unknown error');
+                        resolve({ endpoint: endpoint.name, status: res.statusCode, error: true, response });
+                      }
+                    } catch (e) {
+                      console.log('❌ Failed to parse JSON');
+                      console.log('   Response:', data.substring(0, 200));
+                      resolve({ endpoint: endpoint.name, status: res.statusCode, error: true, parseError: true });
+                    }
+                  });
                 });
-              });
-              
-              req.on('error', (error) => {
-                console.log(`❌ Network error: ${error.message}`);
-                resolve({ endpoint: endpoint.name, error: true, message: error.message });
-              });
-              
-              req.setTimeout(10000, () => {
-                req.destroy();
-                console.log('❌ Timeout after 10 seconds');
-                resolve({ endpoint: endpoint.name, error: true, message: 'timeout' });
-              });
-              
-              req.end();
+                
+                req.on('error', (error) => {
+                  console.log(`❌ Network error: ${error.message}`);
+                  resolve({ endpoint: endpoint.name, error: true, message: error.message });
+                });
+                
+                req.setTimeout(10000, () => {
+                  req.destroy();
+                  console.log('❌ Timeout after 10 seconds');
+                  resolve({ endpoint: endpoint.name, error: true, message: 'timeout' });
+                });
+                
+                req.end();
             });
           }
           
@@ -239,12 +241,11 @@ jobs:
             process.exit(1);
           }
           
-          // Determine API host based on region
-          let apiHost = 'api.relevanceai.com';
-          if (region) {
-            apiHost = `api.${region}.relevanceai.com`;
-            console.log(`🌍 Using regional API: ${apiHost}`);
-          }
+          // Use default API host
+          // Region "bcbe5a" appears to be a project code, not regional endpoint
+          const apiHost = 'api.relevanceai.com';
+          console.log(`🌍 Using API host: ${apiHost}`);
+          console.log(`📍 Region parameter: ${region || 'none'}`);
           
           // Read all agent configs
           const relevanceDir = '.relevance';
@@ -350,20 +351,22 @@ jobs:
                 project_id: projectId
               });
               
-              const options = {
-                hostname: apiHost,
-                port: 443,
-                path: `/api/projects/${projectId}/agents`,
-                method: 'POST',
-                headers: {
-                  'Authorization': `Bearer ${apiKey}`,
-                  'Content-Type': 'application/json',
-                  'Accept': 'application/json',
-                  'Content-Length': Buffer.byteLength(postData),
-                  'User-Agent': 'Lyss-Relevance-Sync/1.0',
-                  'X-Project-Id': projectId
-                }
-              };
+              console.log(`   API host: ${apiHost}`);
+                
+                const options = {
+                  hostname: apiHost,
+                  port: 443,
+                  path: `/api/projects/${projectId}/agents`,
+                  method: 'POST',
+                  headers: {
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Content-Length': Buffer.byteLength(postData),
+                    'User-Agent': 'Lyss-Relevance-Sync/1.0',
+                    'X-Project-Id': projectId
+                  }
+                };
               
               const req = https.request(options, (res) => {
                 let data = '';

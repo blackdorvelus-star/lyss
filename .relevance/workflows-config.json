@@ -2,76 +2,31 @@
   "project": "blackdorvelus-star/lyss",
   "workflows": [
     {
-      "name": "auto_code_review",
-      "description": "Automated code review on pull requests",
+      "name": "docs-generation",
+      "description": "Generate documentation on push",
+      "trigger": "push",
+      "agent": "lyss-docs-agent",
+      "actions": [
+        "generate_docs",
+        "update_readme"
+      ],
+      "active": true
+    },
+    {
+      "name": "test-automation",
+      "description": "Run tests on pull request",
       "trigger": "pull_request",
-      "agent": "lyss-code-review-agent",
-      "actions": [
-        "analyze_code_changes",
-        "generate_review_report",
-        "comment_on_pr"
-      ],
-      "active": true
-    },
-    {
-      "name": "api_docs_update",
-      "description": "Update API documentation when endpoints change",
-      "trigger": "push_to_api_paths",
-      "agent": "lyss-docs-generator-agent",
-      "actions": [
-        "analyze_api_changes",
-        "update_openapi_spec",
-        "generate_api_reference"
-      ],
-      "active": true
-    },
-    {
-      "name": "auto_deploy_staging",
-      "description": "Automated deployment to staging environment",
-      "trigger": "merge_to_main",
-      "agent": "lyss-deployment-agent",
+      "agent": "lyss-tests-agent",
       "actions": [
         "run_tests",
-        "build_artifacts",
-        "deploy_to_staging",
-        "run_smoke_tests"
-      ],
-      "active": true
-    },
-    {
-      "name": "issue_triage",
-      "description": "Automated issue triage and response",
-      "trigger": "new_github_issue",
-      "agent": "lyss-user-support-agent",
-      "actions": [
-        "analyze_issue",
-        "categorize_issue",
-        "provide_initial_response",
-        "assign_labels"
-      ],
-      "active": true
-    },
-    {
-      "name": "main_agent_general",
-      "description": "General assistance and project management",
-      "trigger": "manual",
-      "agent": "lyss-main-agent",
-      "actions": [
-        "project_management",
-        "general_assistance",
-        "coordination"
+        "report_coverage"
       ],
       "active": true
     }
   ],
   "secrets": {
-    "api_key": "${{ secrets.RELEVANCE_API_KEY }}",
-    "project_id": "${{ secrets.RELEVANCE_PROJECT_ID }}",
-    "region": "${{ secrets.RELEVANCE_REGION }}"
-  },
-  "agents": {
-    "total": 5,
-    "active": 5,
-    "types": ["code_review", "documentation", "deployment", "support", "general"]
+    "api_key": "sk-NTY0ZGVlNDQtNDBhNS00OWVlLWJiMWUtNWJiODQ2MWMwZDky",
+    "project_id": "5f222c2f-4035-4f55-93cd-f8e4a1c9e098",
+    "region": "bcbe5a"
   }
 }

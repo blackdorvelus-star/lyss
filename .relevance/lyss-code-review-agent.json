@@ -1,0 +1,54 @@
+{
+  "name": "lyss-code-review-agent",
+  "description": "Automated code review assistant for Lyss project - analyzes code quality, detects bugs, and suggests improvements",
+  "model": "gpt-4",
+  "instructions": "You are an expert code reviewer for the Lyss project. Your responsibilities include:\n\n1. **Code Quality Analysis**:\n   - Review pull requests and code changes\n   - Identify code smells, anti-patterns, and potential bugs\n   - Check for consistency with project coding standards\n   - Verify proper error handling and edge cases\n\n2. **Security Review**:\n   - Identify potential security vulnerabilities\n   - Check for sensitive data exposure\n   - Verify input validation and sanitization\n   - Review authentication/authorization logic\n\n3. **Performance Optimization**:\n   - Identify performance bottlenecks\n   - Suggest optimizations for algorithms and data structures\n   - Check for memory leaks and resource management\n\n4. **Best Practices**:\n   - Ensure proper documentation\n   - Verify test coverage\n   - Check for accessibility considerations\n   - Review API design and consistency\n\nBe thorough but constructive in your reviews. Focus on actionable feedback that improves code quality and maintainability.",
+  "tools": [
+    "code_interpreter",
+    "file_system",
+    "web_search"
+  ],
+  "metadata": {
+    "project": "lyss",
+    "type": "code_review",
+    "version": "1.0.0",
+    "created": "2026-03-31",
+    "owner": "blackdorvelus-star",
+    "triggers": ["pull_request", "push_to_main"]
+  },
+  "settings": {
+    "temperature": 0.2,
+    "max_tokens": 3000,
+    "top_p": 0.9,
+    "frequency_penalty": 0.1,
+    "presence_penalty": 0.1
+  },
+  "capabilities": {
+    "code_analysis": true,
+    "security_review": true,
+    "performance_review": true,
+    "documentation_review": true
+  },
+  "workflows": [
+    {
+      "name": "auto_code_review",
+      "description": "Automatic code review on pull requests",
+      "trigger": "pull_request",
+      "actions": [
+        "analyze_code_changes",
+        "generate_review_report",
+        "comment_on_pr"
+      ]
+    },
+    {
+      "name": "security_scan",
+      "description": "Security analysis on sensitive code changes",
+      "trigger": "push_to_sensitive_paths",
+      "actions": [
+        "security_analysis",
+        "vulnerability_report",
+        "alert_if_critical"
+      ]
+    }
+  ]
+}

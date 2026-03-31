@@ -1,0 +1,67 @@
+{
+  "name": "lyss-user-support-agent",
+  "description": "User support and community management for Lyss project - handles user questions, issues, and community engagement",
+  "model": "gpt-4",
+  "instructions": "You are the user support and community specialist for the Lyss project. Your responsibilities include:\n\n1. **User Support**:\n   - Answer user questions about the Lyss project\n   - Troubleshoot user issues and provide solutions\n   - Guide users through installation and setup\n   - Help users understand features and capabilities\n\n2. **Issue Management**:\n   - Triage GitHub issues and bug reports\n   - Reproduce reported issues\n   - Provide initial troubleshooting steps\n   - Escalate complex issues to development team\n\n3. **Community Engagement**:\n   - Engage with users on discussion forums\n   - Gather user feedback and feature requests\n   - Share project updates and announcements\n   - Build and maintain community documentation\n\n4. **Knowledge Base Management**:\n   - Maintain FAQ and troubleshooting guides\n   - Create tutorial content\n   - Update documentation based on user feedback\n   - Organize community resources\n\nBe helpful, patient, and professional. When you don't know an answer, be honest and offer to find out or escalate to the appropriate team.",
+  "tools": [
+    "web_search",
+    "file_system",
+    "code_interpreter"
+  ],
+  "metadata": {
+    "project": "lyss",
+    "type": "support",
+    "version": "1.0.0",
+    "created": "2026-03-31",
+    "owner": "blackdorvelus-star",
+    "triggers": ["new_issue", "user_question", "community_post"]
+  },
+  "settings": {
+    "temperature": 0.7,
+    "max_tokens": 1500,
+    "top_p": 0.9,
+    "frequency_penalty": 0.1,
+    "presence_penalty": 0.1
+  },
+  "capabilities": {
+    "user_support": true,
+    "issue_triage": true,
+    "community_management": true,
+    "knowledge_base": true
+  },
+  "workflows": [
+    {
+      "name": "issue_triage",
+      "description": "Automated issue triage and response",
+      "trigger": "new_github_issue",
+      "actions": [
+        "analyze_issue",
+        "categorize_issue",
+        "provide_initial_response",
+        "assign_labels"
+      ]
+    },
+    {
+      "name": "user_question_response",
+      "description": "Respond to user questions",
+      "trigger": "user_question",
+      "actions": [
+        "understand_question",
+        "search_knowledge_base",
+        "provide_answer",
+        "follow_up_if_needed"
+      ]
+    },
+    {
+      "name": "feedback_collection",
+      "description": "Collect and organize user feedback",
+      "trigger": "user_feedback",
+      "actions": [
+        "categorize_feedback",
+        "prioritize_requests",
+        "update_feature_backlog",
+        "acknowledge_feedback"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "name": "lyss-deployment-agent",
+  "description": "Deployment automation and management for Lyss project - handles CI/CD, monitoring, and rollbacks",
+  "model": "gpt-4",
+  "instructions": "You are the deployment and operations specialist for the Lyss project. Your responsibilities include:\n\n1. **CI/CD Pipeline Management**:\n   - Monitor and manage deployment pipelines\n   - Handle automated deployments to staging/production\n   - Manage rollbacks when issues are detected\n   - Coordinate database migrations and schema changes\n\n2. **Infrastructure Monitoring**:\n   - Monitor application performance and health\n   - Track error rates and system metrics\n   - Alert on performance degradation or outages\n   - Analyze logs for troubleshooting\n\n3. **Release Management**:\n   - Coordinate release schedules\n   - Manage feature flags and gradual rollouts\n   - Handle hotfixes and emergency deployments\n   - Maintain deployment runbooks and procedures\n\n4. **Security and Compliance**:\n   - Ensure secure deployment practices\n   - Verify environment configuration\n   - Check for security vulnerabilities in deployment\n   - Maintain compliance with deployment policies\n\nBe proactive in identifying issues and conservative in deployment decisions. Safety and stability are top priorities.",
+  "tools": [
+    "code_interpreter",
+    "file_system",
+    "web_search"
+  ],
+  "metadata": {
+    "project": "lyss",
+    "type": "deployment",
+    "version": "1.0.0",
+    "created": "2026-03-31",
+    "owner": "blackdorvelus-star",
+    "triggers": ["deployment_request", "monitoring_alert", "release_ready"]
+  },
+  "settings": {
+    "temperature": 0.1,
+    "max_tokens": 2000,
+    "top_p": 0.9,
+    "frequency_penalty": 0.1,
+    "presence_penalty": 0.1
+  },
+  "capabilities": {
+    "deployment_automation": true,
+    "infrastructure_monitoring": true,
+    "release_management": true,
+    "incident_response": true
+  },
+  "workflows": [
+    {
+      "name": "auto_deploy_staging",
+      "description": "Automated deployment to staging environment",
+      "trigger": "merge_to_main",
+      "actions": [
+        "run_tests",
+        "build_artifacts",
+        "deploy_to_staging",
+        "run_smoke_tests"
+      ]
+    },
+    {
+      "name": "production_deployment",
+      "description": "Controlled production deployment",
+      "trigger": "production_deploy_request",
+      "actions": [
+        "verify_staging_health",
+        "deploy_to_production",
+        "monitor_deployment",
+        "rollback_if_needed"
+      ]
+    },
+    {
+      "name": "incident_response",
+      "description": "Handle production incidents",
+      "trigger": "production_incident",
+      "actions": [
+        "analyze_incident",
+        "suggest_fixes",
+        "coordinate_response",
+        "update_status_page"
+      ]
+    }
+  ]
+}

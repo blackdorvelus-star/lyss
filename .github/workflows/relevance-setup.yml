@@ -210,10 +210,14 @@ jobs:
           
           if [ -z "$RELEVANCE_API_KEY" ]; then
             echo "⚠️ RELEVANCE_API_KEY not set in GitHub Secrets"
-            echo "Using test mode only - add secrets for full integration"
-            echo "Required secrets: RELEVANCE_API_KEY, RELEVANCE_PROJECT_ID, RELEVANCE_REGION"
+            echo "Workflow will skip API tests"
             exit 0
           fi
+          
+          echo "✅ Using GitHub Secrets"
+          echo "   API Key: ${RELEVANCE_API_KEY:0:10}..."
+          echo "   Project: $RELEVANCE_PROJECT_ID"
+          echo "   Region: ${RELEVANCE_REGION:-not set}"
           
           echo "✅ Using hardcoded credentials:"
           echo "   API Key: ${RELEVANCE_API_KEY:0:10}..."
@@ -568,9 +572,14 @@ jobs:
           
           if [ -z "$RELEVANCE_API_KEY" ]; then
             echo "⚠️ RELEVANCE_API_KEY not set in GitHub Secrets"
-            echo "Skipping agent sync - add secrets to enable"
+            echo "Skipping agent sync"
             exit 0
           fi
+          
+          echo "✅ Using GitHub Secrets"
+          echo "   API Key: ${RELEVANCE_API_KEY:0:10}..."
+          echo "   Project: $RELEVANCE_PROJECT_ID"
+          echo "   Region: ${RELEVANCE_REGION:-not set}"
           
           echo "✅ Using hardcoded credentials:"
           echo "   API Key: ${RELEVANCE_API_KEY:0:10}..."

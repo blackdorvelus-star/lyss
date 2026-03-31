@@ -216,6 +216,67 @@ jobs:
             process.exit(1);
           }
           
+          // First, test the API key with a simple health check
+          console.log('🔑 Testing API key validity...');
+          
+          function testApiKey() {
+            return new Promise((resolve) => {
+              const options = {
+                hostname: 'app.twin.so',
+                port: 443,
+                path: '/api/health',
+                method: 'GET',
+                headers: {
+                  'Authorization': `Bearer ${apiKey}`,
+                  'Accept': 'application/json',
+                  'User-Agent': 'Lyss-Twin-Sync/1.0'
+                }
+              };
+              
+              const req = https.request(options, (res) => {
+                let data = '';
+                
+                res.on('data', (chunk) => {
+                  data += chunk;
+                });
+                
+                res.on('end', () => {
+                  const isHtml = data.includes('<!doctype html>') || data.includes('<html');
+                  
+                  if (isHtml) {
+                    console.log('❌ API key appears invalid - server returned HTML');
+                    console.log('   This means:');
+                    console.log('   1. API key is expired or revoked');
+                    console.log('   2. Wrong API key format');
+                    console.log('   3. Authentication failed');
+                    console.log('   Please check your TWIN_API_KEY in GitHub Secrets');
+                    resolve(false);
+                  } else if (res.statusCode === 200) {
+                    console.log('✅ API key is valid');
+                    resolve(true);
+                  } else {
+                    console.log(`❌ API key test failed with status: ${res.statusCode}`);
+                    console.log(`   Response: ${data.substring(0, 200)}`);
+                    resolve(false);
+                  }
+                });
+              });
+              
+              req.on('error', (error) => {
+                console.log(`❌ Network error testing API key: ${error.message}`);
+                resolve(false);
+              });
+              
+              req.setTimeout(10000, () => {
+                req.destroy();
+                console.log('❌ API key test timeout');
+                resolve(false);
+              });
+              
+              req.end();
+            });
+          }
+          
           // Read all agent configs
           const twinDir = '.twin';
           const agentFiles = fs.readdirSync(twinDir)
@@ -270,6 +331,7 @@ jobs:
                   headers: {
                     'Authorization': `Bearer ${apiKey}`,
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json',
                     'Content-Length': Buffer.byteLength(postData),
                     'User-Agent': 'Lyss-Twin-Sync/1.0'
                   }
@@ -284,6 +346,23 @@ jobs:
                   
                   res.on('end', () => {
                     console.log(`   Status: ${res.statusCode}`);
+                    
+                    // Check if response is HTML instead of JSON
+                    const isHtml = data.includes('<!doctype html>') || data.includes('<html') || 
+                                  data.includes('Content-Type: text/html') || 
+                                  (res.headers['content-type'] && res.headers['content-type'].includes('text/html'));
+                    
+                    if (isHtml) {
+                      console.log(`   ⚠️ Server returned HTML instead of JSON`);
+                      console.log(`   This usually means:`);
+                      console.log(`   1. Authentication failed`);
+                      console.log(`   2. API key is invalid or expired`);
+                      console.log(`   3. Endpoint requires different authentication`);
+                      console.log(`   4. Redirect to login/error page`);
+                      console.log(`   Trying next endpoint...`);
+                      tryNextEndpoint();
+                      return;
+                    }
                     
                     if (res.statusCode === 405) {
                       // Method not allowed, try next endpoint
@@ -315,7 +394,8 @@ jobs:
                         tryNextEndpoint();
                       } else {
                         console.log(`❌ ${agentName} sync failed (parse error)`);
-                        console.log(`   Response: ${data.substring(0, 200)}`);
+                        console.log(`   Response type: ${res.headers['content-type'] || 'unknown'}`);
+                        console.log(`   First 200 chars: ${data.substring(0, 200)}`);
                         resolve({ agent: agentName, success: false, error: data });
                       }
                     }
@@ -344,6 +424,19 @@ jobs:
           
           // Sync all agents
           async function syncAllAgents() {
+            // First test the API key
+            const apiKeyValid = await testApiKey();
+            
+            if (!apiKeyValid) {
+              console.log('\n❌ Cannot proceed - API key validation failed');
+              console.log('Please check:');
+              console.log('1. TWIN_API_KEY in GitHub Secrets');
+              console.log('2. API key format (should start with "twin_")');
+              console.log('3. API key expiration');
+              console.log('4. Twin.so account status');
+              process.exit(1);
+            }
+            
             console.log('\n🚀 Starting agent synchronization...');
             
             const results = [];

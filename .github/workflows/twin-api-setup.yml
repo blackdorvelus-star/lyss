@@ -36,8 +36,8 @@ jobs:
           # Create scripts directory if it doesn't exist
           mkdir -p scripts
           
-          cat > scripts/test-twin-api.js << 'EOF'
-          // Twin.so API Test Script
+          cat > scripts/test-twin-api.cjs << 'EOF'
+          // Twin.so API Test Script (CommonJS version)
           // Uses API Key from GitHub Secrets
           
           const fs = require('fs');
@@ -162,7 +162,7 @@ jobs:
           });
           EOF
           
-          echo "✅ API test script created: scripts/test-twin-api.js"
+          echo "✅ API test script created: scripts/test-twin-api.cjs"
           
       - name: Test Twin.so API
         env:
@@ -183,8 +183,8 @@ jobs:
           
           echo "✅ TWIN_API_KEY found (starting with: ${TWIN_API_KEY:0:20}...)"
           
-          # Run the test script
-          node scripts/test-twin-api.js
+          # Run the test script (using .cjs extension for CommonJS)
+          node scripts/test-twin-api.cjs
           
       - name: Create agent sync script
         run: |
@@ -193,8 +193,8 @@ jobs:
           # Create scripts directory if it doesn't exist
           mkdir -p scripts
           
-          cat > scripts/sync-twin-agents.js << 'EOF'
-          // Twin.so Agent Synchronization Script
+          cat > scripts/sync-twin-agents.cjs << 'EOF'
+          // Twin.so Agent Synchronization Script (CommonJS version)
           // Syncs local agent configs with Twin.so
           
           const fs = require('fs');
@@ -346,7 +346,7 @@ jobs:
           });
           EOF
           
-          echo "✅ Agent sync script created: scripts/sync-twin-agents.js"
+          echo "✅ Agent sync script created: scripts/sync-twin-agents.cjs"
           
       - name: Sync agents to Twin.so
         env:
@@ -360,7 +360,7 @@ jobs:
             exit 1
           fi
           
-          node scripts/sync-twin-agents.js
+          node scripts/sync-twin-agents.cjs
           
       - name: Create webhook configuration
         run: |

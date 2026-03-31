@@ -157,12 +157,14 @@ jobs:
           echo "2. Commit both package.json and package-lock.json together" >> $GITHUB_STEP_SUMMARY
           echo "3. Use this workflow to check sync status regularly" >> $GITHUB_STEP_SUMMARY
           
-      - name: Send notification (optional)
-        if: always() && secrets.SLACK_WEBHOOK_URL != ''
-        uses: 8398a7/action-slack@v3
-        with:
-          status: ${{ job.status }}
-          channel: '#lyss-devops'
-          username: 'npm Dependencies Bot'
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      # Note: Slack notification step removed due to syntax issues
+      # To add Slack notifications, uncomment and configure SLACK_WEBHOOK_URL secret
+      # - name: Send notification
+      #   if: always()
+      #   uses: 8398a7/action-slack@v3
+      #   with:
+      #     status: ${{ job.status }}
+      #     channel: '#lyss-devops'
+      #     username: 'npm Dependencies Bot'
+      #   env:
+      #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

@@ -49,6 +49,7 @@ jobs:
           // Get API key from environment
           const apiKey = process.env.RELEVANCE_API_KEY;
           const projectId = process.env.RELEVANCE_PROJECT_ID || 'default';
+          const region = process.env.RELEVANCE_REGION;
           
           if (!apiKey) {
             console.error('❌ RELEVANCE_API_KEY not found in environment');
@@ -56,8 +57,16 @@ jobs:
             process.exit(1);
           }
           
-          console.log('✅ API Key found (first 20 chars):', apiKey.substring(0, 20) + '...');
+          console.log('✅ API Key found (first 10 chars):', apiKey.substring(0, 10) + '...');
           console.log('📁 Project ID:', projectId);
+          console.log('📍 Region:', region || 'not specified');
+          
+          // Determine API host based on region
+          let apiHost = 'api.relevanceai.com';
+          if (region) {
+            apiHost = `api.${region}.relevanceai.com`;
+            console.log(`🌍 Using regional API: ${apiHost}`);
+          }
           
           // Test API endpoints
           const endpoints = [
@@ -70,7 +79,7 @@ jobs:
           function testEndpoint(endpoint) {
             return new Promise((resolve, reject) => {
               const options = {
-                hostname: 'api.relevanceai.com',
+                hostname: apiHost,
                 port: 443,
                 path: endpoint.path,
                 method: endpoint.method,
@@ -78,7 +87,8 @@ jobs:
                   'Authorization': `Bearer ${apiKey}`,
                   'Content-Type': 'application/json',
                   'Accept': 'application/json',
-                  'User-Agent': 'Lyss-Relevance-Integration/1.0'
+                  'User-Agent': 'Lyss-Relevance-Integration/1.0',
+                  'X-Project-Id': projectId
                 }
               };
               
@@ -190,23 +200,32 @@ jobs:
       - name: Test Relevance AI API
         env:
           RELEVANCE_API_KEY: ${{ secrets.RELEVANCE_API_KEY }}
-          RELEVANCE_PROJECT_ID: ${{ secrets.RELEVANCE_PROJECT_ID || 'default' }}
+          RELEVANCE_PROJECT_ID: ${{ secrets.RELEVANCE_PROJECT_ID }}
+          RELEVANCE_REGION: ${{ secrets.RELEVANCE_REGION }}
         run: |
-          echo "Testing Relevance AI API with provided key..."
+          echo "Testing Relevance AI API with provided credentials..."
           
           if [ -z "$RELEVANCE_API_KEY" ]; then
             echo "❌ RELEVANCE_API_KEY secret not found"
-            echo "Please add your Relevance AI API key to GitHub Secrets:"
-            echo "1. Go to: https://github.com/blackdorvelus-star/lyss/settings/secrets/actions"
-            echo "2. Click 'New repository secret'"
-            echo "3. Name: RELEVANCE_API_KEY"
-            echo "4. Value: your_relevance_api_key_here"
-            echo "5. Click 'Add secret'"
+            echo "Please add your Relevance AI credentials to GitHub Secrets:"
+            echo ""
+            echo "Required secrets:"
+            echo "1. RELEVANCE_API_KEY = sk-NTY0ZGVlNDQtNDBhNS00OWVlLWJiMWUtNWJiODQ2MWMwZDky"
+            echo "2. RELEVANCE_PROJECT_ID = 5f222c2f-4035-4f55-93cd-f8e4a1c9e098"
+            echo "3. RELEVANCE_REGION = bcbe5a"
+            echo ""
+            echo "Add them at: https://github.com/blackdorvelus-star/lyss/settings/secrets/actions"
             exit 1
           fi
           
-          echo "✅ RELEVANCE_API_KEY found (starting with: ${RELEVANCE_API_KEY:0:20}...)"
-          echo "📁 Project ID: ${RELEVANCE_PROJECT_ID:-default}"
+          if [ -z "$RELEVANCE_PROJECT_ID" ]; then
+            echo "⚠️ RELEVANCE_PROJECT_ID not set, using default"
+            export RELEVANCE_PROJECT_ID="default"
+          fi
+          
+          echo "✅ RELEVANCE_API_KEY found (starting with: ${RELEVANCE_API_KEY:0:10}...)"
+          echo "✅ RELEVANCE_PROJECT_ID: $RELEVANCE_PROJECT_ID"
+          echo "✅ RELEVANCE_REGION: ${RELEVANCE_REGION:-not set}"
           
           # Run the test script
           node scripts/test-relevance-api.js
@@ -229,10 +248,18 @@ jobs:
           
           const apiKey = process.env.RELEVANCE_API_KEY;
           const projectId = process.env.RELEVANCE_PROJECT_ID || 'default';
+          const region = process.env.RELEVANCE_REGION;
           
           if (!apiKey) {
             console.error('❌ RELEVANCE_API_KEY not found');
             process.exit(1);
+          }
+          
+          // Determine API host based on region
+          let apiHost = 'api.relevanceai.com';
+          if (region) {
+            apiHost = `api.${region}.relevanceai.com`;
+            console.log(`🌍 Using regional API: ${apiHost}`);
           }
           
           // Read all agent configs
@@ -340,7 +367,7 @@ jobs:
               });
               
               const options = {
-                hostname: 'api.relevanceai.com',
+                hostname: apiHost,
                 port: 443,
                 path: `/api/projects/${projectId}/agents`,
                 method: 'POST',
@@ -349,7 +376,8 @@ jobs:
                   'Content-Type': 'application/json',
                   'Accept': 'application/json',
                   'Content-Length': Buffer.byteLength(postData),
-                  'User-Agent': 'Lyss-Relevance-Sync/1.0'
+                  'User-Agent': 'Lyss-Relevance-Sync/1.0',
+                  'X-Project-Id': projectId
                 }
               };
               
@@ -423,7 +451,7 @@ jobs:
               });
               
               const options = {
-                hostname: 'api.relevanceai.com',
+                hostname: apiHost,
                 port: 443,
                 path: `/api/projects/${projectId}/agents/${agentName}`,
                 method: 'PUT',
@@ -432,7 +460,8 @@ jobs:
                   'Content-Type': 'application/json',
                   'Accept': 'application/json',
                   'Content-Length': Buffer.byteLength(postData),
-                  'User-Agent': 'Lyss-Relevance-Sync/1.0'
+                  'User-Agent': 'Lyss-Relevance-Sync/1.0',
+                  'X-Project-Id': projectId
                 }
               };
               
@@ -537,15 +566,29 @@ jobs:
       - name: Sync agents to Relevance AI
         env:
           RELEVANCE_API_KEY: ${{ secrets.RELEVANCE_API_KEY }}
-          RELEVANCE_PROJECT_ID: ${{ secrets.RELEVANCE_PROJECT_ID || 'default' }}
+          RELEVANCE_PROJECT_ID: ${{ secrets.RELEVANCE_PROJECT_ID }}
+          RELEVANCE_REGION: ${{ secrets.RELEVANCE_REGION }}
         run: |
           echo "Syncing agents to Relevance AI..."
           
           if [ -z "$RELEVANCE_API_KEY" ]; then
             echo "❌ RELEVANCE_API_KEY not set"
-            echo "Please add it to GitHub Secrets first"
+            echo "Please add all required secrets to GitHub Secrets:"
+            echo "1. RELEVANCE_API_KEY"
+            echo "2. RELEVANCE_PROJECT_ID"
+            echo "3. RELEVANCE_REGION"
             exit 1
           fi
+          
+          if [ -z "$RELEVANCE_PROJECT_ID" ]; then
+            echo "⚠️ RELEVANCE_PROJECT_ID not set, using default"
+            export RELEVANCE_PROJECT_ID="default"
+          fi
+          
+          echo "✅ Using:"
+          echo "   API Key: ${RELEVANCE_API_KEY:0:10}..."
+          echo "   Project: $RELEVANCE_PROJECT_ID"
+          echo "   Region: ${RELEVANCE_REGION:-not specified}"
           
           node scripts/sync-relevance-agents.js
           

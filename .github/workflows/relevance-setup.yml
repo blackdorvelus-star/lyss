@@ -201,13 +201,19 @@ jobs:
           
       - name: Test Relevance AI API
         continue-on-error: true
+        env:
+          RELEVANCE_API_KEY: ${{ secrets.RELEVANCE_API_KEY }}
+          RELEVANCE_PROJECT_ID: ${{ secrets.RELEVANCE_PROJECT_ID }}
+          RELEVANCE_REGION: ${{ secrets.RELEVANCE_REGION }}
         run: |
-          echo "Testing Relevance AI API with hardcoded credentials..."
+          echo "Testing Relevance AI API..."
           
-          # Hardcode the credentials for testing
-          export RELEVANCE_API_KEY="sk-NTY0ZGVlNDQtNDBhNS00OWVlLWJiMWUtNWJiODQ2MWMwZDky"
-          export RELEVANCE_PROJECT_ID="5f222c2f-4035-4f55-93cd-f8e4a1c9e098"
-          export RELEVANCE_REGION="bcbe5a"
+          if [ -z "$RELEVANCE_API_KEY" ]; then
+            echo "⚠️ RELEVANCE_API_KEY not set in GitHub Secrets"
+            echo "Using test mode only - add secrets for full integration"
+            echo "Required secrets: RELEVANCE_API_KEY, RELEVANCE_PROJECT_ID, RELEVANCE_REGION"
+            exit 0
+          fi
           
           echo "✅ Using hardcoded credentials:"
           echo "   API Key: ${RELEVANCE_API_KEY:0:10}..."
@@ -553,13 +559,18 @@ jobs:
           
       - name: Sync agents to Relevance AI
         continue-on-error: true
+        env:
+          RELEVANCE_API_KEY: ${{ secrets.RELEVANCE_API_KEY }}
+          RELEVANCE_PROJECT_ID: ${{ secrets.RELEVANCE_PROJECT_ID }}
+          RELEVANCE_REGION: ${{ secrets.RELEVANCE_REGION }}
         run: |
           echo "Syncing agents to Relevance AI..."
           
-          # Hardcode the credentials for testing
-          export RELEVANCE_API_KEY="sk-NTY0ZGVlNDQtNDBhNS00OWVlLWJiMWUtNWJiODQ2MWMwZDky"
-          export RELEVANCE_PROJECT_ID="5f222c2f-4035-4f55-93cd-f8e4a1c9e098"
-          export RELEVANCE_REGION="bcbe5a"
+          if [ -z "$RELEVANCE_API_KEY" ]; then
+            echo "⚠️ RELEVANCE_API_KEY not set in GitHub Secrets"
+            echo "Skipping agent sync - add secrets to enable"
+            exit 0
+          fi
           
           echo "✅ Using hardcoded credentials:"
           echo "   API Key: ${RELEVANCE_API_KEY:0:10}..."
@@ -600,9 +611,9 @@ jobs:
               }
             ],
             "secrets": {
-              "api_key": "sk-NTY0ZGVlNDQtNDBhNS00OWVlLWJiMWUtNWJiODQ2MWMwZDky",
-              "project_id": "5f222c2f-4035-4f55-93cd-f8e4a1c9e098",
-              "region": "bcbe5a"
+              "api_key": "${{ secrets.RELEVANCE_API_KEY }}",
+              "project_id": "${{ secrets.RELEVANCE_PROJECT_ID }}",
+              "region": "${{ secrets.RELEVANCE_REGION }}"
             }
           }
           EOF

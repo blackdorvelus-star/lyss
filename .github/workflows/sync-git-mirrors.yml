@@ -11,6 +11,9 @@ on:
       - main
       - master
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   sync-mirrors:
     runs-on: ubuntu-latest
@@ -27,26 +30,37 @@ jobs:
         git config --global user.name "GitHub Actions"
         git config --global user.email "actions@github.com"
     
+    - name: Debug - Show secrets (masked)
+      run: |
+        echo "GITEA_USER is set: ${{ secrets.GITEA_USER != '' }}"
+        echo "CODEBERG_USER is set: ${{ secrets.CODEBERG_USER != '' }}"
+    
     - name: Add Gitea remote
       run: |
         git remote add gitea https://${{ secrets.GITEA_USER }}:${{ secrets.GITEA_TOKEN }}@gitea.com/blackdorvelus-star/lyss.git
-        git fetch gitea
+        git config --global user.name "GitHub Actions Bot"
+        git config --global user.email "github-actions@github.com"
+        git fetch gitea --verbose 2>&1 | head -20
     
     - name: Add Codeberg remote
       run: |
         git remote add codeberg https://${{ secrets.CODEBERG_USER }}:${{ secrets.CODEBERG_TOKEN }}@codeberg.org/blackdorvelus-star/lyss.git
-        git fetch codeberg
+        git fetch codeberg --verbose 2>&1 | head -20
     
     - name: Sync from Gitea to GitHub
       run: |
-        git pull gitea main --no-rebase --allow-unrelated-histories || true
+        echo "Pulling from Gitea..."
+        git pull gitea main --no-rebase --allow-unrelated-histories || echo "No changes from Gitea"
+        echo "Pushing to GitHub..."
         git push origin main
         
     - name: Sync from GitHub to Codeberg
       run: |
-        git push codeberg main
+        echo "Pushing to Codeberg..."
+        git push codeberg main || echo "Codeberg push failed"
         
     - name: Cleanup
       run: |
-        git remote remove gitea
-        git remote remove codeberg
+        git remote remove gitea || true
+        git remote remove codeberg || true
+        echo "Workflow completed"

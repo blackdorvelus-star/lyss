@@ -1,0 +1,32 @@
+{
+  "project": "blackdorvelus-star/lyss",
+  "workflows": [
+    {
+      "name": "docs-generation",
+      "description": "Generate documentation on push",
+      "trigger": "push",
+      "agent": "lyss-docs-agent",
+      "actions": [
+        "generate_docs",
+        "update_readme"
+      ],
+      "active": true
+    },
+    {
+      "name": "test-automation",
+      "description": "Run tests on pull request",
+      "trigger": "pull_request",
+      "agent": "lyss-tests-agent",
+      "actions": [
+        "run_tests",
+        "report_coverage"
+      ],
+      "active": true
+    }
+  ],
+  "secrets": {
+    "api_key": "sk-NTY0ZGVlNDQtNDBhNS00OWVlLWJiMWUtNWJiODQ2MWMwZDky",
+    "project_id": "5f222c2f-4035-4f55-93cd-f8e4a1c9e098",
+    "region": "bcbe5a"
+  }
+}

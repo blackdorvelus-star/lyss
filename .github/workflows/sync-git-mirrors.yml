@@ -14,6 +14,9 @@ on:
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
+permissions:
+  contents: write
+
 jobs:
   sync-mirrors:
     runs-on: ubuntu-latest
@@ -23,14 +26,15 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.PERSONAL_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
+        submodules: false
     
     - name: Configure Git
       run: |
-        git config --global user.name "GitHub Actions"
-        git config --global user.email "actions@github.com"
+        git config --global user.name "GitHub Actions Bot"
+        git config --global user.email "github-actions@github.com"
     
-    - name: Debug - Show secrets (masked)
+    - name: Debug - Check secrets
       run: |
         echo "GITEA_USER is set: ${{ secrets.GITEA_USER != '' }}"
         echo "CODEBERG_USER is set: ${{ secrets.CODEBERG_USER != '' }}"
@@ -38,29 +42,53 @@ jobs:
     - name: Add Gitea remote
       run: |
         git remote add gitea https://${{ secrets.GITEA_USER }}:${{ secrets.GITEA_TOKEN }}@gitea.com/blackdorvelus-star/lyss.git
-        git config --global user.name "GitHub Actions Bot"
-        git config --global user.email "github-actions@github.com"
-        git fetch gitea --verbose 2>&1 | head -20
+        git fetch gitea --all --verbose 2>&1 | tail -10
     
     - name: Add Codeberg remote
       run: |
         git remote add codeberg https://${{ secrets.CODEBERG_USER }}:${{ secrets.CODEBERG_TOKEN }}@codeberg.org/blackdorvelus-star/lyss.git
-        git fetch codeberg --verbose 2>&1 | head -20
+        git fetch codeberg --all --verbose 2>&1 | tail -10
     
     - name: Sync from Gitea to GitHub
       run: |
-        echo "Pulling from Gitea..."
-        git pull gitea main --no-rebase --allow-unrelated-histories || echo "No changes from Gitea"
-        echo "Pushing to GitHub..."
-        git push origin main
+        # Determine which branch exists in Gitea
+        echo "Checking available branches in Gitea..."
+        git ls-remote gitea
+        
+        # Try to sync main first, then master as fallback
+        if git rev-parse gitea/main >/dev/null 2>&1; then
+          echo "Found main branch in Gitea"
+          git checkout -b main gitea/main 2>/dev/null || git checkout main 2>/dev/null || true
+          git merge gitea/main --no-ff --no-commit 2>/dev/null || true
+          git push -u origin main --force-with-lease
+        elif git rev-parse gitea/master >/dev/null 2>&1; then
+          echo "Found master branch in Gitea"
+          git checkout -b master gitea/master 2>/dev/null || git checkout master 2>/dev/null || true
+          git merge gitea/master --no-ff --no-commit 2>/dev/null || true
+          git push -u origin master --force-with-lease
+        else
+          echo "No main or master branch found in Gitea"
+          echo "Creating main branch from current state..."
+          git checkout -b main 2>/dev/null || git checkout main 2>/dev/null || true
+          git push -u origin main --force-with-lease
+        fi
         
     - name: Sync from GitHub to Codeberg
       run: |
         echo "Pushing to Codeberg..."
-        git push codeberg main || echo "Codeberg push failed"
+        # Push both branches to Codeberg
+        if git rev-parse origin/main >/dev/null 2>&1; then
+          echo "Pushing main to Codeberg..."
+          git push codeberg main --force-with-lease 2>&1 || echo "Failed to push main to Codeberg"
+        fi
+        
+        if git rev-parse origin/master >/dev/null 2>&1; then
+          echo "Pushing master to Codeberg..."
+          git push codeberg master --force-with-lease 2>&1 || echo "Failed to push master to Codeberg"
+        fi
         
     - name: Cleanup
       run: |
         git remote remove gitea || true
         git remote remove codeberg || true
-        echo "Workflow completed"
+        echo "✅ Workflow completed"

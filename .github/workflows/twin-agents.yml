@@ -1,0 +1,259 @@
+name: Twin.so Agents Sync
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.twin/**'
+      - 'src/**'
+      - 'package.json'
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 2 * * *'  # Daily at 2 AM
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  sync-twin-agents:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Validate Twin agents configuration
+        run: |
+          echo "Validating Twin.so agents configuration..."
+          
+          # Check if .twin directory exists
+          if [ ! -d ".twin" ]; then
+            echo "❌ .twin directory not found"
+            exit 1
+          fi
+          
+          # Check for required agent files
+          REQUIRED_AGENTS=("lyss-docs-agent.yml" "lyss-tests-agent.yml" "lyss-deploy-agent.yml")
+          for agent in "${REQUIRED_AGENTS[@]}"; do
+            if [ ! -f ".twin/$agent" ]; then
+              echo "❌ Missing required agent: $agent"
+              exit 1
+            else
+              echo "✅ Found agent: $agent"
+            fi
+          done
+          
+          # Validate YAML syntax
+          echo "Validating YAML syntax..."
+          for file in .twin/*.yml; do
+            if python3 -c "import yaml; yaml.safe_load(open('$file'))" 2>/dev/null; then
+              echo "✅ Valid YAML: $file"
+            else
+              echo "❌ Invalid YAML: $file"
+              exit 1
+            fi
+          done
+          
+          echo "✅ All Twin agents configuration validated successfully"
+          
+      - name: Generate documentation from agents
+        run: |
+          echo "Generating agent documentation..."
+          
+          # Create docs directory if it doesn't exist
+          mkdir -p docs/agents
+          
+          # Generate README for Twin agents
+          cat > docs/agents/README.md << 'EOF'
+          # Twin.so Agents for Lyss
+          
+          This directory contains configuration for Twin.so agents that automate various aspects of the Lyss project.
+          
+          ## Available Agents
+          
+          1. **lyss-docs-agent** - Automatically generates and maintains documentation
+          2. **lyss-tests-agent** - Runs tests and generates reports
+          3. **lyss-deploy-agent** - Manages automated deployment
+          
+          ## Configuration
+          
+          Each agent is configured in YAML format in the `.twin/` directory.
+          
+          ## Usage
+          
+          These agents are automatically synchronized with Twin.so via GitHub Actions.
+          
+          ### Manual Trigger
+          
+          To manually trigger agent synchronization:
+          
+          ```bash
+          # Via GitHub UI
+          Go to Actions → Twin.so Agents Sync → Run workflow
+          
+          # Via CLI
+          gh workflow run "Twin.so Agents Sync"
+          ```
+          
+          ### Monitoring
+          
+          Agent execution can be monitored in:
+          - GitHub Actions logs
+          - Twin.so dashboard
+          - Slack notifications (if configured)
+          
+          ## Troubleshooting
+          
+          Common issues and solutions:
+          
+          1. **Agent not syncing**: Check GitHub Actions permissions
+          2. **Configuration errors**: Validate YAML syntax
+          3. **Execution failures**: Check agent logs in Twin.so
+          
+          ## Contributing
+          
+          To add a new agent:
+          
+          1. Create a new YAML file in `.twin/`
+          2. Follow the existing schema
+          3. Update this README
+          4. Test the configuration
+          5. Submit a pull request
+          EOF
+          
+          # Generate individual agent documentation
+          for agent_file in .twin/*.yml; do
+            agent_name=$(basename "$agent_file" .yml)
+            
+            # Extract agent description from YAML
+            description=$(grep -A1 "description:" "$agent_file" | tail -1 | sed 's/^[[:space:]]*//' | sed 's/description:[[:space:]]*//')
+            
+            cat > "docs/agents/$agent_name.md" << EOF
+          # $agent_name
+          
+          $description
+          
+          ## Configuration
+          
+          \`\`\`yaml
+          $(cat "$agent_file")
+          \`\`\`
+          
+          ## Triggers
+          
+          \`\`\`yaml
+          $(grep -A10 "triggers:" "$agent_file" | head -11)
+          \`\`\`
+          
+          ## Actions
+          
+          \`\`\`yaml
+          $(grep -A10 "actions:" "$agent_file" | head -11)
+          \`\`\`
+          
+          ## Usage
+          
+          This agent is automatically managed by the Twin.so Agents Sync workflow.
+          
+          ### Manual Execution
+          
+          To manually execute this agent:
+          
+          1. Go to the Twin.so dashboard
+          2. Navigate to the agent
+          3. Click "Run Now"
+          
+          ### Monitoring
+          
+          Execution logs are available in:
+          - Twin.so agent logs
+          - GitHub Actions
+          - Configured notification channels
+          
+          ## Troubleshooting
+          
+          If this agent fails:
+          
+          1. Check the execution logs in Twin.so
+          2. Verify configuration syntax
+          3. Check dependencies and permissions
+          4. Review error messages
+          EOF
+            
+            echo "✅ Generated documentation for: $agent_name"
+          done
+          
+      - name: Commit generated documentation
+        run: |
+          # Configure git
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          # Check if there are changes to commit
+          if git diff --quiet docs/agents; then
+            echo "No documentation changes to commit"
+          else
+            # Add and commit changes
+            git add docs/agents/
+            git commit -m "docs: update Twin agents documentation [skip ci]"
+            
+            # Push changes
+            git push origin HEAD:main
+            echo "✅ Committed and pushed documentation updates"
+          fi
+          
+      - name: Create summary report
+        run: |
+          echo "📊 Twin Agents Sync Summary" >> $GITHUB_STEP_SUMMARY
+          echo "==========================" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Date:** $(date)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Count agents
+          AGENT_COUNT=$(ls -1 .twin/*.yml 2>/dev/null | wc -l)
+          echo "**Agents Configured:** $AGENT_COUNT" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # List agents
+          echo "**Agent List:**" >> $GITHUB_STEP_SUMMARY
+          for agent in .twin/*.yml; do
+            agent_name=$(basename "$agent" .yml)
+            echo "- \`$agent_name\`" >> $GITHUB_STEP_SUMMARY
+          done
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Documentation status
+          echo "**Documentation Generated:**" >> $GITHUB_STEP_SUMMARY
+          if [ -d "docs/agents" ]; then
+            DOC_COUNT=$(ls -1 docs/agents/*.md 2>/dev/null | wc -l)
+            echo "- $DOC_COUNT agent documentation files" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- No documentation directory found" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          echo "✅ Sync completed successfully" >> $GITHUB_STEP_SUMMARY
+          
+      - name: Send notification
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          channel: '#lyss-ci'
+          username: 'Twin Agents Bot'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

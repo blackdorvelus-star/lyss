@@ -1,0 +1,208 @@
+# Agent Twin.so pour Lyss - Déploiement Automatique
+# Version: 1.0
+# Date: 2026-03-31
+
+agent:
+  name: "lyss-deploy-agent"
+  description: "Gère le déploiement automatique de l'application Lyss"
+  version: "1.0.0"
+  
+  # Configuration du modèle
+  model:
+    provider: "openai"
+    model: "gpt-4-turbo"
+    temperature: 0.1
+    max_tokens: 2000
+    
+  # Triggers
+  triggers:
+    - name: "production_deployment"
+      description: "Déploiement en production après validation"
+      conditions:
+        - branch: "main"
+        - tests_passed: true
+        - code_review_approved: true
+        - deployment_approved: true
+        
+    - name: "staging_deployment"
+      description: "Déploiement en staging pour tests"
+      conditions:
+        - branch: "staging"
+        - tests_passed: true
+        
+    - name: "manual_deployment"
+      description: "Déploiement manuel sur demande"
+      
+    - name: "rollback_trigger"
+      description: "Rollback en cas de problème"
+      conditions:
+        - health_check_failed: true
+        - error_rate_threshold_exceeded: 5%
+        - manual_rollback_request: true
+        
+  # Environnements
+  environments:
+    production:
+      url: "https://lyss.app"
+      provider: "vercel"
+      region: "us-east-1"
+      auto_scale: true
+      
+    staging:
+      url: "https://staging.lyss.app"
+      provider: "vercel"
+      region: "us-east-1"
+      
+    development:
+      url: "https://dev.lyss.app"
+      provider: "vercel"
+      region: "us-east-1"
+      
+  # Actions de déploiement
+  actions:
+    - name: "pre_deployment_checks"
+      description: "Vérifications avant déploiement"
+      steps:
+        - check_branch_protection: true
+        - verify_tests_passed: true
+        - check_dependencies: true
+        - validate_build: true
+        - security_scan: true
+        
+    - name: "build_application"
+      description: "Build de l'application"
+      steps:
+        - install_dependencies: "npm ci"
+        - run_build: "npm run build"
+        - optimize_assets: true
+        - generate_build_id: true
+        
+    - name: "deploy_to_environment"
+      description: "Déploiement vers l'environnement cible"
+      steps:
+        - select_environment: "auto"
+        - deploy_command: "vercel --prod"
+        - wait_for_deployment: true
+        - get_deployment_url: true
+        
+    - name: "post_deployment_validation"
+      description: "Validation après déploiement"
+      steps:
+        - health_check: true
+        - smoke_tests: true
+        - performance_check: true
+        - security_scan: true
+        
+    - name: "notify_deployment_status"
+      description: "Notification du statut du déploiement"
+      steps:
+        - send_slack_notification: true
+        - update_deployment_tracker: true
+        - create_deployment_log: true
+        
+    - name: "rollback_procedure"
+      description: "Procédure de rollback"
+      steps:
+        - identify_previous_version: true
+        - execute_rollback: true
+        - verify_rollback: true
+        - notify_rollback: true
+        
+  # Stratégie de déploiement
+  deployment_strategy:
+    type: "blue-green"
+    canary_percentage: 10%
+    canary_duration: "15m"
+    auto_promote: true
+    rollback_on_failure: true
+    
+  # Vérifications de sécurité
+  security_checks:
+    - name: "dependency_vulnerabilities"
+      tool: "npm audit"
+      threshold: "high"
+      fail_on_vulnerability: true
+      
+    - name: "code_scan"
+      tool: "sonarqube"
+      quality_gate: true
+      
+    - name: "secrets_detection"
+      tool: "gitleaks"
+      fail_on_secret: true
+      
+  # Surveillance
+  monitoring:
+    health_checks:
+      - endpoint: "/health"
+        interval: "30s"
+        timeout: "5s"
+        
+    performance_metrics:
+      - response_time: "p95 < 500ms"
+      - error_rate: "< 1%"
+      - availability: "> 99.9%"
+      
+    business_metrics:
+      - active_users: "track"
+      - conversion_rate: "track"
+      - revenue_impact: "alert_on_drop"
+      
+  # Notifications
+  notifications:
+    deployment_started:
+      channels: ["slack", "email"]
+      recipients: ["devops@lyss.com", "team@lyss.com"]
+      
+    deployment_success:
+      channels: ["slack"]
+      recipients: ["team@lyss.com"]
+      
+    deployment_failed:
+      channels: ["slack", "pagerduty"]
+      recipients: ["oncall@lyss.com", "devops@lyss.com"]
+      urgency: "high"
+      
+    rollback_executed:
+      channels: ["slack", "email"]
+      recipients: ["team@lyss.com", "management@lyss.com"]
+      
+  # Plan de reprise d'activité
+  disaster_recovery:
+    backup_frequency: "daily"
+    backup_retention: "30d"
+    rto: "1h"  # Recovery Time Objective
+    rpo: "15m" # Recovery Point Objective
+    
+  # Documentation du déploiement
+  documentation:
+    deployment_playbook: "docs/deployment.md"
+    rollback_procedure: "docs/rollback.md"
+    troubleshooting_guide: "docs/troubleshooting.md"
+    
+  # Métriques et rapports
+  metrics:
+    deployment_frequency: "track"
+    lead_time_for_changes: "track"
+    change_failure_rate: "track"
+    mean_time_to_recovery: "track"
+    
+  # Plan d'amélioration
+  improvement_plan:
+    - goal: "Réduire le temps de déploiement"
+      target: "< 5 minutes"
+      actions:
+        - "Optimiser le pipeline CI/CD"
+        - "Paralléliser les étapes"
+        
+    - goal: "Améliorer la fiabilité"
+      target: "99.99% de succès"
+      actions:
+        - "Implémenter plus de tests automatisés"
+        - "Améliorer la surveillance"
+        
+    - goal: "Automatiser le rollback"
+      target: "Rollback automatique en < 2 minutes"
+      actions:
+        - "Implémenter la détection automatique des anomalies"
+        - "Automatiser la procédure de rollback"
